@@ -34,7 +34,7 @@ export function HeroSection() {
           />
         </div>
 
-        {/* Static Overlay (moved outside parallax container-) */}
+        {/* Static Overlay (moved outside parallax container) */}
         <div className="absolute inset-0 bg-black/40 z-10" />
 
         {/* Content (moved outside parallax container) */}
