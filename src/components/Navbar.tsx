@@ -7,7 +7,8 @@ import NavItem from "@/components/NavItem";
 import NavItemWithSubmenu from "@/components/NavItemWithSubmenu";
 import Submenu from "@/components/Submenu";
 import MobileMenu from "@/components/MobileMenu";
-
+import Image from "next/image";
+import Link from "next/link";
 const Navbar = () => {
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -53,7 +54,15 @@ const Navbar = () => {
       <nav className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <NavItem href="/">Logo</NavItem>
+            <Link href="/">
+              <Image
+                src="/logo.svg"
+                alt="Logo"
+                width={80}
+                height={80}
+                priority
+              />
+            </Link>
           </div>
           <div className="hidden md:flex items-center gap-6 font-semibold">
             <NavItem href="/about">About</NavItem>
