@@ -10,7 +10,7 @@ export default function Custom404() {
       <h1 className="text-2xl text-center">
         404 - Page Not Found
         <span className="text-primary block text-center">
-          Oops! The page you're looking for doesn't exist.
+          Oops&apos; The page you&apos;re looking for doesn&apos;t exist.
         </span>
       </h1>
       <Button asChild className="transition-colors duration-300">
