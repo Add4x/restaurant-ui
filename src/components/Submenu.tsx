@@ -1,4 +1,5 @@
 import React from "react";
+import { menuItems } from "@/data/menuItems";
 
 interface SubmenuProps {
   onItemClick: () => void;
@@ -6,16 +7,6 @@ interface SubmenuProps {
 
 const Submenu = React.forwardRef<HTMLDivElement, SubmenuProps>(
   ({ onItemClick }, ref) => {
-    const submenuItems = [
-      "Breakfast",
-      "Lunch",
-      "Dinner",
-      "Desserts",
-      "Drinks",
-      "Snacks",
-      "Specialties",
-    ];
-
     return (
       <div
         ref={ref}
@@ -23,7 +14,7 @@ const Submenu = React.forwardRef<HTMLDivElement, SubmenuProps>(
       >
         <div className="container mx-auto px-4 py-4">
           <ul className="flex flex-wrap justify-center gap-12">
-            {submenuItems.map((item) => (
+            {menuItems.map((item) => (
               <li key={item} className="w-full sm:w-auto mb-2 sm:mb-0">
                 <button
                   onClick={onItemClick}
