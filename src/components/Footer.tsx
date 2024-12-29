@@ -1,7 +1,11 @@
-import Link from 'next/link'
+import Link from "next/link";
+
 export function Footer() {
   return (
-    <footer id="contact" className="bg-gradient-to-b from-gray-800 to-gray-900 text-gray-300 py-12">
+    <footer
+      id="contact"
+      className="bg-gradient-to-b from-gray-800 to-gray-900 text-gray-300 py-12"
+    >
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {/* Contact Section */}
@@ -11,10 +15,27 @@ export function Footer() {
             </h3>
             <div className="space-y-3">
               <div className="flex flex-row">
-                <span className="flex-none"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 text-primary">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                </svg></span>
+                <span className="flex-none">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-6 text-primary"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                    />
+                  </svg>
+                </span>
                 <div className="flex-1 hover:text-primary transition-colors pl-1">
                   <div className="flex flex-col">
                     <Link
@@ -23,16 +44,32 @@ export function Footer() {
                       rel="noopener noreferrer"
                       className="groupitems-center gap-2 hover:text-primary hover:scale-x-105 transition-all duration-300"
                     >
-                      <p className="transition-colors pl-2 ">11105 State Bridge Rd Suite 140,</p>
-                      <p className="transition-colors pl-2">Alpharetta, GA, United States, 30004</p>
+                      <p className="transition-colors pl-2 ">
+                        11105 State Bridge Rd Suite 140,
+                      </p>
+                      <p className="transition-colors pl-2">
+                        Alpharetta, GA, United States, 30004
+                      </p>
                     </Link>
                   </div>
                 </div>
               </div>
               <p className="flex items-center hover:text-primary transition-colors gap-2">
-                <span className="mr-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 text-primary">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 3.75v4.5m0-4.5h-4.5m4.5 0-6 6m3 12c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z" />
-                </svg>
+                <span className="mr-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-6 text-primary"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M20.25 3.75v4.5m0-4.5h-4.5m4.5 0-6 6m3 12c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z"
+                    />
+                  </svg>
                 </span>
                 <Link
                   href="tel:+8329730740"
@@ -42,11 +79,26 @@ export function Footer() {
                 </Link>
               </p>
               <p className="flex items-center hover:text-white transition-colors gap-2">
-                <span className="mr-2"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6 text-primary">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
-                </svg>
+                <span className="mr-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="size-6 text-primary"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z"
+                    />
+                  </svg>
                 </span>
-                <a href="mailto:Jathara.northamerica@gmail.com" className="hover:underline hover:text-primary hover:scale-x-105 transition-all duration-300">
+                <a
+                  href="mailto:Jathara.northamerica@gmail.com"
+                  className="hover:underline hover:text-primary hover:scale-x-105 transition-all duration-300"
+                >
                   Jathara.northamerica@gmail.com
                 </a>
               </p>
@@ -102,7 +154,6 @@ export function Footer() {
           <p>© {new Date().getFullYear()} Jathara. All rights reserved.</p>
         </div>
       </div>
-    </footer >
-  )
+    </footer>
+  );
 }
-

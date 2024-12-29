@@ -5,6 +5,7 @@ interface SubmenuProps {
   onItemClick: () => void;
 }
 
+// Submenu component
 const Submenu = React.forwardRef<HTMLDivElement, SubmenuProps>(
   ({ onItemClick }, ref) => {
     return (

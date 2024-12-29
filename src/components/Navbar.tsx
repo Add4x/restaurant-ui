@@ -9,6 +9,7 @@ import Submenu from "@/components/submenu";
 import MobileMenu from "@/components/mobile-menu";
 import Image from "next/image";
 import Link from "next/link";
+
 const Navbar = () => {
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
