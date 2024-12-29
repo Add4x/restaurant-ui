@@ -3,12 +3,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import NavItem from "@/components/NavItem";
-import NavItemWithSubmenu from "@/components/NavItemWithSubmenu";
-import Submenu from "@/components/Submenu";
-import MobileMenu from "@/components/MobileMenu";
+import NavItem from "@/components/nav-item";
+import NavItemWithSubmenu from "@/components/nav-item-with-submenu";
+import Submenu from "@/components/submenu";
+import MobileMenu from "@/components/mobile-menu";
 import Image from "next/image";
 import Link from "next/link";
+
 const Navbar = () => {
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -26,6 +27,16 @@ const Navbar = () => {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen((prev) => !prev);
   };
+
+  // close submenu when orientation changes
+  useEffect(() => {
+    window.addEventListener("orientationchange", closeSubmenu);
+    window.addEventListener("resize", closeSubmenu);
+    return () => {
+      window.removeEventListener("orientationchange", closeSubmenu);
+      window.removeEventListener("resize", closeSubmenu);
+    };
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -70,16 +81,29 @@ const Navbar = () => {
             <NavItem href="/contact">Contact</NavItem>
           </div>
           <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
-              <Menu className="h-6 w-6" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMobileMenu}
+              className="[&>svg]:!h-6 [&>svg]:!w-6"
+            >
+              <Menu className="text-primaryDark" />
             </Button>
           </div>
         </div>
       </nav>
-      {isSubmenuOpen && <Submenu ref={submenuRef} onItemClick={closeSubmenu} />}
+      <div
+        className={`transition-all duration-1000 transform ${
+          isSubmenuOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-2 pointer-events-none"
+        }`}
+      >
+        <Submenu ref={submenuRef} onItemClick={closeSubmenu} />
+      </div>
       <MobileMenu
         isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
     </header>
   );
