@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import NavItem from "./NavItem";
+import NavItem from "@/components/NavItem";
 import { subMenuItems } from "@/data/subMenuItems";
 import Link from "next/link";
 import Image from "next/image";
@@ -34,10 +34,14 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
     };
   }, [setIsMobileMenuOpen]);
 
-  if (!isOpen) return null;
+  // if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-background z-50 md:hidden">
+    <div
+      className={`fixed inset-0 bg-background z-50 md:hidden transition-all duration-300 transform ${
+        isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
+      }`}
+    >
       <div className="flex justify-between items-center px-4">
         <Link href="/">
           <Image src="/logo.svg" alt="Logo" width={80} height={80} priority />
