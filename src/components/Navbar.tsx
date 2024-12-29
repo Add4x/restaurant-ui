@@ -84,7 +84,7 @@ const Navbar = () => {
       {isSubmenuOpen && <Submenu ref={submenuRef} onItemClick={closeSubmenu} />}
       <MobileMenu
         isOpen={isMobileMenuOpen}
-        onClose={() => setIsMobileMenuOpen(false)}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
       />
     </header>
   );

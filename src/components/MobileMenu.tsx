@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavItem from "./NavItem";
@@ -10,15 +10,29 @@ import Image from "next/image";
 
 interface MobileMenuProps {
   isOpen: boolean;
-  onClose: () => void;
+  setIsMobileMenuOpen: (isOpen: boolean) => void;
 }
 
-const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
+const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen((prev) => !prev);
   };
+
+  // close menu when orientation changes
+  useEffect(() => {
+    const closeHamburgerMenu = () => {
+      setIsMobileMenuOpen(false);
+      setIsMenuOpen(false);
+    };
+    window.addEventListener("orientationchange", closeHamburgerMenu);
+    window.addEventListener("resize", closeHamburgerMenu);
+    return () => {
+      window.removeEventListener("orientationchange", closeHamburgerMenu);
+      window.removeEventListener("resize", closeHamburgerMenu);
+    };
+  }, []);
 
   if (!isOpen) return null;
 
@@ -31,31 +45,43 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
         <Button
           variant="ghost"
           size="icon"
-          onClick={onClose}
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+            setIsMenuOpen(false);
+          }}
           className="[&>svg]:!h-6 [&>svg]:!w-6"
         >
           <X className="text-primaryDark" />
         </Button>
       </div>
       <nav className="p-4">
-        <ul className="space-y-4">
-          <NavItem href="/" onClick={onClose}>
-            Home
-          </NavItem>
-          <NavItem href="/about" onClick={onClose}>
+        <ul className="flex flex-col list-none items-start font-semibold">
+          <NavItem
+            href="/about"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              setIsMenuOpen(false);
+            }}
+          >
             About
           </NavItem>
           <li>
-            <button onClick={toggleMenu} className="w-full text-left py-2">
+            <button
+              onClick={toggleMenu}
+              className="text-left text-primaryDark border-b-2 border-transparent hover:scale-x-105 hover:border-b-2 hover:border-primary transition-all duration-300"
+            >
               Menu
             </button>
             {isMenuOpen && (
-              <ul className="pl-4 mt-2 space-y-2">
+              <ul className="pl-4 flex flex-col items-start">
                 {subMenuItems.map((item) => (
                   <NavItem
                     key={item}
                     href={`/menu/${item.toLowerCase()}`}
-                    onClick={onClose}
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setIsMenuOpen(false);
+                    }}
                   >
                     {item}
                   </NavItem>
@@ -63,11 +89,14 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
               </ul>
             )}
           </li>
-          <NavItem href="/contact" onClick={onClose}>
+          <NavItem
+            href="/contact"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+              setIsMenuOpen(false);
+            }}
+          >
             Contact
-          </NavItem>
-          <NavItem href="/faq" onClick={onClose}>
-            FAQ
           </NavItem>
         </ul>
       </nav>
