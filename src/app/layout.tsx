@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Open_Sans } from "next/font/google";
 import "./globals.css";
-import { Footer } from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import { Footer } from "@/components/footer";
+import Navbar from "@/components/navbar";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import NavItem from "@/components/NavItem";
-import { subMenuItems } from "@/data/subMenuItems";
+import NavItem from "@/components/nav-item";
+import { subMenuItems } from "@/data/submenu-items";
 import Link from "next/link";
 import Image from "next/image";
 

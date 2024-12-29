@@ -1,5 +1,5 @@
 import React from "react";
-import { subMenuItems } from "@/data/subMenuItems";
+import { subMenuItems } from "@/data/submenu-items";
 
 interface SubmenuProps {
   onItemClick: () => void;
