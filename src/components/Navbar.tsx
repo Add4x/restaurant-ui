@@ -70,8 +70,13 @@ const Navbar = () => {
             <NavItem href="/contact">Contact</NavItem>
           </div>
           <div className="md:hidden">
-            <Button variant="ghost" size="icon" onClick={toggleMobileMenu}>
-              <Menu className="h-6 w-6" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMobileMenu}
+              className="[&>svg]:!h-6 [&>svg]:!w-6"
+            >
+              <Menu className="text-primaryDark" />
             </Button>
           </div>
         </div>

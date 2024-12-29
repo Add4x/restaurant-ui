@@ -1,4 +1,4 @@
-export const menuItems = [
+export const subMenuItems = [
   "Breakfast",
   "Lunch",
   "Dinner",
@@ -8,4 +8,4 @@ export const menuItems = [
   "Specialties",
 ] as const;
 
-export type MenuItem = (typeof menuItems)[number];
+export type SubMenuItem = (typeof subMenuItems)[number];

@@ -4,7 +4,9 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavItem from "./NavItem";
-import { menuItems } from "@/data/menuItems";
+import { subMenuItems } from "@/data/subMenuItems";
+import Link from "next/link";
+import Image from "next/image";
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -22,9 +24,17 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
 
   return (
     <div className="fixed inset-0 bg-background z-50 md:hidden">
-      <div className="flex justify-end p-4">
-        <Button variant="ghost" size="icon" onClick={onClose}>
-          <X className="h-6 w-6" />
+      <div className="flex justify-between items-center px-4">
+        <Link href="/">
+          <Image src="/logo.svg" alt="Logo" width={80} height={80} priority />
+        </Link>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          className="[&>svg]:!h-6 [&>svg]:!w-6"
+        >
+          <X className="text-primaryDark" />
         </Button>
       </div>
       <nav className="p-4">
@@ -41,7 +51,7 @@ const MobileMenu = ({ isOpen, onClose }: MobileMenuProps) => {
             </button>
             {isMenuOpen && (
               <ul className="pl-4 mt-2 space-y-2">
-                {menuItems.map((item) => (
+                {subMenuItems.map((item) => (
                   <NavItem
                     key={item}
                     href={`/menu/${item.toLowerCase()}`}
