@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavItem from "./NavItem";
@@ -32,7 +32,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
       window.removeEventListener("orientationchange", closeHamburgerMenu);
       window.removeEventListener("resize", closeHamburgerMenu);
     };
-  }, []);
+  }, [setIsMobileMenuOpen]);
 
   if (!isOpen) return null;
 
