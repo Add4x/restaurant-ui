@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { type MenuItem } from "@/lib/types"
-import { Badge } from "@/components/ui/badge"
+// import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 interface MenuItemCardProps {
@@ -12,17 +12,17 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     <div className="bg-gray-100 rounded-lg overflow-hidden">
       <div className="relative aspect-square">
         <Image
-          src={item.image}
-          alt={item.title}
+          src={item.image_url}
+          alt={item.name}
           fill
           className="object-cover"
         />
       </div>
       <div className="p-4">
-        <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
-        <p className="text-gray-600 text-sm mb-3">{item.description}</p>
+        <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
+        <p className="text-gray-600 text-sm mb-3">{item.short_description}</p>
         <div className="flex items-center justify-between mb-3">
-          <div className="flex gap-2">
+          {/* <div className="flex gap-2">
             {item.isVeg && (
               <Badge variant="secondary" className="bg-green-500/10 text-green-500">
                 veg
@@ -33,9 +33,9 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
                 non-veg
               </Badge>
             )}
-          </div>
+          </div> */}
           <span className="text-sm font-medium">
-            ${item.price_from.toFixed(2)} - ${item.price_to.toFixed(2)}
+            ${item.base_price.toFixed(2)} - ${item.max_price.toFixed(2)}
           </span>
         </div>
         <Button className="w-full bg-orange-500 hover:bg-orange-600">

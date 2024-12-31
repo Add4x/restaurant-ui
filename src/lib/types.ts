@@ -21,6 +21,7 @@ export const menuItemSchema = z.object({
   short_description: z.string(),
   has_protein_options: z.boolean(),
   category_name: z.string(),
+  image_url: z.string(),
   menu_item_proteins: z.array(menuItemProteinSchema),
 })
 

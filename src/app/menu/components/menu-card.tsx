@@ -12,31 +12,31 @@ export function MenuCard({ item }: MenuCardProps) {
     <Card className="overflow-hidden bg-black/5 backdrop-blur-sm border-zinc-800">
       <div className="aspect-square relative">
         <Image
-          src={item.image}
-          alt={item.title}
+          src={item.image_url || '/default-menu-item.jpg'}
+          alt={item.name}
           fill
           className="object-cover"
         />
       </div>
       <CardHeader>
-        <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
+        <CardTitle className="text-xl font-bold">{item.name}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-zinc-400 mb-4">{item.description}</p>
+        <p className="text-sm text-zinc-400 mb-4">{item.short_description}</p>
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
-            {item.isVeg && (
+            {item.has_protein_options && (
               <Badge variant="secondary" className="bg-green-500/10 text-green-500">
                 veg
               </Badge>
             )}
-            {item.isNonVeg && (
+            {item.has_protein_options && (
               <Badge variant="secondary" className="bg-orange-500/10 text-orange-500">
                 Non-veg
               </Badge>
             )}
           </div>
-          <p className="text-lg font-bold text-green-500">${item.price.toFixed(2)}</p>
+          <p className="text-lg font-bold text-green-500">${item.base_price.toFixed(2)}</p>
         </div>
       </CardContent>
     </Card>
