@@ -4,13 +4,15 @@ import { useState, useRef, useEffect } from "react";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavItem from "@/components/nav-item";
-import NavItemWithSubmenu from "@/components/nav-item-with-submenu";
+import { NavItemWithSubmenu } from "@/components/nav-item-with-submenu";
 import Submenu from "@/components/submenu";
 import MobileMenu from "@/components/mobile-menu";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const router = useRouter();
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const submenuRef = useRef<HTMLDivElement>(null);
@@ -57,6 +59,16 @@ const Navbar = () => {
     };
   }, [isSubmenuOpen]);
 
+  const handleMenuClick = () => {
+    // Toggle submenu
+    toggleSubmenu();
+
+    // Navigate to menu page after a short delay
+    setTimeout(() => {
+      router.push('/menu');
+    }, 200); // 200ms delay, adjust as needed
+  };
+
   return (
     <header
       ref={navbarRef}
@@ -65,7 +77,7 @@ const Navbar = () => {
       <nav className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link href="/">
+            <Link href="/" onClick={closeSubmenu}>
               <Image
                 src="/logo.svg"
                 alt="Logo"
@@ -76,9 +88,13 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-6 font-semibold">
-            <NavItem href="/about">About</NavItem>
-            <NavItemWithSubmenu label="Menu" onClick={toggleSubmenu} />
-            <NavItem href="/contact">Contact</NavItem>
+            <NavItem href="/about" onClick={closeSubmenu}>About</NavItem>
+            <NavItemWithSubmenu
+              label="Menu"
+              onClick={handleMenuClick}
+              href="/menu"
+            />
+            <NavItem href="/contact" onClick={closeSubmenu}>Contact</NavItem>
           </div>
           <div className="md:hidden">
             <Button
@@ -93,11 +109,10 @@ const Navbar = () => {
         </div>
       </nav>
       <div
-        className={`transition-all duration-1000 transform ${
-          isSubmenuOpen
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 -translate-y-2 pointer-events-none"
-        }`}
+        className={`transition-all duration-1000 transform ${isSubmenuOpen
+          ? "opacity-100 translate-y-0"
+          : "opacity-0 -translate-y-2 pointer-events-none"
+          }`}
       >
         <Submenu ref={submenuRef} onItemClick={closeSubmenu} />
       </div>

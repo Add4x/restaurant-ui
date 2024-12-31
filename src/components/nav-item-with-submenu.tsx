@@ -1,19 +1,19 @@
+
 interface NavItemWithSubmenuProps {
   label: string;
-  onClick: () => void;
+  onClick: (event: React.MouseEvent) => void;
+  href: string;
 }
 
-const NavItemWithSubmenu = ({ label, onClick }: NavItemWithSubmenuProps) => {
+export function NavItemWithSubmenu({ label, onClick }: NavItemWithSubmenuProps) {
   return (
-    <li className="text-foreground transition-colors list-none">
+    <div>
       <button
         onClick={onClick}
-        className="text-primaryDark border-b-2 border-transparent hover:border-primary hover:scale-x-105 hover:border-b-2 transition-all duration-300 focus:outline-none"
+        className="text-primaryDark border-b-2 border-transparent hover:scale-x-105 hover:border-b-2 hover:border-primary transition-all duration-300"
       >
         {label}
       </button>
-    </li>
+    </div >
   );
-};
-
-export default NavItemWithSubmenu;
+}
