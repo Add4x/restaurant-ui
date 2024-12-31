@@ -1,15 +1,21 @@
 import { getMenuItemsByCategory } from "@/actions/menu"
 import { MenuItemCard } from "@/app/menu/components/menu-item-card"
 import { notFound } from "next/navigation"
-
+import { subMenuItems } from "@/data/submenu-items"
 export default async function CategoryPage({
   params,
 }: {
   params: Promise<{ slug: string }>
 }) {
   const slug = (await params).slug
-  const items = await getMenuItemsByCategory(slug)
 
+  // get the value from subMenuItems and use it to get the categoryId from subMenuItemMap
+  const categoryId = subMenuItems[slug as keyof typeof subMenuItems]
+
+  console.log(`categoryId: ${JSON.stringify(categoryId)}`)
+  console.log(`slug: ${slug}`)
+
+  const items = await getMenuItemsByCategory(categoryId)
   const storage_url = process.env.SUPABASE_STORAGE_URL
 
   // append the image_url to each item

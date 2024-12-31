@@ -177,7 +177,7 @@ export type Database = {
     Functions: {
       get_menu_items_by_category: {
         Args: {
-          category_id: string
+          input_category_id: string
         }
         Returns: {
           id: string
