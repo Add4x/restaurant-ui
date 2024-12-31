@@ -11,6 +11,7 @@ interface CategoryPageProps {
 
 export default async function CategoryPage({
   params,
+  _searchParams
 }: CategoryPageProps) {
   const items = await getMenuItemsByCategory(params.slug)
 
@@ -33,4 +34,3 @@ export default async function CategoryPage({
     </div>
   )
 }
-
