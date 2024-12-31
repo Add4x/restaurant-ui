@@ -17,6 +17,8 @@ export type Database = {
           is_active: boolean | null
           name: string
           updated_at: string | null
+          image_url: string | null
+          description: string | null
         }
         Insert: {
           created_at?: string | null
@@ -25,6 +27,8 @@ export type Database = {
           is_active?: boolean | null
           name: string
           updated_at?: string | null
+          image_url?: string | null
+          description?: string | null
         }
         Update: {
           created_at?: string | null
@@ -33,6 +37,8 @@ export type Database = {
           is_active?: boolean | null
           name?: string
           updated_at?: string | null
+          image_url?: string | null
+          description?: string | null
         }
         Relationships: []
       }

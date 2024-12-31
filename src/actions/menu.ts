@@ -1,42 +1,22 @@
 'use server'
 
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { MenuItem } from '@/lib/types'
+import { Category, MenuItem } from '@/lib/types'
 
-// export async function getMenuItems(): Promise<MenuItem[]> {
-//   const supabase = createServerSupabaseClient()
+// get categories ordered by display_order with selected fields
+export async function getCategories(): Promise<Category[]> {
+  const supabase = createServerSupabaseClient()
+  const { data, error } = await supabase.from('menu_categories').select('id, name, display_order, description, image_url').order('display_order', { ascending: true })
+  if (error) throw new Error('Failed to fetch categories')
 
-//   const { data, error } = await supabase
-//     .from('menu_items')
-//     .select(`
-//       *,
-//       menu_item_proteins (
-//         protein_options (*)
-//       )
-//     `)
-
-//   if (error) {
-//     console.error('Error fetching menu items:', error)
-//     throw new Error('Failed to fetch menu items')
-//   }
-
-//   return data
-// }
-
-// export async function getCategories(): Promise<Category[]> {
-//   const supabase = createServerSupabaseClient()
-
-//   const { data, error } = await supabase
-//     .from('categories')
-//     .select('*')
-
-//   if (error) {
-//     console.error('Error fetching categories:', error)
-//     throw new Error('Failed to fetch categories')
-//   }
-
-//   return data
-// }
+  // return data
+  return data.map((category) => ({
+    ...category,
+    description: category.description ?? '',
+    image_url: category.image_url ?? '',
+    display_order: category.display_order ?? 0
+  }))
+}
 
 export async function getMenuItemsByCategory(categoryId: string): Promise<MenuItem[]> {
   const supabase = createServerSupabaseClient()
@@ -54,19 +34,3 @@ export async function getMenuItemsByCategory(categoryId: string): Promise<MenuIt
     menu_item_proteins: JSON.parse(item.menu_item_proteins as string)
   }))
 }
-
-// export async function getMenuItemsByName(itemName: string): Promise<MenuItem[]> {
-//   const supabase = createServerSupabaseClient()
-
-//   const { data, error } = await supabase
-//     .rpc('get_menu_items_by_category', {
-//       : itemName
-// })
-
-// if (error) {
-//   console.error('Error fetching menu item:', error)
-//   throw new Error('Failed to fetch menu item')
-// }
-
-// return data
-// } 

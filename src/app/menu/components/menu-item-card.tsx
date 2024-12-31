@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { type MenuItem } from "@/lib/types"
-// import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 
 interface MenuItemCardProps {
@@ -22,18 +22,23 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
         <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
         <p className="text-gray-600 text-sm mb-3">{item.short_description}</p>
         <div className="flex items-center justify-between mb-3">
-          {/* <div className="flex gap-2">
-            {item.isVeg && (
-              <Badge variant="secondary" className="bg-green-500/10 text-green-500">
-                veg
-              </Badge>
+          <div className="flex gap-2">
+            {item.has_protein_options && (
+              // check if any protein options are vegetarian or non-veg
+              item.menu_item_proteins.some((protein) => protein.protein_options.is_vegetarian) && (
+                <Badge variant="secondary" className="bg-green-500/10 text-green-500">
+                  veg
+                </Badge>
+              )
             )}
-            {item.isNonVeg && (
+          </div>
+          {item.has_protein_options && (
+            item.menu_item_proteins.some((protein) => !protein.protein_options.is_vegetarian) && (
               <Badge variant="secondary" className="bg-orange-500/10 text-orange-500">
                 non-veg
               </Badge>
-            )}
-          </div> */}
+            )
+          )}
           <span className="text-sm font-medium">
             ${item.base_price.toFixed(2)} - ${item.max_price.toFixed(2)}
           </span>

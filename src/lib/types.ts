@@ -29,9 +29,9 @@ export const menuItemSchema = z.object({
 export const categorySchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  slug: z.string(),
+  display_order: z.number(),
   description: z.string(),
-  image: z.string(),
+  image_url: z.string(),
 })
 
 // Type exports

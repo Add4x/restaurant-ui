@@ -10,6 +10,13 @@ export default async function CategoryPage({
   const slug = (await params).slug
   const items = await getMenuItemsByCategory(slug)
 
+  const storage_url = process.env.SUPABASE_STORAGE_URL
+
+  // append the image_url to each item
+  items.forEach((item) => {
+    item.image_url = `${storage_url}${item.image_url}`
+  })
+
   if (!items.length) {
     notFound()
   }
