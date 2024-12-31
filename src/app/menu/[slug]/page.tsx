@@ -6,12 +6,11 @@ interface CategoryPageProps {
   params: {
     slug: string
   }
-  searchParams: { [key: string]: string | string[] | undefined }
+  searchParams?: { [key: string]: string | string[] | undefined }
 }
 
 export default async function CategoryPage({
   params,
-  _searchParams
 }: CategoryPageProps) {
   const items = await getMenuItemsByCategory(params.slug)
 
