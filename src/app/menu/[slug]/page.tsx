@@ -2,18 +2,13 @@ import { getMenuItemsByCategory } from "@/actions/menu"
 import { MenuItemCard } from "@/app/menu/components/menu-item-card"
 import { notFound } from "next/navigation"
 
-interface CategoryPageProps {
-  params: {
-    slug: Promise<{ slug: string }>,
-  }
-  searchParams?: { [key: string]: string | string[] | undefined }
-}
-
 export default async function CategoryPage({
   params,
-}: CategoryPageProps) {
+}: {
+  params: Promise<{ slug: string }>
+}) {
   const slug = (await params).slug
-  const items = await getMenuItemsByCategory({ slug })
+  const items = await getMenuItemsByCategory(slug)
 
   if (!items.length) {
     notFound()
