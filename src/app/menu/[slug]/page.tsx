@@ -16,11 +16,13 @@ export default async function CategoryPage({
   console.log(`slug: ${slug}`)
 
   const items = await getMenuItemsByCategory(categoryId)
+
+  console.log(`########################## items: ${JSON.stringify(items)}`)
   const storage_url = process.env.SUPABASE_STORAGE_URL
 
   // append the image_url to each item
   items.forEach((item) => {
-    item.image_url = `${storage_url}${item.image_url}`
+    item.image_url = `${storage_url}/${item.image_url}`
   })
 
   if (!items.length) {

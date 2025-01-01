@@ -25,8 +25,8 @@ interface MenuItemView {
   max_price: number;
   short_description: string;
   has_protein_options: boolean;
-  category_name: string;
   image_url: string;
+  category_name: string;
   menu_item_proteins: Array<{
     protein_options: {
       name: string;
