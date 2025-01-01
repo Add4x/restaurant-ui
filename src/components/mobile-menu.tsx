@@ -38,9 +38,8 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
 
   return (
     <div
-      className={`fixed inset-0 bg-background z-50 md:hidden transition-all duration-300 transform ${
-        isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
-      }`}
+      className={`fixed inset-0 bg-background z-50 md:hidden transition-all duration-300 transform ${isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
+        }`}
     >
       <div className="flex justify-between items-center px-4">
         <Link href="/">
@@ -78,7 +77,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
             </button>
             {isMenuOpen && (
               <ul className="pl-4 flex flex-col items-start">
-                {subMenuItems.map((item) => (
+                {Object.keys(subMenuItems).map((item) => (
                   <NavItem
                     key={item}
                     href={`/menu/${item.toLowerCase()}`}

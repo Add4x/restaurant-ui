@@ -11,7 +11,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
     <div className="bg-gray-100 rounded-lg overflow-hidden">
       <div className="relative aspect-square">
         <Image
-          src={category.image}
+          src={category.image_url}
           alt={category.name}
           fill
           className="object-cover"
@@ -21,7 +21,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
         <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
         <p className="text-gray-600 mb-4">{category.description}</p>
         <Link
-          href={`/menu/${category.slug}`}
+          href={`/menu/${category.id}`}
           className="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors"
         >
           View all {category.name.toLowerCase()}
