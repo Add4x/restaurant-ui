@@ -1,7 +1,6 @@
-"use client"
+"use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 interface NavItemProps {
   href: string;
@@ -11,23 +10,25 @@ interface NavItemProps {
 }
 
 const NavItem = ({ href, children, onClick, className }: NavItemProps) => {
-  const router = useRouter();
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (onClick) {
-      onClick();
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const elementId = href.substring(1);
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
     }
-    setTimeout(() => {
-      router.push(href);
-    }, 300);
+    onClick?.();
   };
 
   return (
     <Link
       href={href}
       onClick={handleClick}
-      className={`text-primaryDark border-b-2 border-transparent hover:scale-x-105 hover:border-b-2 hover:border-primary transition-all duration-300 ${className || ''}`}
+      className={`text-primaryDark border-b-2 border-transparent hover:scale-x-105 hover:border-b-2 hover:border-primary transition-all duration-300 ${
+        className || ""
+      }`}
     >
       {children}
     </Link>
