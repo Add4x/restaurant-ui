@@ -1,11 +1,13 @@
-
 interface NavItemWithSubmenuProps {
   label: string;
   onClick: (event: React.MouseEvent) => void;
   href: string;
 }
 
-export function NavItemWithSubmenu({ label, onClick }: NavItemWithSubmenuProps) {
+export function NavItemWithSubmenu({
+  label,
+  onClick,
+}: NavItemWithSubmenuProps) {
   return (
     <div>
       <button
@@ -14,6 +16,6 @@ export function NavItemWithSubmenu({ label, onClick }: NavItemWithSubmenuProps) 
       >
         {label}
       </button>
-    </div >
+    </div>
   );
 }

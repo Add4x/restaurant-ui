@@ -1,48 +1,106 @@
-import Image from "next/image"
-import { type MenuItem } from "@/lib/types"
-// import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import Image from "next/image";
+import { type MenuItem } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
+// import { Button } from "@/components/ui/button";
 
 interface MenuItemCardProps {
-  item: MenuItem
+  item: MenuItem;
 }
 
 export function MenuItemCard({ item }: MenuItemCardProps) {
+  // Memoize these calculations to avoid recalculating on every render
+  const hasVegetarianOptions =
+    item.has_protein_options &&
+    item.menu_item_proteins.some(
+      (protein) => protein.protein_options.is_vegetarian
+    );
+
+  const hasNonVegetarianOptions =
+    item.has_protein_options &&
+    item.menu_item_proteins.some(
+      (protein) => !protein.protein_options.is_vegetarian
+    );
+
   return (
     <div className="bg-gray-100 rounded-lg overflow-hidden">
-      <div className="relative aspect-square">
-        <Image
-          src={item.image_url}
-          alt={item.name}
-          fill
-          className="object-cover"
-        />
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
-        <p className="text-gray-600 text-sm mb-3">{item.short_description}</p>
-        <div className="flex items-center justify-between mb-3">
-          {/* <div className="flex gap-2">
-            {item.isVeg && (
-              <Badge variant="secondary" className="bg-green-500/10 text-green-500">
-                veg
-              </Badge>
-            )}
-            {item.isNonVeg && (
-              <Badge variant="secondary" className="bg-orange-500/10 text-orange-500">
-                non-veg
-              </Badge>
-            )}
-          </div> */}
-          <span className="text-sm font-medium">
-            ${item.base_price.toFixed(2)} - ${item.max_price.toFixed(2)}
+      <div className="flex flex-row items-center justify-start gap-2">
+        <div className="relative aspect-square self-start h-[6rem] w-[8rem]">
+          <Image
+            src={item.image_url}
+            alt={item.image_alt_text}
+            fill
+            sizes="(max-width: 768px) 8rem, 6rem"
+            className="object-cover"
+          />
+        </div>
+        <div className="flex flex-col items-start justify-start self-start basis-2/3">
+          <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
+          <div className="flex justify-between mb-3 gap-2 self-ends">
+            <div className="flex gap-2">
+              {hasVegetarianOptions && (
+                <Badge
+                  variant="secondary"
+                  className="bg-green-500/10 hover:bg-green-500/10 text-green-700"
+                >
+                  veg
+                </Badge>
+              )}
+              {hasNonVegetarianOptions && (
+                <Badge
+                  variant="secondary"
+                  className="bg-primary/20 hover:bg-primary/20 text-primaryDark"
+                >
+                  non-veg
+                </Badge>
+              )}
+            </div>
+          </div>
+          <span className="text-sm font-medium mx-2">
+            ${item.base_price.toFixed(2)}
+            {item.base_price !== item.max_price &&
+              ` - $${item.max_price.toFixed(2)}`}
           </span>
         </div>
-        <Button className="w-full bg-orange-500 hover:bg-orange-600">
+      </div>
+
+      <div className="p-4">
+        <div className="flex flex-col items-start justify-start gap-2">
+          <p className="text-xs text-gray-700 mb-2">{item.short_description}</p>
+          {item.has_protein_options && (
+            <div className="flex flex-col items-start justify-start gap-2">
+              <h4 className="text-xs font-norma">Available in</h4>
+              {item.has_protein_options && (
+                <div className="flex flex-row items-center justify-start gap-2 flex-wrap">
+                  {item.menu_item_proteins.map((protein) => (
+                    <Badge
+                      key={protein.protein_options.name}
+                      variant="secondary"
+                      className={`${
+                        protein.protein_options.is_vegetarian
+                          ? "bg-green-500/10 hover:bg-green-500/10 text-green-700"
+                          : "bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark"
+                      } flex items-center gap-1.5`}
+                    >
+                      <span>{protein.protein_options.name}</span>
+                      <span className="text-gray-500/70">|</span>
+                      <span className="text-xs">
+                        $
+                        {(
+                          item.base_price +
+                          protein.protein_options.price_addition
+                        ).toFixed(2)}
+                      </span>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        {/* <Button className="w-full bg-orange-500 hover:bg-orange-600">
           Order Now
-        </Button>
+        </Button> */}
       </div>
     </div>
-  )
+  );
 }
-

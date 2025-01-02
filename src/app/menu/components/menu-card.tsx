@@ -1,45 +1,37 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import Image from "next/image"
-import { type MenuItem } from "@/lib/types"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Image from "next/image";
+import { Category } from "@/lib/types";
+import { Divider } from "@/components/divider";
+import { Button } from "@/components/ui/button";
 
 interface MenuCardProps {
-  item: MenuItem
+  item: Category;
 }
 
 export function MenuCard({ item }: MenuCardProps) {
   return (
-    <Card className="overflow-hidden bg-black/5 backdrop-blur-sm border-zinc-800">
-      <div className="aspect-square relative">
-        <Image
-          src={item.image_url || '/default-menu-item.jpg'}
-          alt={item.name}
-          fill
-          className="object-cover"
-        />
-      </div>
-      <CardHeader>
-        <CardTitle className="text-xl font-bold">{item.name}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-sm text-zinc-400 mb-4">{item.short_description}</p>
-        <div className="flex items-center justify-between">
-          <div className="flex gap-2">
-            {item.has_protein_options && (
-              <Badge variant="secondary" className="bg-green-500/10 text-green-500">
-                veg
-              </Badge>
-            )}
-            {item.has_protein_options && (
-              <Badge variant="secondary" className="bg-orange-500/10 text-orange-500">
-                Non-veg
-              </Badge>
-            )}
-          </div>
-          <p className="text-lg font-bold text-green-500">${item.base_price.toFixed(2)}</p>
+    <Card className="overflow-hidden backdrop-blur-sm md:mt-4">
+      <div className="flex flex-col">
+        <div className="relative w-full h-[12.5rem]">
+          <Image
+            src={item.image_url || "/default-menu-item.jpg"}
+            alt={item.image_alt_text}
+            fill
+            sizes="(max-width: 768px) 100vw, 50vw"
+            className="object-cover"
+          />
         </div>
-      </CardContent>
+        <CardHeader className="flex flex-col py-2 ">
+          <CardTitle className="text-xl font-bold text-primaryDark">
+            {item.name}
+          </CardTitle>
+        </CardHeader>
+        <Divider />
+        <CardContent className="py-2 flex flex-col justify-around mb-2">
+          <p className="text-sm text-gray-700 mb-2">{item.description}</p>
+          <Button className="self-start">View More</Button>
+        </CardContent>
+      </div>
     </Card>
-  )
+  );
 }
-

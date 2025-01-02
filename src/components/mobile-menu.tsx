@@ -34,8 +34,6 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
     };
   }, [setIsMobileMenuOpen]);
 
-  // if (!isOpen) return null;
-
   return (
     <div
       className={`fixed inset-0 bg-background z-50 md:hidden transition-all duration-300 transform ${
@@ -59,7 +57,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
         </Button>
       </div>
       <nav className="p-4">
-        <ul className="flex flex-col list-none items-start font-semibold">
+        <ul className="flex flex-col list-none items-start font-semibold gap-2">
           <NavItem
             href="/about"
             onClick={() => {
@@ -78,7 +76,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
             </button>
             {isMenuOpen && (
               <ul className="pl-4 flex flex-col items-start">
-                {subMenuItems.map((item) => (
+                {Object.keys(subMenuItems).map((item) => (
                   <NavItem
                     key={item}
                     href={`/menu/${item.toLowerCase()}`}
