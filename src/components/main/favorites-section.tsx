@@ -18,8 +18,8 @@ interface FavoritesSectionProps {
 
 export function FavoritesSection({ items }: FavoritesSectionProps) {
   return (
-    <section className="py-8 md:py-12">
-      <div className="container mx-auto px-4">
+    <section className="container py-8 md:py-12">
+      <div className="mx-auto px-8 md:px-12">
         <h2 className="text-3xl font-bold text-center mb-6 font-playfair text-primaryDark">
           Our Favorites
         </h2>
