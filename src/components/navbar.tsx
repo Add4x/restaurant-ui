@@ -65,7 +65,7 @@ const Navbar = () => {
 
     // Navigate to menu page after a short delay
     setTimeout(() => {
-      router.push('/menu');
+      router.push("/menu");
     }, 200); // 200ms delay, adjust as needed
   };
 
@@ -88,13 +88,17 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-6 font-semibold">
-            <NavItem href="/about" onClick={closeSubmenu}>About</NavItem>
+            <NavItem href="/about" onClick={closeSubmenu}>
+              About
+            </NavItem>
             <NavItemWithSubmenu
               label="Menu"
               onClick={handleMenuClick}
               href="/menu"
             />
-            <NavItem href="/contact" onClick={closeSubmenu}>Contact</NavItem>
+            <NavItem href="#contact" onClick={closeSubmenu}>
+              Contact
+            </NavItem>
           </div>
           <div className="md:hidden">
             <Button
@@ -109,10 +113,11 @@ const Navbar = () => {
         </div>
       </nav>
       <div
-        className={`transition-all duration-1000 transform ${isSubmenuOpen
-          ? "opacity-100 translate-y-0"
-          : "opacity-0 -translate-y-2 pointer-events-none"
-          }`}
+        className={`transition-all duration-1000 transform ${
+          isSubmenuOpen
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-2 pointer-events-none"
+        }`}
       >
         <Submenu ref={submenuRef} onItemClick={closeSubmenu} />
       </div>
