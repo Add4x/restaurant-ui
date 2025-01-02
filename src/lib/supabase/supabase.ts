@@ -95,6 +95,8 @@ export type Database = {
           has_protein_options: boolean | null;
           id: string;
           image_url: string | null;
+          image_alt_text: string | null;
+          is_favorite: boolean | null;
           is_available: boolean | null;
           is_spicy: boolean | null;
           name: string;
@@ -112,7 +114,9 @@ export type Database = {
           has_protein_options?: boolean | null;
           id?: string;
           image_url?: string | null;
+          image_alt_text?: string | null;
           is_available?: boolean | null;
+          is_favorite?: boolean | null;
           is_spicy?: boolean | null;
           name: string;
           preparation_time?: number | null;
@@ -129,8 +133,10 @@ export type Database = {
           has_protein_options?: boolean | null;
           id?: string;
           image_url?: string | null;
+          image_alt_text?: string | null;
           is_available?: boolean | null;
           is_spicy?: boolean | null;
+          is_favorite?: boolean | null;
           name?: string;
           preparation_time?: number | null;
           short_description?: string | null;

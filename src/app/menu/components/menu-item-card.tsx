@@ -22,7 +22,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     );
 
   return (
-    <div className="bg-gray-100 rounded-lg overflow-hidden">
+    <div className="bg-gray-100 rounded-lg overflow-hidden shadow-md">
       <div className="flex flex-row items-center justify-start gap-2">
         <div className="relative aspect-square self-start h-[6rem] w-[8rem]">
           <Image
@@ -57,7 +57,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
           </div>
           <span className="text-sm font-medium mx-2">
             ${item.base_price.toFixed(2)}
-            {item.base_price !== item.max_price &&
+            {item.menu_item_proteins.length > 1 &&
               ` - $${item.max_price.toFixed(2)}`}
           </span>
         </div>
@@ -66,32 +66,39 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
       <div className="p-4">
         <div className="flex flex-col items-start justify-start gap-2">
           <p className="text-xs text-gray-700 mb-2">{item.short_description}</p>
-          {item.has_protein_options && (
+          {item.has_protein_options && item.menu_item_proteins.length > 1 && (
             <div className="flex flex-col items-start justify-start gap-2">
-              <h4 className="text-xs font-norma">Available in</h4>
+              <h4 className="text-xs">Available in</h4>
               {item.has_protein_options && (
                 <div className="flex flex-row items-center justify-start gap-2 flex-wrap">
-                  {item.menu_item_proteins.map((protein) => (
-                    <Badge
-                      key={protein.protein_options.name}
-                      variant="secondary"
-                      className={`${
-                        protein.protein_options.is_vegetarian
-                          ? "bg-green-500/10 hover:bg-green-500/10 text-green-700"
-                          : "bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark"
-                      } flex items-center gap-1.5`}
-                    >
-                      <span>{protein.protein_options.name}</span>
-                      <span className="text-gray-500/70">|</span>
-                      <span className="text-xs">
-                        $
-                        {(
-                          item.base_price +
-                          protein.protein_options.price_addition
-                        ).toFixed(2)}
-                      </span>
-                    </Badge>
-                  ))}
+                  {item.menu_item_proteins
+                    .sort(
+                      (a, b) =>
+                        a.protein_options.price_addition +
+                        item.base_price -
+                        (b.protein_options.price_addition + item.base_price)
+                    )
+                    .map((protein) => (
+                      <Badge
+                        key={protein.protein_options.name}
+                        variant="secondary"
+                        className={`${
+                          protein.protein_options.is_vegetarian
+                            ? "bg-green-500/10 hover:bg-green-500/10 text-green-700"
+                            : "bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark"
+                        } flex items-center gap-1.5`}
+                      >
+                        <span>{protein.protein_options.name}</span>
+                        <span className="text-gray-500/70">|</span>
+                        <span className="text-xs">
+                          $
+                          {(
+                            item.base_price +
+                            protein.protein_options.price_addition
+                          ).toFixed(2)}
+                        </span>
+                      </Badge>
+                    ))}
                 </div>
               )}
             </div>

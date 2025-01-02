@@ -20,7 +20,7 @@ export function HeroSection() {
 
   return (
     <>
-      <div className="relative w-full h-[60vh] min-h-[32rem] mb-16 overflow-hidden">
+      <div className="relative w-full h-[60vh] min-h-[32rem] overflow-hidden mb-8">
         {/* Parallax Image Container */}
         <div ref={parallaxRef} className="absolute inset-0 z-0">
           <Image
