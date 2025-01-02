@@ -22,6 +22,25 @@ export async function getCategories(): Promise<Category[]> {
   }));
 }
 
+export interface FavoriteMenuItem {
+  id: string;
+  name: string;
+  short_description: string;
+  image_url: string;
+  image_alt_text: string;
+}
+
+export async function getFavoriteMenuItems(): Promise<FavoriteMenuItem[]> {
+  const supabase = createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("menu_items")
+    .select("id, name, short_description, image_url, image_alt_text")
+    .eq("is_favorite", true)
+    .limit(6);
+  if (error) throw new Error("Failed to fetch favorite menu items");
+  return data as FavoriteMenuItem[];
+}
+
 interface MenuItemView {
   id: string;
   name: string;
@@ -51,7 +70,7 @@ export async function getMenuItemsByCategory(
   });
 
   if (error) {
-    console.error("Failed to fetch menu items:", error);
+    // console.error("Failed to fetch menu items:", error);
     throw new Error("Failed to fetch menu items");
   }
 
