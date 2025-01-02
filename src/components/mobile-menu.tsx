@@ -34,12 +34,11 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
     };
   }, [setIsMobileMenuOpen]);
 
-  // if (!isOpen) return null;
-
   return (
     <div
-      className={`fixed inset-0 bg-background z-50 md:hidden transition-all duration-300 transform ${isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
-        }`}
+      className={`fixed inset-0 bg-background z-50 md:hidden transition-all duration-300 transform ${
+        isOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
+      }`}
     >
       <div className="flex justify-between items-center px-4">
         <Link href="/">
@@ -58,7 +57,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
         </Button>
       </div>
       <nav className="p-4">
-        <ul className="flex flex-col list-none items-start font-semibold">
+        <ul className="flex flex-col list-none items-start font-semibold gap-2">
           <NavItem
             href="/about"
             onClick={() => {
