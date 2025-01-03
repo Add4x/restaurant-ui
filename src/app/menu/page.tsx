@@ -16,8 +16,6 @@ export default async function MenuPage() {
     }
   });
 
-  console.log(categories);
-
   return (
     <div className="container md:max-w-6xl min-h-screen py-16">
       <MenuCategoryGrid items={categories} />

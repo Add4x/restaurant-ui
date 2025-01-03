@@ -70,11 +70,8 @@ export async function getMenuItemsByCategory(
   });
 
   if (error) {
-    // console.error("Failed to fetch menu items:", error);
     throw new Error("Failed to fetch menu items");
   }
-
-  console.log(`data: ${JSON.stringify(data)}`);
 
   return data as MenuItemView[];
 }
