@@ -1,7 +1,7 @@
-// import { Suspense } from "react";
+import { Suspense } from "react";
 import { subMenuItems } from "@/data/submenu-items";
 import { MenuItemsGrid } from "@/app/menu/[slug]/menu-items-grid";
-// import { LoadingGrid } from "@/components/loading-grid";
+import { LoadingGrid } from "@/components/loading-grid";
 import { notFound } from "next/navigation";
 
 export default async function CategoryPage({
@@ -23,9 +23,9 @@ export default async function CategoryPage({
         <h1 className="text-4xl font-bold mb-12 capitalize font-playfair text-primaryDark text-center">
           {slug.replace("-", " ")}
         </h1>
-        {/* <Suspense fallback={<LoadingGrid />}> */}
-        <MenuItemsGrid categoryId={categoryId} />
-        {/* </Suspense> */}
+        <Suspense fallback={<LoadingGrid />}>
+          <MenuItemsGrid categoryId={categoryId} />
+        </Suspense>
       </div>
     </div>
   );
