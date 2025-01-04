@@ -1,6 +1,7 @@
 import { HeroSection } from "@/components/hero-section";
 import { FavoritesSection } from "@/components/main/favorites-section";
 import { getFavoriteMenuItems } from "@/actions/menu";
+import TestimonialSection from "@/components/testimonial-section";
 
 export default async function Home() {
   const FavoriteMenuItem = await getFavoriteMenuItems();
@@ -18,6 +19,7 @@ export default async function Home() {
     <div>
       <HeroSection />
       <FavoritesSection items={FavoriteMenuItem} />
+      <TestimonialSection />
     </div>
   );
 }
