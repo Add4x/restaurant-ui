@@ -12,8 +12,6 @@ export default async function CategoryPage({
   const slug = (await params).slug;
   const categoryId = subMenuItems[slug as keyof typeof subMenuItems];
 
-  console.log("CategoryPage rendering with:", { slug, categoryId });
-
   if (!categoryId) {
     console.log("Category not found for slug:", slug);
     notFound();
