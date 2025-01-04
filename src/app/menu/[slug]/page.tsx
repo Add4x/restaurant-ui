@@ -23,9 +23,9 @@ export default async function CategoryPage({
         <h1 className="text-4xl font-bold mb-12 capitalize font-playfair text-primaryDark text-center">
           {slug.replace("-", " ")}
         </h1>
-        <Suspense fallback={<LoadingGrid />}>
-          <MenuItemsGrid categoryId={categoryId} />
-        </Suspense>
+        {/* <Suspense fallback={<LoadingGrid />}> */}
+        <MenuItemsGrid categoryId={categoryId} />
+        {/* </Suspense> */}
       </div>
     </div>
   );
