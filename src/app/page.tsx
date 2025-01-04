@@ -7,7 +7,7 @@ export default async function Home() {
 
   FavoriteMenuItem.forEach((item) => {
     if (item.image_url) {
-      item.image_url = `${process.env.SUPABASE_STORAGE_URL}/${item.image_url}`;
+      item.image_url = `${process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL}/${item.image_url}`;
     } else {
       item.image_url = "/images/menu-placeholder.jpg";
       item.image_alt_text = "Menu placeholder image";

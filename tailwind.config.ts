@@ -9,6 +9,7 @@ export default {
     "./src/data/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/actions/**/*.{js,ts}",
     "./src/lib/**/*.{js,ts}",
+    "./src/hooks/**/*.{js,ts}",
   ],
   theme: {
     container: {
