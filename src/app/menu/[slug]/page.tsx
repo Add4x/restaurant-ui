@@ -13,7 +13,6 @@ export default async function CategoryPage({
   const categoryId = subMenuItems[slug as keyof typeof subMenuItems];
 
   if (!categoryId) {
-    console.log("Category not found for slug:", slug);
     notFound();
   }
 

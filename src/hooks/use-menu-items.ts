@@ -8,14 +8,10 @@ import {
 import { MenuItem, Category } from "@/lib/types";
 
 export function useMenuItems(categoryId: string) {
-  console.log("useMenuItems hook called with categoryId:", categoryId);
-
   const query = useQuery({
     queryKey: ["menuItems", categoryId],
     queryFn: async () => {
-      console.log("🔍 Fetching items for category:", categoryId);
       const items = await getMenuItemsByCategory(categoryId);
-      console.log("📦 Fetched items:", items);
       return items;
     },
     select: (items: MenuItem[]) => {
@@ -29,7 +25,6 @@ export function useMenuItems(categoryId: string) {
         image_alt_text: item.image_url ? item.name : "Menu placeholder image",
       }));
 
-      console.log("✨ Processed items:", processedItems);
       return processedItems;
     },
   });
