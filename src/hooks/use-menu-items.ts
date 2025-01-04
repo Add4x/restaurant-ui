@@ -1,15 +1,72 @@
 import { useQuery } from "@tanstack/react-query";
-import { getMenuItemsByCategory } from "@/actions/menu";
-import { MenuItem } from "@/lib/types";
+import {
+  getMenuItemsByCategory,
+  getCategories,
+  getFavoriteMenuItems,
+  type FavoriteMenuItem,
+} from "@/actions/menu";
+import { MenuItem, Category } from "@/lib/types";
 
 export function useMenuItems(categoryId: string) {
-  return useQuery({
+  console.log("useMenuItems hook called with categoryId:", categoryId);
+
+  const query = useQuery({
     queryKey: ["menuItems", categoryId],
     queryFn: async () => {
+      console.log("🔍 Fetching items for category:", categoryId);
       const items = await getMenuItemsByCategory(categoryId);
+      console.log("📦 Fetched items:", items);
       return items;
     },
     select: (items: MenuItem[]) => {
+      const storage_url = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL;
+
+      const processedItems = items.map((item) => ({
+        ...item,
+        image_url: item.image_url
+          ? `${storage_url}/${item.image_url}`
+          : "/images/menu-placeholder.jpg",
+        image_alt_text: item.image_url ? item.name : "Menu placeholder image",
+      }));
+
+      console.log("✨ Processed items:", processedItems);
+      return processedItems;
+    },
+  });
+
+  console.log("useMenuItems hook result:", {
+    isLoading: query.isLoading,
+    isError: query.isError,
+    data: query.data,
+  });
+
+  return query;
+}
+
+export function useCategories() {
+  return useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: () => getCategories(),
+    select: (categories: Category[]) => {
+      const storage_url = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL;
+
+      return categories.map((category) => ({
+        ...category,
+        image_url: category.image_url
+          ? `${storage_url}/${category.image_url}`
+          : "/images/menu-placeholder.jpg",
+        image_alt_text:
+          category.image_alt_text || "Menu category placeholder image",
+      }));
+    },
+  });
+}
+
+export function useFavoriteMenuItems() {
+  return useQuery<FavoriteMenuItem[]>({
+    queryKey: ["favoriteMenuItems"],
+    queryFn: () => getFavoriteMenuItems(),
+    select: (items: FavoriteMenuItem[]) => {
       const storage_url = process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL;
 
       return items.map((item) => ({
@@ -17,7 +74,7 @@ export function useMenuItems(categoryId: string) {
         image_url: item.image_url
           ? `${storage_url}/${item.image_url}`
           : "/images/menu-placeholder.jpg",
-        image_alt_text: item.image_url ? item.name : "Menu placeholder image",
+        image_alt_text: item.image_alt_text || "Menu item placeholder image",
       }));
     },
   });

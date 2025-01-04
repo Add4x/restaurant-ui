@@ -9,10 +9,23 @@ interface MenuItemsGridProps {
 }
 
 export function MenuItemsGrid({ categoryId }: MenuItemsGridProps) {
-  const { data: items, isError, error, isLoading } = useMenuItems(categoryId);
+  console.log("MenuItemsGrid rendering with categoryId:", categoryId);
+
+  const { data: items, isLoading, isError, error } = useMenuItems(categoryId);
+
+  console.log("MenuItemsGrid hook result:", {
+    isLoading,
+    isError,
+    itemsLength: items?.length,
+  });
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="mx-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:mx-0">
+        {/* Add loading skeletons here if needed */}
+        <div>Loading...</div>
+      </div>
+    );
   }
 
   if (isError) {
