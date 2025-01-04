@@ -25,7 +25,7 @@ export function FeaturedItems() {
         </h2>
         <Carousel className="w-full max-w-5xl mx-auto">
           <CarouselContent className="h-96">
-            {favoriteItems.map((item, index) => (
+            {favoriteItems?.map((item, index) => (
               <CarouselItem
                 key={item.id}
                 className="md:basis-1/2 lg:basis-1/3 h-full"
@@ -58,7 +58,7 @@ export function FeaturedItems() {
                   </Card>
                 </motion.div>
               </CarouselItem>
-            ))}
+            )) || []}
           </CarouselContent>
           <CarouselPrevious />
           <CarouselNext />
