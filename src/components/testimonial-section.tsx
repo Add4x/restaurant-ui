@@ -37,7 +37,7 @@ const TestimonialSection = () => {
   const plugin = useRef(Autoplay({ delay: 30000, stopOnInteraction: true }));
 
   return (
-    <section className="bg-gradient-to-br from-primary/0 to-primary/10">
+    <section className="bg-gradient-to-br from-primary/0 to-primary/10 pb-16">
       <div className="container m-auto">
         <div className="sm:gap-7 mx-auto py-16 md:py-6">
           <h2 className="text-3xl font-bold text-center mb-12 text-primaryDark">

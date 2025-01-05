@@ -10,6 +10,7 @@ import MobileMenu from "@/components/mobile-menu";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { OrderButton } from "@/components/order-button";
 
 const Navbar = () => {
   const router = useRouter();
@@ -76,6 +77,16 @@ const Navbar = () => {
     >
       <nav className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
+          <div className="md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMobileMenu}
+              className="[&>svg]:!h-6 [&>svg]:!w-6"
+            >
+              <Menu className="text-primaryDark" />
+            </Button>
+          </div>
           <div className="flex items-center">
             <Link href="/" onClick={closeSubmenu}>
               <Image
@@ -108,16 +119,7 @@ const Navbar = () => {
               Contact
             </NavItem>
           </div>
-          <div className="md:hidden">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleMobileMenu}
-              className="[&>svg]:!h-6 [&>svg]:!w-6"
-            >
-              <Menu className="text-primaryDark" />
-            </Button>
-          </div>
+          <OrderButton />
         </div>
       </nav>
       <div

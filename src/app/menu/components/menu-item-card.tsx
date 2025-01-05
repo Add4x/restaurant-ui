@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { type MenuItem } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
+import { OrderButton } from "@/components/order-button";
 // import { Button } from "@/components/ui/button";
 
 interface MenuItemCardProps {
@@ -22,7 +23,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     );
 
   return (
-    <div className="bg-gray-100 rounded-lg overflow-hidden shadow-md">
+    <div className="bg-gray-100 rounded-lg overflow-hidden shadow-md flex flex-col">
       <div className="flex flex-row items-center justify-start gap-2">
         <div className="relative aspect-square self-start h-[6rem] w-[8rem]">
           <Image
@@ -63,8 +64,8 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
         </div>
       </div>
 
-      <div className="p-4">
-        <div className="flex flex-col items-start justify-start gap-2">
+      <div className="p-4 flex flex-col flex-1">
+        <div className="flex flex-col items-start justify-start gap-2 flex-1">
           <p className="text-xs text-gray-700 mb-2">{item.short_description}</p>
           {item.has_protein_options && item.menu_item_proteins.length > 1 && (
             <div className="flex flex-col items-start justify-start gap-2">
@@ -104,9 +105,9 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
             </div>
           )}
         </div>
-        {/* <Button className="w-full bg-orange-500 hover:bg-orange-600">
-          Order Now
-        </Button> */}
+        <div className="flex justify-end mt-auto pt-4">
+          <OrderButton />
+        </div>
       </div>
     </div>
   );
