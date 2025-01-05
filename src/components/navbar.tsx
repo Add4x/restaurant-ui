@@ -88,7 +88,11 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="hidden md:flex items-center gap-6 font-semibold">
-            <NavItem href="/about" onClick={closeSubmenu}>
+            <NavItem
+              href="/about"
+              onClick={closeSubmenu}
+              className="border-b-2 border-transparent hover:border-b-2 hover:border-primary hover:scale-x-105 transition-all duration-300"
+            >
               About
             </NavItem>
             <NavItemWithSubmenu
@@ -96,7 +100,11 @@ const Navbar = () => {
               onClick={handleMenuClick}
               href="/menu"
             />
-            <NavItem href="#contact" onClick={closeSubmenu}>
+            <NavItem
+              href="#contact"
+              onClick={closeSubmenu}
+              className="border-b-2 border-transparent hover:border-b-2 hover:border-primary hover:scale-x-105 transition-all duration-300"
+            >
               Contact
             </NavItem>
           </div>

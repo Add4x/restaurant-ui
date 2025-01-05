@@ -26,9 +26,7 @@ const NavItem = ({ href, children, onClick, className }: NavItemProps) => {
     <Link
       href={href}
       onClick={handleClick}
-      className={`text-primaryDark border-b-2 border-transparent hover:scale-x-105 hover:border-b-2 hover:border-primary transition-all duration-300 ${
-        className || ""
-      }`}
+      className={`text-primaryDark ${className || ""}`}
     >
       {children}
     </Link>

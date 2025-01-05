@@ -57,7 +57,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
         </Button>
       </div>
       <nav className="p-4">
-        <ul className="flex flex-col list-none items-start font-semibold gap-2">
+        <ul className="flex flex-col list-none font-semibold gap-2">
           <NavItem
             href="/about"
             onClick={() => {
@@ -70,12 +70,12 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
           <li>
             <button
               onClick={toggleMenu}
-              className="text-left text-primaryDark border-b-2 border-transparent hover:scale-x-105 hover:border-b-2 hover:border-primary transition-all duration-300"
+              className="w-full text-left text-primaryDark"
             >
               Menu
             </button>
             {isMenuOpen && (
-              <ul className="pl-4 flex flex-col items-start">
+              <ul className="pl-4 flex flex-col">
                 {Object.keys(subMenuItems).map((item) => (
                   <NavItem
                     key={item}
