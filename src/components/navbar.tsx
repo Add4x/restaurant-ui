@@ -87,7 +87,7 @@ const Navbar = () => {
               <Menu className="text-primaryDark" />
             </Button>
           </div>
-          <div className="flex items-center">
+          <div className="flex items-center translate-x-2">
             <Link href="/" onClick={closeSubmenu}>
               <Image
                 src="/logo.svg"
@@ -98,6 +98,7 @@ const Navbar = () => {
               />
             </Link>
           </div>
+          {/* translate x-1 */}
           <div className="hidden md:flex items-center gap-6 font-semibold">
             <NavItem
               href="/about"
@@ -119,7 +120,7 @@ const Navbar = () => {
               Contact
             </NavItem>
           </div>
-          <OrderButton />
+          <OrderButton className="leading-4 h-12 md:h-auto" newLine={true} />
         </div>
       </nav>
       <div
