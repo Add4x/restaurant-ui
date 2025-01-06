@@ -12,12 +12,19 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/divider";
 import { useCategories } from "@/hooks/use-menu-items";
+import { useRouter } from "next/navigation";
 
 export function MenuCategoryGrid() {
   const { data: categories, error } = useCategories();
+  const router = useRouter();
 
   if (error) return <div>Error loading categories</div>;
   if (!categories) return null;
+
+  const handleViewMore = (categoryName: string) => {
+    const slug = categoryName.toLowerCase().replace(/\s+/g, "-");
+    router.push(`/menu/${slug}`);
+  };
 
   return (
     <div className="container mx-auto">
@@ -46,7 +53,12 @@ export function MenuCategoryGrid() {
               <Divider />
               <CardDescription className="flex flex-col gap-4 text-sm text-gray-500">
                 <p className="text-sm">{categories[0].description}</p>
-                <Button className="self-start">View More</Button>
+                <Button
+                  onClick={() => handleViewMore(categories[0].name)}
+                  className="self-start"
+                >
+                  View More
+                </Button>
               </CardDescription>
             </CardContent>
           </div>

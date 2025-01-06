@@ -106,7 +106,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
           )}
         </div>
         <div className="flex justify-end mt-auto pt-4">
-          <OrderButton />
+          <OrderButton className="h-auto" fontSize="small" />
         </div>
       </div>
     </div>
