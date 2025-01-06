@@ -3,12 +3,20 @@ import Image from "next/image";
 import { Category } from "@/lib/types";
 import { Divider } from "@/components/divider";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface MenuCardProps {
   item: Category;
 }
 
 export function MenuCard({ item }: MenuCardProps) {
+  const router = useRouter();
+
+  const handleViewMore = () => {
+    const slug = item.name.toLowerCase().replace(/\s+/g, "-");
+    router.push(`/menu/${slug}`);
+  };
+
   return (
     <Card className="overflow-hidden backdrop-blur-sm md:mt-4">
       <div className="flex flex-col">
@@ -21,7 +29,7 @@ export function MenuCard({ item }: MenuCardProps) {
             className="object-cover"
           />
         </div>
-        <CardHeader className="flex flex-col py-2 ">
+        <CardHeader className="flex flex-col py-2">
           <CardTitle className="text-xl font-bold text-primaryDark">
             {item.name}
           </CardTitle>
@@ -29,7 +37,9 @@ export function MenuCard({ item }: MenuCardProps) {
         <Divider />
         <CardContent className="py-2 flex flex-col justify-around mb-2">
           <p className="text-sm text-gray-700 mb-2">{item.description}</p>
-          <Button className="self-start">View More</Button>
+          <Button onClick={handleViewMore} className="self-start">
+            View More
+          </Button>
         </CardContent>
       </div>
     </Card>

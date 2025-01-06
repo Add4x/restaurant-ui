@@ -120,7 +120,11 @@ const Navbar = () => {
               Contact
             </NavItem>
           </div>
-          <OrderButton className="leading-4 h-12 md:h-auto" newLine={true} />
+          <OrderButton
+            className="leading-4 h-12 md:h-auto"
+            fontSize="base"
+            newLine={true}
+          />
         </div>
       </nav>
       <div
