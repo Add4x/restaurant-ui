@@ -1,11 +1,19 @@
 import Image from "next/image";
 import { type MenuItem } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { OrderButton } from "@/components/order-button";
+// import { OrderButton } from "@/components/order-button";
 // import { Button } from "@/components/ui/button";
 
 interface MenuItemCardProps {
   item: MenuItem;
+}
+
+function capitalizeWords(str: string): string {
+  return str
+    .toLowerCase() // Convert the entire string to lowercase
+    .split(" ") // Split the string into words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1)) // Capitalize the first letter of each word
+    .join(" "); // Join the words back into a single string
 }
 
 export function MenuItemCard({ item }: MenuItemCardProps) {
@@ -35,7 +43,9 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
           />
         </div>
         <div className="flex flex-col items-start justify-start self-start basis-2/3">
-          <h3 className="text-lg font-semibold mb-2">{item.name}</h3>
+          <h3 className="text-lg font-semibold mb-2">
+            {capitalizeWords(item.name)}
+          </h3>
           <div className="flex justify-between mb-3 gap-2 self-ends">
             <div className="flex gap-2">
               {hasVegetarianOptions && (
@@ -106,7 +116,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
           )}
         </div>
         <div className="flex justify-end mt-auto pt-4">
-          <OrderButton className="h-auto" fontSize="small" />
+          {/* <OrderButton className="h-auto" fontSize="small" /> */}
         </div>
       </div>
     </div>
