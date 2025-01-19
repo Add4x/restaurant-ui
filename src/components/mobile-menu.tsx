@@ -92,7 +92,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
             )}
           </li>
           <NavItem
-            href="/contact"
+            href="/#contact"
             onClick={() => {
               setIsMobileMenuOpen(false);
               setIsMenuOpen(false);
