@@ -37,6 +37,7 @@ export async function getFavoriteMenuItems(): Promise<FavoriteMenuItem[]> {
     .select("id, name, short_description, image_url, image_alt_text")
     .eq("is_favorite", true)
     .limit(6);
+
   if (error) throw new Error("Failed to fetch favorite menu items");
   return data as FavoriteMenuItem[];
 }

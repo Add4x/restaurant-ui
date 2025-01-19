@@ -75,7 +75,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
               Menu
             </button>
             {isMenuOpen && (
-              <ul className="pl-4 flex flex-col">
+              <ul className="pl-4 flex flex-col gap-2">
                 {Object.keys(subMenuItems).map((item) => (
                   <NavItem
                     key={item}
