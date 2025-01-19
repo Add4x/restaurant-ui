@@ -10,17 +10,15 @@ interface MenuItemsGridProps {
 }
 
 export function MenuItemsGrid({ categoryId }: MenuItemsGridProps) {
-  const { data: items, isLoading, isError, error } = useMenuItems(categoryId);
+  const { data: items, isLoading, isError } = useMenuItems(categoryId);
 
   if (isLoading) return <LoadingGrid />;
 
   if (isError) {
-    console.error("Error loading menu items:", error);
     throw new Error("Failed to load menu items");
   }
 
   if (!items?.length) {
-    console.log("No items found for category:", categoryId);
     notFound();
   }
 

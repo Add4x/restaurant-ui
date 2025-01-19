@@ -25,16 +25,8 @@ export function useMenuItems(categoryId: string) {
         image_alt_text: item.image_url ? item.name : "Menu placeholder image",
       }));
 
-      console.log("processedItems", processedItems);
-
       return processedItems;
     },
-  });
-
-  console.log("useMenuItems hook result:", {
-    isLoading: query.isLoading,
-    isError: query.isError,
-    data: query.data,
   });
 
   return query;
