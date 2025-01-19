@@ -4,7 +4,7 @@ import Image from "next/image";
 import { type MenuItem } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { useState, useCallback, useEffect } from "react";
-import { X } from "lucide-react";
+import { ImageModal } from "@/components/image-modal";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -162,40 +162,12 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
         </div>
       </div>
       {isModalOpen && (
-        <div
-          className={`fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 ${
-            isClosing
-              ? `animate-out fade-out duration-${animationDuration}`
-              : `animate-in fade-in duration-${animationDuration}`
-          }`}
-          onClick={handleClose}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
-        >
-          <div
-            className={`relative w-full max-w-4xl h-[80vh] rounded-lg overflow-hidden ${
-              isClosing
-                ? `animate-out zoom-out-50 duration-${animationDuration}`
-                : `animate-in zoom-in-50 duration-${animationDuration}`
-            }`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={item.image_url || "/placeholder.svg"}
-              alt={item.image_alt_text}
-              fill
-              className="object-cover rounded-lg"
-            />
-            <button
-              onClick={handleClose}
-              className="absolute top-4 right-4 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-colors"
-              aria-label="Close modal"
-            >
-              <X size={24} />
-            </button>
-          </div>
-        </div>
+        <ImageModal
+          src={item.image_url || "/placeholder.svg"}
+          alt={item.image_alt_text}
+          isClosing={isClosing}
+          handleClose={handleClose}
+        />
       )}
     </>
   );
