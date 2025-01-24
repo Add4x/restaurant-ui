@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NavItem from "@/components/nav-item";
-import { subMenuItems } from "@/data/submenu-items";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -14,17 +13,10 @@ interface MobileMenuProps {
 }
 
 const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen((prev) => !prev);
-  };
-
   // close menu when orientation changes
   useEffect(() => {
     const closeHamburgerMenu = () => {
       setIsMobileMenuOpen(false);
-      setIsMenuOpen(false);
     };
     window.addEventListener("orientationchange", closeHamburgerMenu);
     window.addEventListener("resize", closeHamburgerMenu);
@@ -49,7 +41,6 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
           size="icon"
           onClick={() => {
             setIsMobileMenuOpen(false);
-            setIsMenuOpen(false);
           }}
           className="[&>svg]:!h-6 [&>svg]:!w-6"
         >
@@ -62,40 +53,22 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
             href="/about"
             onClick={() => {
               setIsMobileMenuOpen(false);
-              setIsMenuOpen(false);
             }}
           >
             About
           </NavItem>
-          <li>
-            <button
-              onClick={toggleMenu}
-              className="w-full text-left text-primaryDark"
-            >
-              Menu
-            </button>
-            {isMenuOpen && (
-              <ul className="pl-4 flex flex-col gap-2">
-                {Object.keys(subMenuItems).map((item) => (
-                  <NavItem
-                    key={item}
-                    href={`/menu/${item.toLowerCase()}`}
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    {item}
-                  </NavItem>
-                ))}
-              </ul>
-            )}
-          </li>
+          <NavItem
+            href="/menu"
+            onClick={() => {
+              setIsMobileMenuOpen(false);
+            }}
+          >
+            Menu
+          </NavItem>
           <NavItem
             href="/#contact"
             onClick={() => {
               setIsMobileMenuOpen(false);
-              setIsMenuOpen(false);
             }}
           >
             Contact
