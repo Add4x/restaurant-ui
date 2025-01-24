@@ -18,7 +18,7 @@ export default function AboutPage() {
       <div className="grid md:grid-cols-2 gap-8 items-center mb-12">
         <div className="relative min-h-[18rem] h-full w-full">
           <Image
-            src="/images/family-photo.jpg"
+            src="/logo.png"
             alt="The jathara family in their restaurant kitchen"
             fill
             className="object-cover rounded-lg"
@@ -32,21 +32,25 @@ export default function AboutPage() {
             A Family Tradition of Natural Cooking
           </h2>
           <p className="text-muted-foreground">
-            For three generations, our family has been committed to serving
-            authentic dishes made with only natural ingredients. What started as
-            a small family kitchen in 1985 has grown into a beloved
-            establishment, but our principles remain unchanged.
+            At JATHARA, we are dedicated to bringing the vibrant spirit of India
+            to the heart of Atlanta, serving as a culinary bridge between
+            tradition and modernity for the city&apos;s diverse and culturally
+            rich community. The name &apos;Jathara&apos; carries a profound dual
+            meaning—rooted in the concept of the digestive fire that nourishes
+            and sustains life, and celebrated as a grand cultural festival that
+            unites people in joy, devotion, and festivity.
           </p>
           <p className="text-muted-foreground">
-            Every dish we serve is made from scratch, using recipes passed down
-            through generations and refined over decades of experience. We
-            believe that real food doesn&apos;t need artificial enhancers to
-            taste amazing.
+            In a city that thrives on diversity, JATHARA aspires to be more than
+            just a restaurant. We envision it as a gathering place where
+            everyone can experience the essence of Indian culture, rediscover
+            the tastes of home, and share the richness of these traditions with
+            others.
           </p>
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-12">
+      <div className="grid md:grid-cols-2 gap-6 mb-12">
         <Card className="p-6">
           <h3 className="text-xl font-semibold mb-3 text-primaryDark">
             Our Promise
@@ -58,7 +62,7 @@ export default function AboutPage() {
           </p>
         </Card>
 
-        <Card className="p-6">
+        {/* <Card className="p-6">
           <h3 className="text-xl font-semibold mb-3 text-primaryDark">
             Fresh Ingredients
           </h3>
@@ -67,7 +71,7 @@ export default function AboutPage() {
             to quality. Our ingredients are carefully selected and delivered
             fresh daily.
           </p>
-        </Card>
+        </Card> */}
 
         <Card className="p-6">
           <h3 className="text-xl font-semibold mb-3 text-primaryDark">
@@ -86,10 +90,13 @@ export default function AboutPage() {
           Our Vision
         </h2>
         <p className="text-muted-foreground mb-6">
-          We believe that food should be more than just sustenance – it should
-          be an experience that brings people together and celebrates the
-          natural flavors of quality ingredients. Our vision is to continue
-          serving our community while staying true to our roots and principles.
+          “At Jathara, our vision is celebrate the rich tapestry of Indian
+          culture tradition by offering an authentic, vibrant and unforgettable
+          dining experience. We aim to be the beacon of Indian cuisine, blending
+          timeless recipes with contemporary presentation, all while fostering a
+          warm and welcoming atmosphere. Through our passion for food and
+          commitment to excellence, we aspire to connect people, culture and
+          stories - one plate at a time”
         </p>
         <p className="text-muted-foreground">
           Thank you for being part of our journey and allowing us to share our
