@@ -18,6 +18,10 @@ function capitalizeWords(str: string): string {
     .join(" ");
 }
 
+function capitalizeFirstLetter(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export function MenuItemCard({ item }: MenuItemCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -115,8 +119,10 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
 
         <div className="p-4 flex flex-col flex-1">
           <div className="flex flex-col items-start justify-start gap-2 flex-1">
-            <p className="text-xs text-gray-700 mb-2 capitalize">
-              {item.short_description}
+            <p className="text-xs text-gray-700 mb-2 normal-case">
+              {item.short_description
+                ? capitalizeFirstLetter(item.short_description)
+                : "No description available"}
             </p>
             {item.has_protein_options && item.menu_item_proteins.length > 1 && (
               <div className="flex flex-col items-start justify-start gap-2">

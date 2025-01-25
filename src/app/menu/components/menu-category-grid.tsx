@@ -46,12 +46,12 @@ export function MenuCategoryGrid() {
 
             <CardContent className="flex flex-col gap-4 justify-center">
               <CardHeader className="p-0"></CardHeader>
-              <CardTitle className="text-2xl font-bold text-primaryDark capitalize">
+              <CardTitle className="text-2xl font-bold text-primaryDark normal-case">
                 {categories[0].name}
               </CardTitle>
               <Divider />
               <CardDescription className="flex flex-col gap-4 text-sm text-gray-500">
-                <p className="text-sm capitalize">
+                <p className="text-sm normal-case">
                   {categories[0].description}
                 </p>
                 <Button

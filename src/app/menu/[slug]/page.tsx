@@ -19,7 +19,7 @@ export default async function CategoryPage({
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold mb-12 capitalize font-playfair text-primaryDark text-center">
+        <h1 className="text-4xl font-bold mb-12 normal-case font-playfair text-primaryDark text-center">
           {slug.replace("-", " ")}
         </h1>
         <Suspense fallback={<LoadingGrid />}>
