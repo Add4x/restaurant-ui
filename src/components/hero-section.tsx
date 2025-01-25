@@ -1,11 +1,20 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import Image from "next/image";
 
+const offers = [
+  "Offer valid till 28th February 2025",
+  "New Menu Items",
+  "20% off on all orders",
+];
+
+const offerColors = ["bg-primary", "bg-primary/90", "bg-primary/80"];
+
 export function HeroSection() {
   const parallaxRef = useRef<HTMLDivElement>(null);
+  const [currentOfferIndex, setCurrentOfferIndex] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -18,8 +27,24 @@ export function HeroSection() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    const offerInterval = setInterval(() => {
+      setCurrentOfferIndex((prevIndex) => (prevIndex + 1) % offers.length);
+    }, 5000);
+
+    return () => clearInterval(offerInterval);
+  }, []);
+
   return (
     <>
+      <div
+        ref={parallaxRef}
+        className={`h-10 ${offerColors[currentOfferIndex]} flex items-center justify-center`}
+      >
+        <span className="text-white text-md tracking-wide">
+          {offers[currentOfferIndex]}
+        </span>
+      </div>
       <div className="relative w-full h-[60vh] min-h-[32rem] overflow-hidden mb-8">
         {/* Parallax Image Container */}
         <div ref={parallaxRef} className="absolute inset-0 z-0">
