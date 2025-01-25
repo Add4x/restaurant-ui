@@ -36,7 +36,9 @@ export function MenuCard({ item }: MenuCardProps) {
         </CardHeader>
         <Divider />
         <CardContent className="py-2 flex flex-col justify-around mb-2">
-          <p className="text-sm text-gray-700 mb-2">{item.description}</p>
+          <p className="text-sm text-gray-700 mb-2 capitalize">
+            {item.description}
+          </p>
           <Button onClick={handleViewMore} className="self-start">
             View More
           </Button>

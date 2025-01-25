@@ -41,11 +41,14 @@ export function useCategories() {
 
       return categories.map((category) => ({
         ...category,
-        image_url: category.image_url
-          ? `${storage_url}/${category.image_url}`
-          : "/images/menu-placeholder.jpg",
+        image_url:
+          category.image_url && category.image_url !== ""
+            ? `${storage_url}/${category.image_url}`
+            : "/images/menu-placeholder.jpg",
         image_alt_text:
-          category.image_alt_text || "Menu category placeholder image",
+          category.image_alt_text && category.image_alt_text !== ""
+            ? category.image_alt_text
+            : "Menu category placeholder image",
       }));
     },
   });

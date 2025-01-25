@@ -25,7 +25,6 @@ export function MenuCategoryGrid() {
     const slug = categoryName.toLowerCase().replace(/\s+/g, "-");
     router.push(`/menu/${slug}`);
   };
-
   return (
     <div className="container mx-auto">
       <h1 className="text-4xl font-bold text-center mb-8 text-primaryDark font-playfair">
@@ -47,12 +46,14 @@ export function MenuCategoryGrid() {
 
             <CardContent className="flex flex-col gap-4 justify-center">
               <CardHeader className="p-0"></CardHeader>
-              <CardTitle className="text-2xl font-bold text-primaryDark">
+              <CardTitle className="text-2xl font-bold text-primaryDark capitalize">
                 {categories[0].name}
               </CardTitle>
               <Divider />
               <CardDescription className="flex flex-col gap-4 text-sm text-gray-500">
-                <p className="text-sm">{categories[0].description}</p>
+                <p className="text-sm capitalize">
+                  {categories[0].description}
+                </p>
                 <Button
                   onClick={() => handleViewMore(categories[0].name)}
                   className="self-start"
