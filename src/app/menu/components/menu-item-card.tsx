@@ -115,7 +115,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
 
         <div className="p-4 flex flex-col flex-1">
           <div className="flex flex-col items-start justify-start gap-2 flex-1">
-            <p className="text-xs text-gray-700 mb-2">
+            <p className="text-xs text-gray-700 mb-2 capitalize">
               {item.short_description}
             </p>
             {item.has_protein_options && item.menu_item_proteins.length > 1 && (
