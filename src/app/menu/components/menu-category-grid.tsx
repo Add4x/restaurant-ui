@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/divider";
 import { useCategories } from "@/hooks/use-menu-items";
@@ -35,12 +34,10 @@ export function MenuCategoryGrid() {
         <Card className="w-full rounded-lg overflow-hidden">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="relative w-full h-[18.75rem] ">
-              <Image
+              <img
                 src={categories[0].image_url}
                 alt={categories[0].image_alt_text}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
+                className="object-cover w-full h-full"
               />
             </div>
 
