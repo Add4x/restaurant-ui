@@ -35,8 +35,8 @@ const Navbar = () => {
             </Button>
           </div>
           <div className="flex items-center translate-x-2">
-            <Link href="/" >
-              <Image className="rounded-full"
+            <Link href="/">
+              <Image
                 src="/logo.svg"
                 alt="Logo"
                 width={80}
