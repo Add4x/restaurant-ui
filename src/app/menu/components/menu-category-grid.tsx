@@ -44,7 +44,7 @@ export function MenuCategoryGrid() {
               />
             </div>
 
-            <CardContent className="flex flex-col gap-4 justify-center">
+            <CardContent className="flex flex-col gap-4 justify-center p-4">
               <CardHeader className="p-0"></CardHeader>
               <CardTitle className="text-2xl font-bold text-primaryDark normal-case">
                 {categories[0].name}
