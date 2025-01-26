@@ -32,7 +32,7 @@ const Submenu = React.forwardRef<HTMLDivElement, SubmenuProps>(
               <li key={item} className="w-full sm:w-auto mb-2 sm:mb-0">
                 <button
                   onClick={() => handleItemClick(item)}
-                  className="w-full border-b-2 border-transparent sm:w-auto font-semibold text-primaryDark hover:scale-x-105 hover:border-b-2 hover:border-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary transition-colors duration-300 normal-case"
+                  className="w-full border-b-2 border-transparent sm:w-auto font-semibold text-primaryDark hover:scale-x-105 hover:border-b-2 hover:border-primary focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary transition-colors duration-300 normal-case"
                 >
                   {item}
                 </button>

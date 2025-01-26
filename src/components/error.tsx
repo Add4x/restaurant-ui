@@ -11,7 +11,7 @@ export default function Error({
   reset: () => void
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-900 to-black text-white flex items-center justify-center">
+    <div className="min-h-screen bg-linear-to-br from-zinc-900 to-black text-white flex items-center justify-center">
       <div className="text-center space-y-4">
         <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
         <h2 className="text-2xl font-bold">Something went wrong!</h2>

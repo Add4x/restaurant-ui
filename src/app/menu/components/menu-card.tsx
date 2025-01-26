@@ -18,7 +18,7 @@ export function MenuCard({ item }: MenuCardProps) {
   };
 
   return (
-    <Card className="overflow-hidden backdrop-blur-sm md:mt-4">
+    <Card className="overflow-hidden backdrop-blur-xs md:mt-4">
       <div className="flex flex-col">
         <div className="relative w-full h-[12.5rem]">
           <Image

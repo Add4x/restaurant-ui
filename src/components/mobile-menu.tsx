@@ -42,7 +42,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
           onClick={() => {
             setIsMobileMenuOpen(false);
           }}
-          className="[&>svg]:!h-6 [&>svg]:!w-6"
+          className="[&>svg]:h-6! [&>svg]:w-6!"
         >
           <X className="text-primaryDark" />
         </Button>

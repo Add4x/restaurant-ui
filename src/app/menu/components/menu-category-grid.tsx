@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/divider";
 import { useCategories } from "@/hooks/use-menu-items";
 import { useRouter } from "next/navigation";
-
+// import Image from "next/image";
 export function MenuCategoryGrid() {
   const { data: categories, error } = useCategories();
   const router = useRouter();
@@ -40,6 +40,7 @@ export function MenuCategoryGrid() {
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
+                loading="eager"
               /> */}
               <img
                 src={categories[0].image_url}

@@ -29,7 +29,7 @@ const Navbar = () => {
               variant="ghost"
               size="icon"
               onClick={toggleMobileMenu}
-              className="[&>svg]:!h-6 [&>svg]:!w-6"
+              className="[&>svg]:h-6! [&>svg]:w-6!"
             >
               <Menu className="text-primaryDark" />
             </Button>
