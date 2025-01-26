@@ -54,7 +54,7 @@ export function HeroSection() {
             fill
             className="object-cover"
             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mMsqAcAAWUA8f6XWZkAAAAASUVORK5CYII="
-            placeholder="blur"
+            // placeholder="blur-sm"
             priority
           />
         </div>

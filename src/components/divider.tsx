@@ -5,7 +5,7 @@ export function Divider() {
         aria-hidden="true"
         className="absolute inset-0 flex items-center mx-auto"
       >
-        <div className="w-full h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+        <div className="w-full h-px bg-linear-to-r from-transparent via-primary to-transparent" />
       </div>
     </div>
   );
