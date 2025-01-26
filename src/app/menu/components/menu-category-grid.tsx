@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/divider";
 import { useCategories } from "@/hooks/use-menu-items";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+// import Image from "next/image";
 export function MenuCategoryGrid() {
   const { data: categories, error } = useCategories();
   const router = useRouter();
@@ -34,19 +34,19 @@ export function MenuCategoryGrid() {
         <Card className="w-full rounded-lg overflow-hidden">
           <div className="grid md:grid-cols-2 gap-4">
             <div className="relative w-full h-[18.75rem] ">
-              <Image
+              {/* <Image
                 src={categories[0].image_url}
                 alt={categories[0].image_alt_text}
                 fill
                 sizes="(max-width: 768px) 100vw, 50vw"
                 className="object-cover"
                 loading="eager"
-              />
-              {/* <img
+              /> */}
+              <img
                 src={categories[0].image_url}
                 alt={categories[0].image_alt_text}
                 className="object-cover w-full h-full"
-              /> */}
+              />
             </div>
 
             <CardContent className="flex flex-col gap-4 justify-center p-4">
