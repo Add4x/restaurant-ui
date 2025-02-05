@@ -48,7 +48,7 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
         </Button>
       </div>
       <nav className="p-4">
-        <ul className="flex flex-col list-none font-semibold gap-2">
+        <ul className="flex flex-col list-none font-semibold gap-3">
           <NavItem
             href="/about"
             onClick={() => {
