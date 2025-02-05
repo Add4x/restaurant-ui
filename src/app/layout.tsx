@@ -4,6 +4,7 @@ import "./globals.css";
 import { Footer } from "@/components/footer";
 import Navbar from "@/components/navbar";
 import { Providers } from "@/app/providers";
+import { OffersBanner } from "@/components/offers-banner";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -31,6 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${openSans.variable} antialiased`}>
+        <OffersBanner />
         <Providers>
           <Navbar />
           <main>{children}</main>
