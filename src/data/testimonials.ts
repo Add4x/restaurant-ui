@@ -7,51 +7,41 @@ export interface Testimonial {
 
 export const testimonials: Testimonial[] = [
   {
-    name: "John Doe",
+    name: "Suresh Namala",
     rating: 4.5,
-    quote: "Working with them has been amazing...",
+    quote: "The Biryani and Chai are authentic and delicious.",
     image: "/images/testimonials/t1.jpg",
   },
   {
-    name: "Sarah Johnson",
+    name: "Rajesh Kumar",
     rating: 5,
     quote:
-      "The products exceeded our expectations. Truly a game-changer for our business.",
+      "We ordered Veg Hakka Noodles, Paneer Tikka, and a Paneer Butter Masala. All were delicious.",
     image: "/images/testimonials/t2.jpg",
   },
   {
-    name: "Michael Chen",
+    name: "Kavya Reddy",
     rating: 5,
     quote:
-      "Outstanding quality and reliability. We couldn&apos;t be happier with the results.",
+      "I liked that they avoid too much food coloring and artificial flavors.",
     image: "/images/testimonials/t3.jpg",
   },
   {
-    name: "Emma Williams",
+    name: "Vimlesh Kumar",
     rating: 5,
-    quote:
-      "Their innovative approach and attention to detail have transformed our workflow.",
+    quote: "The Chicken Tikka and Chicken Butter Masala were amazing.",
     image: "/images/testimonials/t4.jpg",
   },
   {
     name: "Robert Martinez",
     rating: 5,
-    quote:
-      "Exceptional service and product quality. Theyve become our trusted partner.",
-    image: "/images/testimonials/t3.jpg",
+    quote: "Ordered Vijayawada Special Biryani and the spices were just right.",
+    image: "/images/testimonials/t5.jpg",
   },
   {
-    name: "Lisa Thompson",
-    rating: 2,
-    quote:
-      "The team&apos;s expertise and dedication have made all the difference in our projects.",
-    image: "/images/testimonials/t1.jpg",
-  },
-  {
-    name: "David Kim",
-    rating: 2,
-    quote:
-      "A fantastic partnership that has helped us scale our business effectively.",
-    image: "/images/testimonials/t4.jpg",
+    name: "Sai Kumar",
+    rating: 5,
+    quote: "The Chicken Tikka and Chicken Butter Masala were amazing.",
+    image: "/images/testimonials/t6.jpg",
   },
 ];
