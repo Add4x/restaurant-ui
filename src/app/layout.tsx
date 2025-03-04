@@ -5,6 +5,7 @@ import { Footer } from "@/components/footer";
 import Navbar from "@/components/navbar";
 import { Providers } from "@/app/providers";
 import { OffersBanner } from "@/components/offers-banner";
+import { Analytics } from "@vercel/analytics/next";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({
           <main>{children}</main>
           <Footer />
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
