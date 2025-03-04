@@ -39,7 +39,10 @@ export function MenuCard({ item }: MenuCardProps) {
           <p className="text-sm text-gray-700 mb-2 normal-case">
             {item.description}
           </p>
-          <Button onClick={handleViewMore} className="self-start">
+          <Button
+            onClick={handleViewMore}
+            className="self-start cursor-pointer"
+          >
             View More
           </Button>
         </CardContent>

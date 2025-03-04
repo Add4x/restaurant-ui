@@ -61,7 +61,7 @@ export function MenuCategoryGrid() {
                 </p>
                 <Button
                   onClick={() => handleViewMore(categories[0].name)}
-                  className="self-start"
+                  className="self-start cursor-pointer"
                 >
                   View More
                 </Button>
