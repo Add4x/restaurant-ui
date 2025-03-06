@@ -13,35 +13,38 @@ export const testimonials: Testimonial[] = [
     image: "/images/testimonials/t1.jpg",
   },
   {
-    name: "Rajesh Kumar",
+    name: "Muchukota Raja Kumar",
     rating: 5,
     quote:
-      "We ordered Veg Hakka Noodles, Paneer Tikka, and a Paneer Butter Masala. All were delicious.",
+      "The food, service, and ambiance were excellent. We ordered Vijayawada paneer biryani, haleem, rumali roti, jalapeño chicken, and veg keema curry, and everything was delicious. Ending the meal with a cup of amazing Irani chai made the experience even better. We will definitely visit again and highly recommend this place.",
     image: "/images/testimonials/t2.jpg",
   },
   {
-    name: "Kavya Reddy",
+    name: "Sri Kanth",
     rating: 5,
     quote:
-      "I liked that they avoid too much food coloring and artificial flavors.",
+      "Fantastic food! We ordered quite a few varieties of food and everything was tasty and service was quick and efficient as well.",
     image: "/images/testimonials/t3.jpg",
   },
   {
-    name: "Vimlesh Kumar",
+    name: "Monika Katipally",
     rating: 5,
-    quote: "The Chicken Tikka and Chicken Butter Masala were amazing.",
+    quote:
+      "Started off with their complimentary Irani chai n Maska bun (soft n yummlicious). We were recommended their Jalapeño Chicken appetizer n also we chose to try Baby corn appetizer. Both were great to taste. We got to try their Haleem. And it was my first time trying Haleem and liked it!! We got home some Tandoori Chicken.We also got to try the Rumaali roti which is not a regular item to find on the menu for many restaurants around.Overall the food was good n definitely would come to try their other items in the menu.",
     image: "/images/testimonials/t4.jpg",
   },
   {
-    name: "Robert Martinez",
+    name: "Akhila Akhi",
     rating: 5,
-    quote: "Ordered Vijayawada Special Biryani and the spices were just right.",
+    quote:
+      "This place offers a variety of vegetarian food options. For a snack, we ordered punugulu and Irani chai. The ginger and groundnut chutneys served with the punugulu had authentic flavors and were delicious. The Irani chai was amazing. For the main course, we had Vijayawada paneer biryani, rumali roti, and kadai paneer, all of which were absolutely delicious. Would surely visit again.",
     image: "/images/testimonials/t5.jpg",
   },
   {
-    name: "Sai Kumar",
+    name: "Siri Puligadda",
     rating: 5,
-    quote: "The Chicken Tikka and Chicken Butter Masala were amazing.",
+    quote:
+      "Newly opened indian restaurant in Alpharetta. It was truly delicious and delightful. We tried the snacks cut mirchi, pungulu, samosa and the Appetizers like babycorn 65, jalapeno chicken. I highly recommend the pungulu. Overall all the dishes tasted amazing. The irani chai and bun is complimentary as it was opened today.",
     image: "/images/testimonials/t6.jpg",
   },
 ];
