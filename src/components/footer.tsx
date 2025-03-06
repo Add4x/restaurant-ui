@@ -135,10 +135,24 @@ export function Footer() {
               Opening Hours
             </h3>
             <div className="space-y-3">
-              <div className="flex justify-between items-center group max-w-xs">
-                <span>Monday to Sunday</span>
+              <div className="flex justify-between items-center group">
+                <span>Monday - Thursday</span>
                 <span className="text-green-400 group-hover:text-white transition-colors ml-4">
-                  12pm - 11pm
+                  12:00 PM - 3:00 PM
+                  <br />
+                  5:00 PM - 10:00 PM
+                </span>
+              </div>
+              <div className="flex justify-between items-center group">
+                <span>Friday - Saturday</span>
+                <span className="text-green-400 group-hover:text-white transition-colors ml-4">
+                  12:00 PM - 11:00 PM
+                </span>
+              </div>
+              <div className="flex justify-between items-center group">
+                <span>Sunday</span>
+                <span className="text-green-400 group-hover:text-white transition-colors ml-4">
+                  12:00 PM - 9:30 PM
                 </span>
               </div>
             </div>

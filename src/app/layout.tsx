@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${openSans.variable} antialiased`}>
-        <OffersBanner />
+        {/* <OffersBanner /> */}
         <Providers>
           <Navbar />
           <main>{children}</main>
