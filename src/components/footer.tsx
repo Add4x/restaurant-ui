@@ -54,7 +54,7 @@ export function Footer() {
                   </div>
                 </div>
               </div>
-              <p className="flex items-center hover:text-primary transition-colors gap-2">
+              {/* <p className="flex items-center hover:text-primary transition-colors gap-2">
                 <span className="mr-2">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +77,7 @@ export function Footer() {
                 >
                   +1 (832) 973-0740
                 </Link>
-              </p>
+              </p> */}
               <p className="flex items-center hover:text-primary transition-colors gap-2">
                 <span className="mr-2">
                   <svg
