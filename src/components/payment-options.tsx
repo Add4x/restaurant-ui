@@ -9,14 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useCart } from "@/components/cart-provider";
+import { useCartStore } from "@/store/cart-store";
 import { useRouter } from "next/navigation";
 import { initiateCheckout } from "@/lib/stripe-client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { CreditCard, Store } from "lucide-react";
 
 export function PaymentOptions() {
-  const { items, clearCart } = useCart();
+  const { items, clearCart } = useCartStore();
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState<"online" | "in-store">(
     "online"

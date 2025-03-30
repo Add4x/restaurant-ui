@@ -53,10 +53,10 @@ export async function createCheckoutSession(
       line_items: lineItems,
       mode: "payment",
       success_url: `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
       }/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
       }/checkout?status=canceled`,
       metadata: {
         orderId: orderId || "",
@@ -68,7 +68,7 @@ export async function createCheckoutSession(
     }
 
     // Return the session URL for client-side redirect
-    return { url: session.url };
+    return { url: session.url, sessionId: session.id };
   } catch (error) {
     console.error("Error creating checkout session:", error);
 
@@ -95,12 +95,91 @@ export async function getCheckoutSession(sessionId: string) {
     }
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    return session;
+    return {
+      url: session.url,
+      payment_status: session.payment_status,
+      status: session.status,
+      amount_total: session.amount_total,
+      metadata: session.metadata,
+    };
   } catch (error) {
     console.error("Error retrieving checkout session:", error);
     if (error instanceof Error) {
       throw new Error(`Failed to retrieve checkout session: ${error.message}`);
     }
     throw new Error("Failed to retrieve checkout session");
+  }
+}
+
+// New server action to verify a session and handle payment confirmation
+export async function verifyPaymentSession(sessionId: string): Promise<{
+  success: boolean;
+  paymentStatus: string;
+  message?: string;
+  customerInfo?: {
+    email?: string;
+    name?: string;
+    customerId?: string;
+  };
+}> {
+  try {
+    if (!sessionId) {
+      return {
+        success: false,
+        paymentStatus: "error",
+        message: "Session ID is required",
+      };
+    }
+
+    // Expand customer details when retrieving the session
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ["customer", "line_items"],
+    });
+
+    // Check if payment was successful
+    if (session.payment_status === "paid") {
+      // Extract customer information
+      const customerInfo: {
+        email?: string;
+        name?: string;
+        customerId?: string;
+      } = {};
+
+      // Get email from session
+      if (session.customer_email) {
+        customerInfo.email = session.customer_email;
+      } else if (session.customer_details?.email) {
+        customerInfo.email = session.customer_details.email;
+      }
+
+      // Get name from session
+      if (session.customer_details?.name) {
+        customerInfo.name = session.customer_details.name;
+      }
+
+      // Here you would typically save this information to your database
+      // For example: await saveOrderToDatabase(customerInfo, orderDetails);
+
+      return {
+        success: true,
+        paymentStatus: "paid",
+        customerInfo,
+      };
+    }
+
+    return {
+      success: false,
+      paymentStatus: session.payment_status,
+      message: `Payment is ${session.payment_status}`,
+    };
+  } catch (error) {
+    console.error("Error verifying payment session:", error);
+
+    return {
+      success: false,
+      paymentStatus: "error",
+      message:
+        error instanceof Error ? error.message : "Failed to verify payment",
+    };
   }
 }

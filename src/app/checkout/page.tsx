@@ -3,14 +3,14 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { CartProvider, useCart } from "@/components/cart-provider";
+import { useCartStore } from "@/store/cart-store";
 import { CheckoutSummary } from "@/components/checkout-summary";
 import { PaymentOptions } from "@/components/payment-options";
 import { CheckIcon } from "lucide-react";
-import { getCheckoutSessionInfo } from "@/lib/stripe-client";
+import { verifyPaymentSession } from "@/lib/stripe";
 
 function CheckoutContent() {
-  const { items, clearCart } = useCart();
+  const { items, clearCart } = useCartStore();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
@@ -36,15 +36,16 @@ function CheckoutContent() {
 
         const verifySession = async () => {
           try {
-            // In a real app, you'd verify the session on the server
-            // For demo purposes, we're just retrieving it
-            const session = await getCheckoutSessionInfo(sessionId);
+            const verified = await verifyPaymentSession(sessionId);
 
-            if (session.payment_status === "paid") {
+            if (verified.success && verified.paymentStatus === "paid") {
               clearCart();
+            } else {
+              setPaymentStatus("error");
             }
           } catch (error) {
             console.error("Error verifying session:", error);
+            setPaymentStatus("error");
           } finally {
             setIsLoading(false);
           }
@@ -122,16 +123,14 @@ function CheckoutContent() {
 
 export default function CheckoutPage() {
   return (
-    <CartProvider>
-      <Suspense
-        fallback={
-          <div className="flex justify-center items-center h-screen">
-            Loading checkout...
-          </div>
-        }
-      >
-        <CheckoutContent />
-      </Suspense>
-    </CartProvider>
+    <Suspense
+      fallback={
+        <div className="flex justify-center items-center h-screen">
+          Loading checkout...
+        </div>
+      }
+    >
+      <CheckoutContent />
+    </Suspense>
   );
 }

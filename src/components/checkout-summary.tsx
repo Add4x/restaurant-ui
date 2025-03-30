@@ -1,9 +1,9 @@
 "use client";
 
-import { useCart } from "@/components/cart-provider";
+import { useCartStore } from "@/store/cart-store";
 import { Card } from "@/components/ui/card";
 export function CheckoutSummary() {
-  const { items, getTotalPrice } = useCart();
+  const { items, getTotalPrice } = useCartStore();
 
   // Calculate tax and total
   const subtotal = getTotalPrice();
