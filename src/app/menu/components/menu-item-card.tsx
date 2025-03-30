@@ -5,6 +5,7 @@ import { type MenuItem } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { useState, useCallback, useEffect } from "react";
 import { ImageModal } from "@/components/image-modal";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -162,8 +163,8 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
               </div>
             )}
           </div>
-          <div className="flex justify-end mt-auto pt-4">
-            {/* <OrderButton className="h-auto" fontSize="small" /> */}
+          <div className="flex mt-auto pt-4">
+            <AddToCartButton item={item} />
           </div>
         </div>
       </div>
