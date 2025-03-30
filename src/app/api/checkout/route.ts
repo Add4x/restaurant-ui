@@ -20,8 +20,19 @@ export async function POST(req: NextRequest) {
 
   // Handle regular checkout request
   try {
+    // Check if Stripe secret key is available
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("Missing Stripe secret key");
+      return NextResponse.json(
+        { error: "Server configuration error" },
+        { status: 500 }
+      );
+    }
+
     const body = await req.json();
     const { items, total } = body;
+
+    console.log("######items", items);
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
@@ -30,28 +41,68 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log("###### validating items");
+
+    // Validate items structure
+    for (const item of items) {
+      console.log("###### item.totalPrice", item.totalPrice);
+      console.log("###### item.quantity", item.quantity);
+      console.log("###### item.title", item.menuItem.name);
+      if (
+        !item.menuItem.name ||
+        typeof item.totalPrice !== "number" ||
+        !item.quantity
+      ) {
+        return NextResponse.json(
+          { error: "Invalid item format" },
+          { status: 400 }
+        );
+      }
+    }
+
+    console.log("###### creating order");
+
     // Create order in database
     const order = await createOrder(items, total, "stripe");
 
+    console.log("######order", order);
+
     // Format line items for Stripe
-    const lineItems = items.map((item) => ({
-      price_data: {
-        currency: "usd",
-        product_data: {
-          name: item.title,
-          description: item.description || undefined,
-          images: item.imageUrl ? [item.imageUrl] : undefined,
+    const lineItems = items.map((item) => {
+      // Ensure price is a valid number and convert to cents
+      const unitAmount = Math.round((parseFloat(item.totalPrice) || 0) * 100);
+
+      if (isNaN(unitAmount) || unitAmount <= 0) {
+        throw new Error(`Invalid price for item "${item.title}"`);
+      }
+
+      return {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.menuItem.name,
+            description: item.menuItem.description || undefined,
+            images: item.menuItem.imageUrl
+              ? [item.menuItem.imageUrl]
+              : undefined,
+          },
+          unit_amount: unitAmount,
         },
-        unit_amount: Math.round(item.price * 100), // Stripe expects amounts in cents
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      };
+    });
+
+    console.log("######lineItems", lineItems);
 
     // Create Stripe checkout session
     const checkoutSessionResult = await createCheckoutSession(
       lineItems,
       order.id
     );
+
+    if (!checkoutSessionResult || !checkoutSessionResult.url) {
+      throw new Error("Failed to create checkout session URL");
+    }
 
     return NextResponse.json({
       success: true,

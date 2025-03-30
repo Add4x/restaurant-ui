@@ -91,7 +91,7 @@ export function Cart() {
                     className="w-full bg-black hover:bg-gray-800 text-white"
                     onClick={handleCheckout}
                   >
-                    Checkout
+                    Proceed to Checkout
                   </Button>
                   <Button
                     variant="outline"

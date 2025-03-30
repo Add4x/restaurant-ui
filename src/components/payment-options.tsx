@@ -107,7 +107,7 @@ export function PaymentOptions() {
         )}
 
         <Button
-          className="w-full bg-black hover:bg-gray-800 text-white py-6 mt-4"
+          className="w-full bg-primary hover:bg-primary/80 text-white py-6 mt-4"
           onClick={handleCheckout}
           disabled={isLoading}
         >
