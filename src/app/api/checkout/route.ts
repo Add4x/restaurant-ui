@@ -31,9 +31,6 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const { items, total } = body;
-
-    console.log("######items", items);
-
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: "Invalid cart items" },
@@ -41,13 +38,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("###### validating items");
-
     // Validate items structure
     for (const item of items) {
-      console.log("###### item.totalPrice", item.totalPrice);
-      console.log("###### item.quantity", item.quantity);
-      console.log("###### item.title", item.menuItem.name);
       if (
         !item.menuItem.name ||
         typeof item.totalPrice !== "number" ||
@@ -60,12 +52,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.log("###### creating order");
-
     // Create order in database
     const order = await createOrder(items, total, "stripe");
-
-    console.log("######order", order);
 
     // Format line items for Stripe
     const lineItems = items.map((item) => {
@@ -91,8 +79,6 @@ export async function POST(req: NextRequest) {
         quantity: item.quantity,
       };
     });
-
-    console.log("######lineItems", lineItems);
 
     // Create Stripe checkout session
     const checkoutSessionResult = await createCheckoutSession(

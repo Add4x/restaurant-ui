@@ -2,7 +2,6 @@
 
 import { useCart } from "@/components/cart-provider";
 import { Card } from "@/components/ui/card";
-import { useEffect } from "react";
 export function CheckoutSummary() {
   const { items, getTotalPrice } = useCart();
 
@@ -11,11 +10,6 @@ export function CheckoutSummary() {
   const taxRate = 0.08; // 8% tax rate
   const tax = subtotal * taxRate;
   const total = subtotal + tax;
-
-  // print items
-  useEffect(() => {
-    console.log("###### summary_items", items);
-  }, [items]);
 
   return (
     <Card className="p-6">

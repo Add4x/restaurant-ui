@@ -33,8 +33,6 @@ export async function createCheckoutSession(
       throw new Error("Line items are required");
     }
 
-    console.log("######lineItems", JSON.stringify(lineItems, null, 2));
-
     // Validate each line item
     lineItems.forEach((item, index) => {
       if (!item.price_data || !item.price_data.unit_amount) {
