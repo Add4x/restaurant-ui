@@ -1,6 +1,6 @@
 "use server";
 
-import { CartItem } from "@/store/cart-store";
+import { CartItem } from "@/stores/cart-store";
 import { z } from "zod";
 
 // Schema for validating the order data

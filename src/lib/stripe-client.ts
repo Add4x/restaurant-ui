@@ -1,6 +1,6 @@
 "use client";
 
-import { CartItem } from "@/store/cart-store";
+import { CartItem } from "@/stores/cart-store";
 
 // Mock checkout session for client-side use
 export interface CheckoutSession {

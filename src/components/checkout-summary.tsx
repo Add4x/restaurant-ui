@@ -1,6 +1,6 @@
 "use client";
 
-import { useCartStore } from "@/store/cart-store";
+import { useCartStore } from "@/stores/cart-store";
 import { Card } from "@/components/ui/card";
 export function CheckoutSummary() {
   const { items, getTotalPrice } = useCartStore();

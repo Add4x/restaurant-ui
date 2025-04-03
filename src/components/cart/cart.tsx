@@ -5,7 +5,7 @@ import { ShoppingCart, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { CartItemComponent } from "@/components/cart/cart-item";
-import { useCartStore } from "@/store/cart-store";
+import { useCartStore } from "@/stores/cart-store";
 import { isCartEnabled } from "@/lib/feature-flags";
 import { useRouter } from "next/navigation";
 

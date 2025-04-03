@@ -3,8 +3,8 @@
 import Image from "next/image";
 import { Minus, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CartItem } from "@/store/cart-store";
-import { useCartStore } from "@/store/cart-store";
+import { CartItem } from "@/stores/cart-store";
+import { useCartStore } from "@/stores/cart-store";
 
 interface CartItemProps {
   item: CartItem;

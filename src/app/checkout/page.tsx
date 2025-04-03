@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useCartStore } from "@/store/cart-store";
+import { useCartStore } from "@/stores/cart-store";
 import { CheckoutSummary } from "@/components/checkout-summary";
 import { PaymentOptions } from "@/components/payment-options";
 import { CheckIcon } from "lucide-react";
