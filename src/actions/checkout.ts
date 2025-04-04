@@ -1,7 +1,7 @@
 "use server";
 
 import { createCheckoutSession } from "@/lib/stripe";
-import { CartItem } from "@/store/cart-store";
+import { CartItem } from "@/stores/cart-store";
 import { z } from "zod";
 
 const CheckoutSchema = z.object({

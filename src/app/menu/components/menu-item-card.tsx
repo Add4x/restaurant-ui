@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState, useCallback, useEffect } from "react";
 import { ImageModal } from "@/components/image-modal";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { isCartEnabled } from "@/lib/feature-flags";
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -125,43 +126,45 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
                 ? capitalizeFirstLetter(item.short_description)
                 : "No description available"}
             </p>
-            {item.has_protein_options && item.menu_item_proteins.length > 1 && (
-              <div className="flex flex-col items-start justify-start gap-2">
-                <h4 className="text-xs">Available in</h4>
-                {item.has_protein_options && (
-                  <div className="flex flex-row items-center justify-start gap-2 flex-wrap">
-                    {item.menu_item_proteins
-                      .sort(
-                        (a, b) =>
-                          a.protein_options.price_addition +
-                          item.base_price -
-                          (b.protein_options.price_addition + item.base_price)
-                      )
-                      .map((protein) => (
-                        <Badge
-                          key={protein.protein_options.name}
-                          variant="secondary"
-                          className={`${
-                            protein.protein_options.is_vegetarian
-                              ? "bg-green-500/10 hover:bg-green-500/10 text-green-700"
-                              : "bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark"
-                          } flex items-center gap-1.5`}
-                        >
-                          <span>{protein.protein_options.name}</span>
-                          <span className="text-gray-500/70">|</span>
-                          <span className="text-xs">
-                            $
-                            {(
-                              item.base_price +
-                              protein.protein_options.price_addition
-                            ).toFixed(2)}
-                          </span>
-                        </Badge>
-                      ))}
-                  </div>
-                )}
-              </div>
-            )}
+            {!isCartEnabled() &&
+              item.has_protein_options &&
+              item.menu_item_proteins.length > 1 && (
+                <div className="flex flex-col items-start justify-start gap-2">
+                  <h4 className="text-xs">Available in</h4>
+                  {item.has_protein_options && (
+                    <div className="flex flex-row items-center justify-start gap-2 flex-wrap">
+                      {item.menu_item_proteins
+                        .sort(
+                          (a, b) =>
+                            a.protein_options.price_addition +
+                            item.base_price -
+                            (b.protein_options.price_addition + item.base_price)
+                        )
+                        .map((protein) => (
+                          <Badge
+                            key={protein.protein_options.name}
+                            variant="secondary"
+                            className={`${
+                              protein.protein_options.is_vegetarian
+                                ? "bg-green-500/10 hover:bg-green-500/10 text-green-700"
+                                : "bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark"
+                            } flex items-center gap-1.5`}
+                          >
+                            <span>{protein.protein_options.name}</span>
+                            <span className="text-gray-500/70">|</span>
+                            <span className="text-xs">
+                              $
+                              {(
+                                item.base_price +
+                                protein.protein_options.price_addition
+                              ).toFixed(2)}
+                            </span>
+                          </Badge>
+                        ))}
+                    </div>
+                  )}
+                </div>
+              )}
           </div>
           <div className="flex mt-auto pt-4">
             <AddToCartButton item={item} />

@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useOffersStore } from "@/store/offers-store";
+import { useOffersStore } from "@/stores/offers-store";
 import Image from "next/image";
 
 export function OfferModal() {

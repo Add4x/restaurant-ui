@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { useCartStore } from "@/store/cart-store";
+import { useCartStore } from "@/stores/cart-store";
 import { useRouter } from "next/navigation";
 import { initiateCheckout } from "@/lib/stripe-client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
