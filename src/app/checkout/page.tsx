@@ -62,7 +62,7 @@ function CheckoutContent() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 px-4">
+      <div className="flex flex-col items-center justify-center py-8">
         <p>Verifying your payment...</p>
       </div>
     );
@@ -70,7 +70,7 @@ function CheckoutContent() {
 
   if (paymentStatus === "success") {
     return (
-      <div className="flex flex-col items-center justify-center py-12 px-4">
+      <div className="flex flex-col items-center justify-center py-8">
         <div className="bg-green-100 rounded-full p-3 mb-4">
           <CheckIcon className="h-8 w-8 text-green-600" />
         </div>
@@ -91,7 +91,7 @@ function CheckoutContent() {
 
   if (items.length === 0 && !paymentStatus) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 px-4">
+      <div className="flex flex-col items-center justify-center py-8">
         <h1 className="text-2xl font-bold mb-4">Your cart is empty</h1>
         <p className="text-muted-foreground mb-6">
           Add some items from our menu to get started.
@@ -102,7 +102,7 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto">
       <h1 className="text-3xl font-bold mb-8">Checkout</h1>
 
       {paymentStatus === "canceled" && (
@@ -125,7 +125,7 @@ export default function CheckoutPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex justify-center items-center h-screen">
+        <div className="flex justify-center items-center h-[70vh]">
           Loading checkout...
         </div>
       }
