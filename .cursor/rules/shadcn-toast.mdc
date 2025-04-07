@@ -1,6 +1,7 @@
 ---
-description: Shadcn UI Toast Usage Patterns
-globs: src/**/*.{ts,tsx}
+description: 
+globs: 
+alwaysApply: true
 ---
 # Shadcn UI Toast Usage Patterns
 

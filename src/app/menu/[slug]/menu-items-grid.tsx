@@ -23,7 +23,7 @@ export function MenuItemsGrid({ categoryId }: MenuItemsGridProps) {
   }
 
   return (
-    <div className="mx-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:mx-0">
+    <div className="mx-4 grid grid-cols-1 md:grid-cols-3 gap-6 sm:mx-0">
       {items.map((item) => (
         <MenuItemCard key={item.id} item={item} />
       ))}
