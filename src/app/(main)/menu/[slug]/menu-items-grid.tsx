@@ -1,6 +1,6 @@
 "use client";
 
-import { MenuItemCard } from "@/app/menu/components/menu-item-card";
+import { MenuItemCard } from "@/app/(main)/menu/components/menu-item-card";
 import { LoadingGrid } from "@/components/loading-grid";
 import { useMenuItems } from "@/hooks/use-menu-items";
 import { notFound } from "next/navigation";

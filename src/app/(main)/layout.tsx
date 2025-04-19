@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Open_Sans } from "next/font/google";
 import "@/app/globals.css";
+import { Footer } from "@/components/footer";
+import Navbar from "@/components/navbar";
+import { Providers } from "@/app/(main)/providers";
 // import { OffersBanner } from "@/components/offers-banner";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -31,9 +34,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${playfair.variable} ${openSans.variable} antialiased`}>
         {/* <OffersBanner /> */}
-
-        <main>{children}</main>
-
+        <Providers>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </Providers>
         <Analytics />
       </body>
     </html>

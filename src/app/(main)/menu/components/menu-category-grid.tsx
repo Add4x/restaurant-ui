@@ -1,6 +1,6 @@
 "use client";
 
-import { MenuCard } from "@/app/menu/components/menu-card";
+import { MenuCard } from "@/app/(main)/menu/components/menu-card";
 import {
   Card,
   CardContent,
