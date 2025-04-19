@@ -1,0 +1,168 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+---
+description: Next.js with TanStack and Zustand
+globs: *
+---
+# Next.js with TanStack and Zustand
+
+Guidelines for developing Next.js applications using TanStack libraries and Zustand for state management.
+
+<rule>
+name: nextjs_tanstack_zustand
+description: Standards for Next.js projects using TanStack libraries and Zustand
+filters:
+  # Match Next.js, React, TanStack, or Zustand related files
+  - type: file_extension
+    pattern: "\\.(js|jsx|ts|tsx|json)$"
+  # Match configurations and components
+  - type: file_name
+    pattern: "^(next\\.config|tsconfig|package\\.json|.*\\.component|.*\\.hook|.*\\.store)\\."
+  # Match when asking for state management solutions
+  - type: intent
+    pattern: "state_management_recommendation"
+
+actions:
+  - type: suggest
+    message: |
+      When working with this Next.js project:
+
+      ## Project Structure
+      ```
+      .cursor/              # Cursor IDE configuration
+      .idea/                # IntelliJ IDEA configuration
+      .next/                # Next.js build output
+      .vscode/              # VS Code configuration
+      node_modules/         # Node.js dependencies
+      public/               # Static files
+      src/
+      ├── actions/          # Server actions
+      │   ├── checkout.ts
+      │   ├── menu.ts
+      │   └── store-order.ts
+      ├── app/              # Next.js App Router
+      │   ├── about/        # About page routes
+      │   ├── api/          # API routes
+      │   ├── checkout/     # Checkout page routes
+      │   ├── menu/         # Menu page routes
+      │   ├── layout.tsx    # Root layout
+      │   ├── page.tsx      # Home page
+      │   └── providers.tsx # Context providers
+      ├── components/       # Reusable components
+      ├── data/             # Data models and constants
+      ├── hooks/            # Custom hooks
+      ├── lib/              # Utility functions
+      ├── store/            # Zustand stores
+      ├── supabase/         # Supabase client and utilities
+      └── utils/            # Helper functions
+      ```
+
+      ## State Management Patterns
+      
+      ### Zustand Store Pattern
+      ```typescript
+      // src/store/useUserStore.ts
+      import { create } from 'zustand'
+      import { persist } from 'zustand/middleware'
+
+      type UserState = {
+        user: User | null
+        isAuthenticated: boolean
+        login: (user: User) => void
+        logout: () => void
+      }
+
+      export const useUserStore = create<UserState>()(
+        persist(
+          (set) => ({
+            user: null,
+            isAuthenticated: false,
+            login: (user) => set({ user, isAuthenticated: true }),
+            logout: () => set({ user: null, isAuthenticated: false }),
+          }),
+          { name: 'user-store' }
+        )
+      )
+      ```
+
+      ### TanStack Query Pattern
+      ```typescript
+      // src/hooks/useMenuItems.ts
+      import { useQuery } from '@tanstack/react-query'
+      
+      export function useMenuItems() {
+        return useQuery({
+          queryKey: ['menu-items'],
+          queryFn: async () => {
+            const response = await fetch('/api/menu')
+            if (!response.ok) {
+              throw new Error('Failed to fetch menu items')
+            }
+            return response.json()
+          }
+        })
+      }
+      ```
+
+      ## Component Pattern
+      ```typescript
+      // src/components/MenuItemList.tsx
+      'use client'
+      
+      import { useMenuItems } from '@/hooks/useMenuItems'
+      import { useCartStore } from '@/store/useCartStore'
+      
+      export function MenuItemList() {
+        const { data, isLoading, error } = useMenuItems()
+        const addToCart = useCartStore((state) => state.addItem)
+        
+        if (isLoading) return <p>Loading...</p>
+        if (error) return <p>Error: {error.message}</p>
+        
+        return (
+          <ul>
+            {data?.map((item) => (
+              <li key={item.id}>
+                {item.name} - ${item.price}
+                <button onClick={() => addToCart(item)}>Add to Cart</button>
+              </li>
+            ))}
+          </ul>
+        )
+      }
+      ```
+
+  - type: reject
+    conditions:
+      - pattern: "(?i)\\b(redux|recoil|jotai|mobx|context\\s+api)\\b"
+        message: "This project uses Zustand for state management. Please avoid suggesting Redux, Recoil, Jotai, MobX, or Context API."
+      
+      - pattern: "(?i)\\b(swr|apollo|relay|urql)\\b"
+        message: "This project uses TanStack Query (React Query) for data fetching. Please avoid suggesting SWR, Apollo, Relay, or URQL."
+      
+      - pattern: "(?i)\\b(class\\s+component)\\b"
+        message: "Please use functional components with hooks rather than class components."
+
+examples:
+  - input: "How should I manage global state in this app?"
+    output: "For global state management, create a Zustand store in the src/store directory. Zustand provides a simple, hook-based API with minimal boilerplate."
+
+  - input: "What's the best way to fetch data from the API?"
+    output: "Use TanStack Query (formerly React Query) to fetch, cache, and update data. Create custom hooks in src/hooks directory to encapsulate query logic."
+
+  - input: "How should I structure a new component?"
+    output: "Create functional components using TypeScript and hooks. Place reusable components in src/components directory and organize them by feature or functionality."
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>

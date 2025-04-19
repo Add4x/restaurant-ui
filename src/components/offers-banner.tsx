@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { useOffersStore } from "@/store/offers-store";
+import { useOffersStore } from "@/stores/offers-store";
 import { ChevronRight } from "lucide-react";
 import { OfferModal } from "@/components/offer-modal";
 

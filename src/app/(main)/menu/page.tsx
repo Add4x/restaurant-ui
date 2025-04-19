@@ -1,4 +1,4 @@
-import { MenuCategoryGrid } from "@/app/menu/components/menu-category-grid";
+import { MenuCategoryGrid } from "@/app/(main)/menu/components/menu-category-grid";
 
 export default function MenuPage() {
   return (

@@ -1,0 +1,197 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Shadcn UI Toast Usage Patterns
+
+Guidelines for implementing toast notifications using Shadcn UI's toast component.
+
+<rule>
+name: shadcn_toast_patterns
+description: Standards for implementing toast notifications with Shadcn UI
+filters:
+  # Match files that might use toast
+  - type: file_extension
+    pattern: "\\.(ts|tsx)$"
+  # Match toast-related imports and usage
+  - type: content
+    pattern: "(?i)(useToast|toast\\(|Toaster)"
+  # Match when asking about notifications or toasts
+  - type: intent
+    pattern: "toast_notification"
+
+actions:
+  - type: suggest
+    message: |
+      When implementing toast notifications with Shadcn UI:
+
+      ## Toast Provider Setup
+
+      Add the Toaster component to your root layout:
+
+      ```typescript
+      // src/app/layout.tsx
+      import { Toaster } from "@/components/ui/toaster"
+
+      export default function RootLayout({
+        children,
+      }: {
+        children: React.ReactNode
+      }) {
+        return (
+          <html lang="en">
+            <body>
+              {children}
+              <Toaster />
+            </body>
+          </html>
+        )
+      }
+      ```
+
+      ## Toast Hook Usage Pattern
+
+      ```typescript
+      // Component using toast
+      'use client'
+      
+      import { useToast } from "@/components/ui/use-toast"
+      
+      export function MyComponent() {
+        const { toast } = useToast()
+        
+        const handleAction = async () => {
+          try {
+            await someAsyncAction()
+            
+            toast({
+              title: "Success",
+              description: "Action completed successfully",
+              variant: "default", // or "destructive"
+            })
+          } catch (error) {
+            toast({
+              title: "Error",
+              description: error.message || "Something went wrong",
+              variant: "destructive",
+            })
+          }
+        }
+        
+        return <button onClick={handleAction}>Perform Action</button>
+      }
+      ```
+
+      ## Toast Types and Best Practices
+
+      1. Success Toast:
+      ```typescript
+      toast({
+        title: "Success",
+        description: "Your changes have been saved",
+        variant: "default",
+      })
+      ```
+
+      2. Error Toast:
+      ```typescript
+      toast({
+        title: "Error",
+        description: "Failed to save changes",
+        variant: "destructive",
+      })
+      ```
+
+      3. Loading State Toast:
+      ```typescript
+      const { toast } = useToast()
+      
+      const handleAsyncAction = async () => {
+        const toastId = toast({
+          title: "Loading...",
+          description: "Please wait while we process your request",
+        })
+        
+        try {
+          await someAsyncAction()
+          
+          toast({
+            id: toastId,
+            title: "Success",
+            description: "Action completed successfully",
+            variant: "default",
+          })
+        } catch (error) {
+          toast({
+            id: toastId,
+            title: "Error",
+            description: error.message,
+            variant: "destructive",
+          })
+        }
+      }
+      ```
+
+      4. Custom Action Toast:
+      ```typescript
+      toast({
+        title: "Scheduled: Catch up",
+        description: "Friday, February 10, 2023 at 5:57 PM",
+        action: (
+          <ToastAction altText="Try again" onClick={handleRetry}>
+            Undo
+          </ToastAction>
+        ),
+      })
+      ```
+
+      ## Toast Duration and Dismissal
+
+      ```typescript
+      // Auto-dismiss after 5 seconds (default)
+      toast({
+        title: "Note",
+        description: "This will auto-dismiss",
+      })
+
+      // Custom duration (10 seconds)
+      toast({
+        title: "Note",
+        description: "This will stay longer",
+        duration: 10000,
+      })
+
+      // Persist until manually dismissed
+      toast({
+        title: "Important",
+        description: "This won't auto-dismiss",
+        duration: Infinity,
+      })
+      ```
+
+  - type: reject
+    conditions:
+      - pattern: "(?i)\\b(alert|window\\.alert|console\\.log)\\b"
+        message: "Use Shadcn UI's toast component for notifications instead of alerts or console logs."
+      
+      - pattern: "(?i)\\b(react-toastify|react-hot-toast|notistack)\\b"
+        message: "This project uses Shadcn UI's toast component. Please avoid using other toast libraries."
+      
+      - pattern: "document\\.getElementById\\(['\"]toast"
+        message: "Use the useToast hook from Shadcn UI instead of manipulating DOM elements directly."
+
+examples:
+  - input: "How do I show a success message?"
+    output: "Use the useToast hook and call toast() with a success message and default variant."
+
+  - input: "How do I show an error notification?"
+    output: "Use the useToast hook and call toast() with an error message and destructive variant."
+
+  - input: "How do I add an action button to my toast?"
+    output: "Include a ToastAction component in the action prop of your toast configuration."
+
+metadata:
+  priority: high
+  version: 1.0
+</rule> 

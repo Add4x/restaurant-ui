@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { subMenuItems } from "@/data/submenu-items";
-import { MenuItemsGrid } from "@/app/menu/[slug]/menu-items-grid";
+import { MenuItemsGrid } from "@/app/(main)/menu/[slug]/menu-items-grid";
 import { LoadingGrid } from "@/components/loading-grid";
 import { notFound } from "next/navigation";
 

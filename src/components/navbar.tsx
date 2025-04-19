@@ -8,6 +8,7 @@ import MobileMenu from "@/components/mobile-menu";
 import Image from "next/image";
 import Link from "next/link";
 import { OrderButton } from "@/components/order-button";
+import { Cart } from "@/components/cart/cart";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -67,11 +68,16 @@ const Navbar = () => {
               Contact
             </NavItem>
           </div>
-          <OrderButton
-            className="leading-4 h-12 md:h-auto"
-            fontSize="base"
-            newLine={true}
-          />
+          <div className="flex items-center gap-4">
+            <div className="mt-1">
+              <Cart />
+            </div>
+            <OrderButton
+              className="leading-4 h-12 md:h-auto"
+              fontSize="base"
+              newLine={true}
+            />
+          </div>
         </div>
       </nav>
 

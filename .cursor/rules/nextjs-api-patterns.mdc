@@ -1,0 +1,261 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- You can @ files here
+- You can use markdown but dont have to
+
+---
+description: Next.js App Router API Patterns
+globs: src/app/**
+---
+# Next.js App Router API Patterns
+
+Guidelines for implementing API routes with Next.js App Router using Route Handlers.
+
+<rule>
+name: nextjs_app_router_api
+description: Standards for API implementation in Next.js App Router
+filters:
+  # Match API route files and related patterns
+  - type: file_path
+    pattern: "src/app/api/.*\\.(js|ts)$"
+  # Match route.ts files that might contain API handlers
+  - type: file_name
+    pattern: "^route\\.(js|ts)$"
+  # Match when asking for API implementation
+  - type: intent
+    pattern: "api_implementation"
+
+actions:
+  - type: suggest
+    message: |
+      When implementing APIs with Next.js App Router:
+
+      ## Route Handler Structure
+      
+      In Next.js App Router, API endpoints are implemented using Route Handlers in `route.js` or `route.ts` files.
+
+      ```typescript
+      // src/app/api/users/route.ts
+      import { NextResponse } from 'next/server'
+      import type { NextRequest } from 'next/server'
+      
+      export async function GET(request: NextRequest) {
+        // Extract query parameters if needed
+        const { searchParams } = new URL(request.url)
+        const id = searchParams.get('id')
+        
+        try {
+          // Fetch data from your data source
+          const users = await fetchUsers(id)
+          
+          // Return the response
+          return NextResponse.json({ users }, { status: 200 })
+        } catch (error) {
+          return NextResponse.json(
+            { error: 'Failed to fetch users' },
+            { status: 500 }
+          )
+        }
+      }
+      
+      export async function POST(request: NextRequest) {
+        try {
+          // Parse the request body
+          const body = await request.json()
+          
+          // Validate the input
+          if (!body.name) {
+            return NextResponse.json(
+              { error: 'Name is required' },
+              { status: 400 }
+            )
+          }
+          
+          // Process the data
+          const newUser = await createUser(body)
+          
+          // Return success response
+          return NextResponse.json(
+            { user: newUser },
+            { status: 201 }
+          )
+        } catch (error) {
+          return NextResponse.json(
+            { error: 'Failed to create user' },
+            { status: 500 }
+          )
+        }
+      }
+      ```
+
+      ## API Directory Structure
+      
+      Organize API routes in a logical hierarchy:
+      
+      ```
+      src/app/
+      ├── api/                      # All API routes
+      │   ├── auth/                 # Authentication related endpoints
+      │   │   ├── login/           
+      │   │   │   └── route.ts      # POST /api/auth/login
+      │   │   └── register/
+      │   │       └── route.ts      # POST /api/auth/register
+      │   ├── users/                # User related endpoints
+      │   │   ├── [id]/             # Dynamic route for specific user
+      │   │   │   └── route.ts      # GET, PUT, DELETE /api/users/:id
+      │   │   └── route.ts          # GET, POST /api/users
+      │   └── products/             # Product related endpoints
+      │       ├── [id]/
+      │       │   └── route.ts      # GET, PUT, DELETE /api/products/:id
+      │       └── route.ts          # GET, POST /api/products
+      └── ...
+      ```
+
+      ## Error Handling Pattern
+      
+      Use a consistent error handling pattern:
+      
+      ```typescript
+      // src/lib/api-utils.ts
+      import { NextResponse } from 'next/server'
+      
+      export type ApiError = {
+        message: string
+        code?: string
+        status: number
+      }
+      
+      export function handleApiError(error: unknown): NextResponse {
+        console.error(error)
+        
+        if (typeof error === 'object' && error !== null && 'status' in error) {
+          const apiError = error as ApiError
+          return NextResponse.json(
+            { error: apiError.message, code: apiError.code },
+            { status: apiError.status }
+          )
+        }
+        
+        return NextResponse.json(
+          { error: 'Internal server error' },
+          { status: 500 }
+        )
+      }
+      ```
+      
+      ## Route Handler with TanStack Query
+      
+      Connect your API with TanStack Query in the frontend:
+      
+      ```typescript
+      // src/hooks/queries/useUsers.ts
+      import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+      
+      export function useUsers() {
+        return useQuery({
+          queryKey: ['users'],
+          queryFn: async () => {
+            const res = await fetch('/api/users')
+            if (!res.ok) {
+              const error = await res.json()
+              throw new Error(error.message || 'Failed to fetch users')
+            }
+            return res.json()
+          }
+        })
+      }
+      
+      export function useCreateUser() {
+        const queryClient = useQueryClient()
+        
+        return useMutation({
+          mutationFn: async (userData: CreateUserData) => {
+            const res = await fetch('/api/users', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(userData)
+            })
+            
+            if (!res.ok) {
+              const error = await res.json()
+              throw new Error(error.message || 'Failed to create user')
+            }
+            
+            return res.json()
+          },
+          onSuccess: () => {
+            // Invalidate queries that depend on this data
+            queryClient.invalidateQueries({ queryKey: ['users'] })
+          }
+        })
+      }
+      ```
+
+      ## Authentication and Middleware
+      
+      For protected routes, use Next.js middleware:
+      
+      ```typescript
+      // src/middleware.ts
+      import { NextResponse } from 'next/server'
+      import type { NextRequest } from 'next/server'
+      
+      export function middleware(request: NextRequest) {
+        // Check for authentication token
+        const token = request.cookies.get('auth-token')?.value
+        
+        // Protect API routes that require authentication
+        if (request.nextUrl.pathname.startsWith('/api/') && 
+            !request.nextUrl.pathname.startsWith('/api/auth/') && 
+            !token) {
+          return NextResponse.json(
+            { error: 'Authentication required' },
+            { status: 401 }
+          )
+        }
+        
+        return NextResponse.next()
+      }
+      
+      export const config = {
+        matcher: [
+          // Add routes that need protection
+          '/api/users/:path*',
+          '/api/products/:path*',
+          // Exclude auth routes
+          '/((?!api/auth).*)',
+        ],
+      }
+      ```
+
+  - type: reject
+    conditions:
+      - pattern: "(?i)\\b(pages/api)\\b"
+        message: "This project uses App Router, not Pages Router. Please implement API routes using route.js/route.ts files in the app directory rather than in pages/api."
+      
+      - pattern: "(?i)\\b(getServerSideProps|getStaticProps)\\b"
+        message: "This project uses App Router. Instead of getServerSideProps or getStaticProps, use Server Components or the new data fetching methods in Next.js 13+."
+      
+      - pattern: "(?i)\\bapply\\s+middleware\\s+in\\s+api\\s+route\\b"
+        message: "For middleware functionality, use the middleware.ts file at the project root rather than applying middleware within an API route."
+
+examples:
+  - input: "How do I implement a GET endpoint for fetching users?"
+    output: "Create a route.ts file in src/app/api/users/ and export an async GET function that uses NextResponse.json() to return data. Be sure to handle errors appropriately."
+
+  - input: "How should I protect my API routes?"
+    output: "Use Next.js middleware by creating a middleware.ts file at the root of your project. In this file, check for authentication tokens and return appropriate responses for unauthorized requests."
+
+  - input: "What's the best way to handle API errors?"
+    output: "Create a consistent error handling utility that formats errors into a standard response structure. Wrap your route handlers in try/catch blocks and use the utility to handle any errors that occur."
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
