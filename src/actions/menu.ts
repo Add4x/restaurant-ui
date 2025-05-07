@@ -1,78 +1,87 @@
 "use server";
 
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import {
+  getCategories as getApiCategories,
+  getMenuItemsByCategory as getApiMenuItemsByCategory,
+  getFavoriteMenuItems as getApiFavoriteMenuItems,
+  ActionResult as ApiActionResult,
+  FavoriteMenuItem,
+  MenuItemView,
+} from "@/actions/api";
 import { Category } from "@/lib/types";
+import { ApiError } from "@/lib/api-client";
 
-// get categories ordered by display_order with selected fields
-export async function getCategories(): Promise<Category[]> {
-  const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("menu_categories")
-    .select("id, name, display_order, description, image_url, image_alt_text")
-    .order("display_order", { ascending: true });
-  if (error) throw new Error("Failed to fetch categories");
+// Re-export the API result type with a different name to avoid conflicts
+export type ActionResult<T> = ApiActionResult<T>;
 
-  // return data
-  return data.map((category) => ({
-    ...category,
-    description: category.description ?? "",
-    image_url: category.image_url ?? "",
-    image_alt_text: category.image_alt_text ?? "",
-    display_order: category.display_order ?? 0,
-  }));
-}
+// Re-export the API functions with proper type handling
+export async function getCategories(): Promise<ActionResult<Category[]>> {
+  const result = await getApiCategories();
 
-export interface FavoriteMenuItem {
-  id: string;
-  name: string;
-  short_description: string;
-  image_url: string;
-  image_alt_text: string;
-}
+  // Transform the result to match the expected Category type
+  if (result.success) {
+    const transformedData = result.data.map((item) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description ?? "",
+      image_url: item.image_url ?? "",
+      image_alt_text: item.image_alt_text ?? "",
+      display_order: item.display_order ?? 0,
+    }));
 
-export async function getFavoriteMenuItems(): Promise<FavoriteMenuItem[]> {
-  const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("menu_items")
-    .select("id, name, short_description, image_url, image_alt_text")
-    .eq("is_favorite", true)
-    .limit(6);
-
-  if (error) throw new Error("Failed to fetch favorite menu items");
-  return data as FavoriteMenuItem[];
-}
-
-interface MenuItemView {
-  id: string;
-  name: string;
-  base_price: number;
-  max_price: number;
-  short_description: string;
-  has_protein_options: boolean;
-  image_url: string;
-  image_alt_text: string;
-  category_name: string;
-  menu_item_proteins: Array<{
-    protein_options: {
-      name: string;
-      is_vegetarian: boolean;
-      price_addition: number;
+    return {
+      success: true,
+      data: transformedData as Category[],
     };
-  }>;
+  }
+
+  return result;
+}
+
+export type { FavoriteMenuItem };
+
+export async function getFavoriteMenuItems(): Promise<
+  ActionResult<FavoriteMenuItem[]>
+> {
+  return getApiFavoriteMenuItems();
 }
 
 export async function getMenuItemsByCategory(
   categoryId: string
-): Promise<MenuItemView[]> {
-  const supabase = createServerSupabaseClient();
+): Promise<ActionResult<MenuItemView[]>> {
+  return getApiMenuItemsByCategory(categoryId);
+}
 
-  const { data, error } = await supabase.rpc("get_menu_items_by_category", {
-    input_category_id: categoryId,
-  });
+export interface MenuItem {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category_id: string;
+}
 
-  if (error) {
-    throw new Error("Failed to fetch menu items");
+/**
+ * Get a specific menu item by ID
+ */
+export async function getMenuItem(id: string): Promise<ActionResult<MenuItem>> {
+  try {
+    // This is just a placeholder - you'll need to implement the actual API call
+    throw new Error("Not implemented");
+  } catch (error) {
+    console.error(`Failed to fetch menu item with ID ${id}:`, error);
+
+    if (error instanceof ApiError) {
+      return {
+        success: false,
+        error: error.message,
+        code: error.code,
+        status: error.status,
+      };
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
-
-  return data as MenuItemView[];
 }

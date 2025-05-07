@@ -2,6 +2,10 @@
 
 import { CartItem } from "@/stores/cart-store";
 import { z } from "zod";
+import { authorizedFetch } from "@/lib/auth";
+
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
 // Schema for validating the order data
 const StoreOrderSchema = z.object({
@@ -39,16 +43,33 @@ export async function createStoreOrder(
     });
 
     // Here you would typically:
-    // 1. Save the order to your database (Supabase)
+    // 1. Save the order to the backend API
     // 2. Send notification to store staff
     // 3. Generate order number
 
-    // Mock implementation
-    const orderNumber = Math.floor(Math.random() * 1000) + 1000;
+    // Real implementation using our backend API
+    const response = await authorizedFetch(`${BASE_URL}/api/orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        items,
+        customerName,
+        customerPhone,
+        pickupTime,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create order");
+    }
+
+    const data = await response.json();
 
     return {
       success: true,
-      orderNumber,
+      orderNumber: data.orderNumber || Math.floor(Math.random() * 1000) + 1000,
       message: "Your order has been placed successfully!",
     };
   } catch (error) {

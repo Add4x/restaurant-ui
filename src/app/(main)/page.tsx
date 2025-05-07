@@ -4,12 +4,26 @@ import { getFavoriteMenuItems } from "@/actions/menu";
 import TestimonialSection from "@/components/testimonial-section";
 
 export default async function Home() {
-  const FavoriteMenuItem = await getFavoriteMenuItems();
+  const result = await getFavoriteMenuItems();
 
-  FavoriteMenuItem.forEach((item) => {
-    if (item.image_url) {
-      item.image_url = `${process.env.NEXT_PUBLIC_SUPABASE_STORAGE_URL}/${item.image_url}`;
-    } else {
+  if (!result.success) {
+    console.error("Failed to load favorite menu items:", result.error);
+    // Return an empty array if there was an error
+    return (
+      <div>
+        <HeroSection />
+        <FavoritesSection items={[]} />
+        <TestimonialSection />
+      </div>
+    );
+  }
+
+  const favoriteItems = result.data;
+
+  // Process image URLs - our backend API now returns complete URLs
+  // but we still handle the case where an image might be missing
+  favoriteItems.forEach((item) => {
+    if (!item.image_url) {
       item.image_url = "/images/menu-placeholder.jpg";
       item.image_alt_text = "Menu placeholder image";
     }
@@ -18,7 +32,7 @@ export default async function Home() {
   return (
     <div>
       <HeroSection />
-      <FavoritesSection items={FavoriteMenuItem} />
+      <FavoritesSection items={favoriteItems} />
       <TestimonialSection />
     </div>
   );

@@ -1,0 +1,246 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Error Handling Patterns
+
+Guidelines for implementing consistent error handling in the restaurant UI application.
+
+<rule>
+name: error_handling_patterns
+description: Standards for implementing error handling in the restaurant UI application
+filters:
+  - type: file_extension
+    pattern: "\\.(ts|tsx)$"
+  - type: file_path
+    pattern: "src/(hooks|components|actions)/.*"
+  - type: intent
+    pattern: "error_handling|api_errors"
+
+actions:
+  - type: suggest
+    message: |
+      ## Error Handling Patterns
+
+      Implement consistent error handling throughout the restaurant UI application using these patterns.
+
+      ### ActionResult Pattern
+      All server actions must return:
+      ```typescript
+      export type ActionResult<T> =
+        | { success: true; data: T }
+        | { success: false; error: string; code?: string; status?: number };
+      ```
+      Always check `result.success` before using `result.data` in client code and hooks.
+
+      ### API Error Structure
+      The Java backend should return errors in a consistent format:
+      ```json
+      {
+        "message": "Human-readable error message",
+        "code": "ERROR_CODE",
+        "status": 400
+      }
+      ```
+
+      ### API Client Error Handling
+      Use Zod schemas for runtime validation of API responses. Always use `credentials: 'include'` in fetch calls.
+      ```typescript
+      // src/lib/api-client.ts
+      import { z } from 'zod';
+      
+      export class ApiError extends Error {
+        code?: string;
+        status: number;
+        constructor(message: string, status: number, code?: string) {
+          super(message);
+          this.name = 'ApiError';
+          this.status = status;
+          this.code = code;
+        }
+      }
+      
+      export async function fetchWithAuth<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+        const url = `${baseUrl}${endpoint}`;
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          let errorMessage = `API error: ${response.status}`;
+          let errorCode = undefined;
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.message || errorMessage;
+            errorCode = errorData.code;
+          } catch (e) {}
+          throw new ApiError(errorMessage, response.status, errorCode);
+        }
+        return response.json();
+      }
+      ```
+
+      ### Server Action Error Handling
+      All server actions must return `ActionResult<T>`. Use Zod to validate API responses. Example:
+      ```typescript
+      // src/actions/menu.ts
+      import { fetchWithAuth, ApiError } from '@/lib/api-client';
+      import { z } from 'zod';
+      
+      export type ActionResult<T> =
+        | { success: true; data: T }
+        | { success: false; error: string; code?: string; status?: number };
+      
+      const menuItemSchema = z.object({
+        id: z.string(),
+        name: z.string(),
+        // ...
+      });
+      
+      export async function getMenuItems(): Promise<ActionResult<MenuItem[]>> {
+        try {
+          const data = await fetchWithAuth<MenuItem[]>('/api/menu');
+          const items = z.array(menuItemSchema).parse(data);
+          return { success: true, data: items };
+        } catch (error) {
+          if (error instanceof ApiError) {
+            return { success: false, error: error.message, code: error.code, status: error.status };
+          }
+          return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        }
+      }
+      ```
+
+      ### Client-Side Error Handling with React Query
+      ```typescript
+      // src/hooks/use-menu-items.ts
+      import { useQuery } from '@tanstack/react-query';
+      import { getMenuItems } from '@/actions/menu';
+      
+      export function useMenuItems() {
+        return useQuery({
+          queryKey: ['menu-items'],
+          queryFn: async () => {
+            const result = await getMenuItems();
+            if (!result.success) {
+              throw new Error(result.error);
+            }
+            return result.data;
+          },
+          onError: (error) => {
+            // Show toast or handle error in UI
+          },
+        });
+      }
+      ```
+
+      ### Form Submission Error Handling
+      ```tsx
+      // src/components/menu/AddMenuItemForm.tsx
+      'use client'
+      import { useState } from 'react';
+      import { useToast } from '@/components/ui/use-toast';
+      import { createMenuItem } from '@/actions/menu';
+      
+      export function AddMenuItemForm() {
+        const { toast } = useToast();
+        const [pending, setPending] = useState(false);
+        const [error, setError] = useState<string | null>(null);
+        
+        async function handleSubmit(formData: FormData) {
+          setPending(true);
+          setError(null);
+          try {
+            const result = await createMenuItem(formData);
+            if (result.success) {
+              toast({ title: 'Success', description: 'Menu item created successfully' });
+            } else {
+              setError(result.error);
+              toast({ title: 'Error', description: result.error, variant: 'destructive' });
+            }
+          } catch (e) {
+            const message = e instanceof Error ? e.message : 'Unknown error';
+            setError(message);
+            toast({ title: 'Error', description: message, variant: 'destructive' });
+          } finally {
+            setPending(false);
+          }
+        }
+        // ...
+      }
+      ```
+
+      ### Error Boundary Component
+      (No change needed, but ensure errors thrown in hooks are caught by boundaries)
+
+      ### Using Error Boundaries in Layout
+      (No change needed)
+
+  - type: reject
+    conditions:
+      - pattern: "console\\.error\\([^)]*\\)(?!.*catch)"
+        message: "Console errors should be wrapped in try/catch blocks to ensure proper error handling."
+      - pattern: "throw new Error\\("
+        message: "Consider using ApiError and/or ActionResult<T> instead of generic Error for API-related errors to include status codes and error codes."
+      - pattern: "useQuery\\([^{]|useQuery\\({[^}]*queryFn:[^}]*fetch\\([^}]*}\\)"
+        message: "When using React Query, always handle errors properly in the queryFn and use onError for toast notifications."
+      - pattern: "if\\s*\\([^)]*response\\.status\\s*===\\s*401[^)]*\\)\\s*\\{[^}]*\\}"
+        message: "Authentication errors (401) should be handled consistently using ApiError and appropriate redirects."
+      - pattern: "function [a-zA-Z0-9_]+\([^)]*\): Promise<((?!ActionResult).)*>"
+        message: "All server actions must return ActionResult<T> for robust error handling."
+      - pattern: "if\s*\([^)]*\.success\s*\)\s*{[^}]*return [^}]*\.data"
+        message: "Always check result.success before using result.data."
+
+examples:
+  - input: |
+      // src/actions/checkout.ts
+      export async function processOrder(orderData) {
+        try {
+          const response = await fetch('/api/order', {
+            method: 'POST',
+            body: JSON.stringify(orderData),
+            credentials: 'include',
+          });
+          if (!response.ok) {
+            return { success: false, error: 'Failed to process order' };
+          }
+          const data = await response.json();
+          return { success: true, data };
+        } catch (error) {
+          console.error('Order processing error', error);
+          return { success: false, error: 'Failed to process order' };
+        }
+      }
+    output: |
+      // src/actions/checkout.ts
+      import { ApiError } from '@/lib/api-client';
+      import { z } from 'zod';
+      export type ActionResult<T> =
+        | { success: true; data: T }
+        | { success: false; error: string; code?: string; status?: number };
+      export async function processOrder(orderData): Promise<ActionResult<Order>> {
+        try {
+          const data = await fetchWithAuth<Order>('/api/order', {
+            method: 'POST',
+            body: JSON.stringify(orderData),
+          });
+          // Optionally validate with Zod here
+          return { success: true, data };
+        } catch (error) {
+          if (error instanceof ApiError) {
+            return { success: false, error: error.message, code: error.code, status: error.status };
+          }
+          return { success: false, error: error instanceof Error ? error.message : 'Failed to process order' };
+        }
+      }
+
+metadata:
+  priority: high
+  version: 2.0
+</rule>

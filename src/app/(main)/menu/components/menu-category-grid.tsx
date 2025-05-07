@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/divider";
-import { useCategories } from "@/hooks/use-menu-items";
+import { useCategories } from "@/hooks/use-categories";
 import { useRouter } from "next/navigation";
 // import Image from "next/image";
 export function MenuCategoryGrid() {

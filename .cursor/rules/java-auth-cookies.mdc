@@ -1,0 +1,184 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Java Backend Authentication with HTTP-only Cookies
+
+Guidelines for implementing authentication between Next.js frontend and Java backend using client credentials flow with HTTP-only cookies.
+
+<rule>
+name: java_oauth_cookies
+description: Standards for implementing client credentials flow with HTTP-only cookies from Java backend
+filters:
+  - type: file_extension
+    pattern: "\\.(ts|tsx|js|jsx)$"
+  - type: file_path
+    pattern: "src/(hooks|components|app)/.*"
+  - type: intent
+    pattern: "auth_implementation|cookies|authentication"
+
+actions:
+  - type: suggest
+    message: |
+      ## Authentication Flow with HTTP-only Cookies
+
+      This project uses client credentials flow where the client sends a request to the Java authorization server with client ID and secret, and authentication is maintained through HTTP-only cookies.
+
+      ### Frontend API Calls
+
+      When making API calls to the Java backend, always include credentials to ensure cookies are sent:
+
+      ```typescript
+      // Hook for fetching data from the backend API
+      export function useApiQuery<T>(endpoint: string, queryKey: string[]) {
+        return useQuery<T>({
+          queryKey,
+          queryFn: async () => {
+            const response = await fetch(`${BASE_URL}${endpoint}`, {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              // This is crucial - it ensures cookies are sent with the request
+              credentials: 'include',
+            });
+
+            if (!response.ok) {
+              if (response.status === 401) {
+                // Handle unauthorized (redirect to login if needed)
+                window.location.href = '/login';
+                throw new Error('Authentication required');
+              }
+              throw new Error(`API error: ${response.status}`);
+            }
+
+            return response.json();
+          },
+        });
+      }
+      ```
+
+      ### Login Implementation
+
+      The login process should POST credentials to the Java backend, which will respond with HTTP-only cookies:
+
+      ```typescript
+      async function login(username: string, password: string) {
+        try {
+          const response = await fetch(`${BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ username, password }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Login failed');
+          }
+
+          // The Java backend sets HTTP-only cookies in the response
+          // No need to extract or store tokens manually
+          return true;
+        } catch (error) {
+          console.error('Login error:', error);
+          return false;
+        }
+      }
+      ```
+
+      ### Client Credentials Flow
+
+      For service-to-service authentication (client credentials flow):
+
+      ```typescript
+      async function getClientCredentialsToken() {
+        const clientId = process.env.CLIENT_ID;
+        const clientSecret = process.env.CLIENT_SECRET;
+
+        try {
+          const response = await fetch(`${BASE_URL}/oauth2/token`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Authorization': `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString('base64')}`
+            },
+            body: new URLSearchParams({
+              'grant_type': 'client_credentials',
+              'scope': 'api'
+            }),
+            credentials: 'include'
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to obtain access token');
+          }
+
+          // The token is set as an HTTP-only cookie by the server
+          // No need to extract it from the response
+          return true;
+        } catch (error) {
+          console.error('Failed to get token:', error);
+          return false;
+        }
+      }
+      ```
+
+      ### Backend CORS Requirements
+
+      The Java backend must be configured with appropriate CORS settings:
+
+      ```java
+      @Configuration
+      public class WebConfig implements WebMvcConfigurer {
+          @Override
+          public void addCorsMappings(CorsRegistry registry) {
+              registry.addMapping("/**")
+                  .allowedOrigins("http://localhost:3000") // Your frontend URL
+                  .allowedMethods("GET", "POST", "PUT", "DELETE")
+                  .allowedHeaders("*")
+                  .allowCredentials(true); // Critical for cookies!
+          }
+      }
+      ```
+
+  - type: reject
+    conditions:
+      - pattern: "localStorage\\s*\\.\\s*setItem\\s*\\(\\s*['\"]token['\"]"
+        message: "Don't store authentication tokens in localStorage. The backend provides HTTP-only cookies."
+      
+      - pattern: "sessionStorage\\s*\\.\\s*setItem\\s*\\(\\s*['\"]token['\"]"
+        message: "Don't store authentication tokens in sessionStorage. The backend provides HTTP-only cookies."
+      
+      - pattern: "document\\.cookie\\s*=\\s*"
+        message: "Don't manually set cookies for authentication. The backend sets HTTP-only cookies."
+      
+      - pattern: "fetch\\([^)]*\\)\\s*(?!.*credentials\\s*:\\s*['\"]include['\"])"
+        message: "Add 'credentials: 'include'' to your fetch call to ensure cookies are sent with the request."
+
+examples:
+  - input: |
+      // API call to fetch data
+      const response = await fetch(`${BASE_URL}/api/data`, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    output: |
+      // API call to fetch data
+      const response = await fetch(`${BASE_URL}/api/data`, {
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'  // Add this to send cookies with the request
+      });
+
+  - input: |
+      // Store token after login
+      localStorage.setItem('token', data.token);
+    output: |
+      // Don't store token manually, the Java backend sets HTTP-only cookies
+      // Just redirect to the authenticated area after successful login
+      router.push('/dashboard');
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>

@@ -1,0 +1,264 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Next.js API Client with Client Credentials Flow, HTTP-only Cookies, and ActionResult Pattern
+
+Standards for implementing API clients and server actions in Next.js that work with a Java backend using OAuth2 client credentials flow, HTTP-only cookies for authentication, and robust error handling.
+
+<rule>
+name: nextjs_api_client_cookies
+
+description: Standards for implementing API clients with OAuth2 client credentials, HTTP-only cookies authentication, and ActionResult pattern
+filters:
+  - type: file_extension
+    pattern: "\\.(ts|tsx)$"
+  - type: file_path
+    pattern: "src/(hooks|lib|utils|actions)/.*"
+  - type: intent
+    pattern: "api_client|fetch_wrapper|http_client|action_result|error_handling|client_credentials"
+
+actions:
+  - type: suggest
+    message: |
+      ## Next.js API Client & Server Action Implementation
+
+      API clients and server actions in Next.js should:
+      - Authenticate using OAuth2 client credentials flow (POST to `/oauth2/token` with Basic auth)
+      - Use HTTP-only cookies set by the Java backend for all API requests
+      - Always use `credentials: 'include'` in fetch calls
+      - Use the `ActionResult<T>` pattern for all server actions
+      - Use Zod schemas for runtime validation of API responses
+      - Use `ApiError` for robust error handling
+      - Never store tokens in localStorage/sessionStorage
+
+      ### ActionResult Pattern
+      All server actions must return:
+      ```typescript
+      export type ActionResult<T> =
+        | { success: true; data: T }
+        | { success: false; error: string; code?: string; status?: number };
+      ```
+      Client and hook code must check `result.success` before using `result.data`.
+
+      ### API Client Base (Client Credentials Flow)
+      ```typescript
+      // src/lib/api-client.ts
+      import {
+        authenticate as authenticateAction,
+        authorizedFetch,
+      } from "@/actions/auth";
+
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+
+      export class ApiError extends Error {
+        status: number;
+        code?: string;
+        constructor(message: string, status: number, code?: string) {
+          super(message);
+          this.name = "ApiError";
+          this.status = status;
+          this.code = code;
+        }
+      }
+
+      export const authenticate = authenticateAction;
+
+      export async function fetchWithAuth<T>(
+        endpoint: string,
+        options: RequestInit = {}
+      ): Promise<T> {
+        try {
+          const url = `${API_URL}${endpoint}`;
+          const response = await authorizedFetch(url, options);
+          return await response.json();
+        } catch (error) {
+          if (error instanceof Error) {
+            if (error.message.includes("API error: 401")) {
+              throw new ApiError("Authentication failed", 401);
+            }
+            throw new ApiError(error.message, 500);
+          }
+          throw new ApiError("Unknown error", 500);
+        }
+      }
+      ```
+
+      ### Authentication Implementation (Client Credentials Flow)
+      ```typescript
+      // src/actions/auth.ts
+      export async function authenticate(): Promise<boolean> {
+        const clientId = process.env.API_CLIENT_ID || "client";
+        const clientSecret = process.env.API_CLIENT_SECRET || "secret";
+        try {
+          const formData = new URLSearchParams();
+          formData.append("grant_type", "client_credentials");
+          formData.append("scope", "write");
+          const response = await fetch(`${BASE_URL}/oauth2/token`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded",
+              Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+            },
+            body: formData,
+            credentials: "include",
+          });
+          if (!response.ok) {
+            console.error("Authentication failed:", await response.text());
+            return false;
+          }
+          return true;
+        } catch (error) {
+          console.error("Authentication error:", error);
+          return false;
+        }
+      }
+      ```
+
+      ### Authenticated Fetch Wrapper
+      ```typescript
+      // src/actions/auth.ts
+      export async function authorizedFetch(
+        url: string,
+        options: RequestInit = {}
+      ): Promise<Response> {
+        let response = await fetch(url, {
+          ...options,
+          headers: {
+            ...options.headers,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          credentials: "include",
+        });
+        if (response.status === 401) {
+          const authenticated = await authenticate();
+          if (!authenticated) {
+            throw new Error("Authentication failed");
+          }
+          response = await fetch(url, {
+            ...options,
+            headers: {
+              ...options.headers,
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            credentials: "include",
+          });
+        }
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+        return response;
+      }
+      ```
+
+      ### Server Action Example
+      ```typescript
+      // src/actions/api.ts
+      import { authorizedFetch } from "@/actions/auth";
+      import { z } from "zod";
+      import { ApiError } from "@/lib/api-client";
+      export type ActionResult<T> =
+        | { success: true; data: T }
+        | { success: false; error: string; code?: string; status?: number };
+      const menuItemSchema = z.object({
+        id: z.string(),
+        name: z.string(),
+        // ...
+      });
+      export async function getMenuItems(): Promise<ActionResult<MenuItem[]>> {
+        try {
+          const response = await authorizedFetch(`${BASE_URL}/api/menu`);
+          const data = await response.json();
+          const items = z.array(menuItemSchema).parse(data);
+          return { success: true, data: items };
+        } catch (error) {
+          if (error instanceof ApiError) {
+            return { success: false, error: error.message, code: error.code, status: error.status };
+          }
+          if (error instanceof z.ZodError) {
+            return { success: false, error: `Invalid data format: ${error.message}`, code: "VALIDATION_ERROR" };
+          }
+          return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+        }
+      }
+      ```
+
+      ### React Query Hook Example
+      ```typescript
+      // src/hooks/use-menu-items.ts
+      import { useQuery } from '@tanstack/react-query';
+      import { getMenuItems } from '@/actions/menu';
+      export function useMenuItems() {
+        return useQuery({
+          queryKey: ['menu-items'],
+          queryFn: async () => {
+            const result = await getMenuItems();
+            if (!result.success) {
+              throw new Error(result.error);
+            }
+            return result.data;
+          },
+        });
+      }
+      ```
+
+      ### Error Handling
+      - Always check `result.success` before using data
+      - Use Zod for runtime validation
+      - Throw errors in hooks if `!result.success` so UI can handle them
+      - Never store tokens in localStorage/sessionStorage; use HTTP-only cookies
+      - Use ApiError for consistent error handling
+
+  - type: reject
+    conditions:
+      - pattern: "fetch\\([^)]*\\)\\s*(?!.*credentials\\s*:\\s*['\"]include['\"])"
+        message: "Add 'credentials: 'include'' to your fetch call to ensure cookies are sent with the request."
+      - pattern: "localStorage\\.setItem\\(['\"]token['\"]"
+        message: "Don't store authentication tokens in localStorage. The backend provides HTTP-only cookies."
+      - pattern: "sessionStorage\\.setItem\\(['\"]token['\"]"
+        message: "Don't store authentication tokens in sessionStorage. The backend provides HTTP-only cookies."
+      - pattern: "function [a-zA-Z0-9_]+\\([^)]*\\): Promise<((?!ActionResult).)*>"
+        message: "All server actions must return ActionResult<T> for robust error handling."
+      - pattern: "if\\s*\\([^)]*\\.success\\s*\\)\\s*{[^}]*return [^}]*\\.data"
+        message: "Always check result.success before using result.data."
+
+examples:
+  - input: |
+      // API call
+      const fetchData = async () => {
+        const response = await fetch('/api/data');
+        return response.json();
+      };
+    output: |
+      // API call
+      const fetchData = async () => {
+        const response = await fetch('/api/data', {
+          credentials: 'include'  // Add this to send cookies
+        });
+        return response.json();
+      };
+
+  - input: |
+      // Server action
+      export async function getMenuItems(): Promise<MenuItem[]> {
+        const response = await fetchWithAuth('/api/menu');
+        return response.json();
+      }
+    output: |
+      // Server action
+      export async function getMenuItems(): Promise<ActionResult<MenuItem[]>> {
+        try {
+          const data = await fetchWithAuth<MenuItem[]>('/api/menu');
+          return { success: true, data };
+        } catch (error) {
+          return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+        }
+      }
+
+metadata:
+  priority: high
+  version: 3.0
+</rule>

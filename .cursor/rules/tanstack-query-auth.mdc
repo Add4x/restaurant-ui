@@ -1,0 +1,386 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# TanStack Query with Authenticated Requests
+
+Guidelines for implementing data fetching with TanStack Query that works with HTTP-only cookies for authentication.
+
+<rule>
+name: tanstack_query_auth
+description: Standards for using TanStack Query with authenticated requests
+filters:
+  - type: file_extension
+    pattern: "\\.(ts|tsx)$"
+  - type: file_path
+    pattern: "src/(hooks|lib|components)/.*"
+  - type: intent
+    pattern: "data_fetching|tanstack_query|react_query"
+
+actions:
+  - type: suggest
+    message: |
+      ## TanStack Query with Authenticated Requests
+
+      When using TanStack Query with authenticated requests, ensure all fetch calls include credentials and handle authentication errors properly.
+
+      ### Query Client Provider Setup
+
+      ```tsx
+      // src/app/providers.tsx
+      'use client'
+
+      import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+      import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+      import { useState } from 'react'
+
+      export function Providers({ children }: { children: React.ReactNode }) {
+        const [queryClient] = useState(() => new QueryClient({
+          defaultOptions: {
+            queries: {
+              // Default query options
+              staleTime: 60 * 1000, // 1 minute
+              retry: 1, // Retry failed queries once
+              refetchOnWindowFocus: true,
+            },
+          },
+        }))
+
+        return (
+          <QueryClientProvider client={queryClient}>
+            {children}
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
+        )
+      }
+      ```
+
+      ### Base Query Hook
+
+      Create a base query hook that adds authentication handling:
+
+      ```typescript
+      // src/hooks/use-authenticated-query.ts
+      'use client'
+
+      import { useQuery, UseQueryOptions, QueryKey } from '@tanstack/react-query'
+      import { useRouter } from 'next/navigation'
+
+      /**
+       * Custom hook for making authenticated queries with TanStack Query
+       */
+      export function useAuthenticatedQuery<TData, TError = Error>(
+        queryKey: QueryKey,
+        queryFn: () => Promise<TData>,
+        options?: Omit<UseQueryOptions<TData, TError, TData>, 'queryKey' | 'queryFn'>
+      ) {
+        const router = useRouter()
+
+        return useQuery<TData, TError>({
+          queryKey,
+          queryFn: async () => {
+            try {
+              return await queryFn()
+            } catch (error) {
+              // If we get an authentication error, redirect to login
+              if (error instanceof Error) {
+                if (error.message.includes('401') || error.message.includes('unauthorized')) {
+                  // Redirect to authentication endpoint
+                  router.push('/api/auth')
+                }
+              }
+              throw error
+            }
+          },
+          ...options,
+        })
+      }
+      ```
+
+      ### API Fetch Wrapper
+
+      Create a fetch wrapper that handles credentials and errors:
+
+      ```typescript
+      // src/lib/api-client.ts
+      'use client'
+
+      /**
+       * Fetch wrapper that includes credentials and handles common errors
+       */
+      export async function fetchApi<T>(
+        endpoint: string,
+        options: RequestInit = {}
+      ): Promise<T> {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || ''
+        const url = `${baseUrl}${endpoint}`
+
+        const response = await fetch(url, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...options.headers,
+          },
+          // Always include credentials for authentication cookies
+          credentials: 'include',
+        })
+
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}))
+          throw new Error(
+            error.message || `API error: ${response.status} ${response.statusText}`
+          )
+        }
+
+        return response.json()
+      }
+      ```
+
+      ### Resource-Specific Query Hooks
+
+      Implement query hooks for specific resources:
+
+      ```typescript
+      // src/hooks/use-menu-items.ts
+      'use client'
+
+      import { useAuthenticatedQuery } from './use-authenticated-query'
+      import { fetchApi } from '@/lib/api-client'
+
+      export interface MenuItem {
+        id: string
+        name: string
+        description: string
+        price: number
+        imageUrl: string
+        category: string
+      }
+
+      /**
+       * Hook for fetching menu items with authentication handling
+       */
+      export function useMenuItems() {
+        return useAuthenticatedQuery<MenuItem[]>(
+          ['menu-items'],
+          () => fetchApi('/api/menu')
+        )
+      }
+
+      /**
+       * Hook for fetching a specific menu item with authentication handling
+       */
+      export function useMenuItem(id: string) {
+        return useAuthenticatedQuery<MenuItem>(
+          ['menu-items', id],
+          () => fetchApi(`/api/menu/${id}`)
+        )
+      }
+      ```
+
+      ### Mutation Hooks
+
+      Implement mutation hooks for data modifications:
+
+      ```typescript
+      // src/hooks/use-menu-mutations.ts
+      'use client'
+
+      import { useMutation, useQueryClient } from '@tanstack/react-query'
+      import { fetchApi } from '@/lib/api-client'
+      import { MenuItem } from './use-menu-items'
+
+      /**
+       * Hook for creating menu items
+       */
+      export function useCreateMenuItem() {
+        const queryClient = useQueryClient()
+
+        return useMutation({
+          mutationFn: (newItem: Omit<MenuItem, 'id'>) => {
+            return fetchApi<MenuItem>('/api/menu', {
+              method: 'POST',
+              body: JSON.stringify(newItem),
+            })
+          },
+          onSuccess: () => {
+            // Invalidate menu items queries to trigger a refetch
+            queryClient.invalidateQueries({ queryKey: ['menu-items'] })
+          },
+        })
+      }
+
+      /**
+       * Hook for updating menu items
+       */
+      export function useUpdateMenuItem() {
+        const queryClient = useQueryClient()
+
+        return useMutation({
+          mutationFn: (updatedItem: MenuItem) => {
+            return fetchApi<MenuItem>(`/api/menu/${updatedItem.id}`, {
+              method: 'PUT',
+              body: JSON.stringify(updatedItem),
+            })
+          },
+          onSuccess: (data) => {
+            // Update the cache for both the collection and the individual item
+            queryClient.invalidateQueries({ queryKey: ['menu-items'] })
+            queryClient.setQueryData(['menu-items', data.id], data)
+          },
+        })
+      }
+
+      /**
+       * Hook for deleting menu items
+       */
+      export function useDeleteMenuItem() {
+        const queryClient = useQueryClient()
+
+        return useMutation({
+          mutationFn: (id: string) => {
+            return fetchApi(`/api/menu/${id}`, {
+              method: 'DELETE',
+            })
+          },
+          onSuccess: (_, id) => {
+            // Invalidate menu items queries and remove the individual item from cache
+            queryClient.invalidateQueries({ queryKey: ['menu-items'] })
+            queryClient.removeQueries({ queryKey: ['menu-items', id] })
+          },
+        })
+      }
+      ```
+
+      ### Component Usage Example
+
+      ```tsx
+      // src/components/menu/MenuItemList.tsx
+      'use client'
+
+      import { useMenuItems } from '@/hooks/use-menu-items'
+      import { useDeleteMenuItem } from '@/hooks/use-menu-mutations'
+
+      export function MenuItemList() {
+        const { data: menuItems, isLoading, error } = useMenuItems()
+        const deleteMenuItem = useDeleteMenuItem()
+
+        if (isLoading) return <div>Loading menu items...</div>
+        if (error) return <div>Error loading menu items: {error.message}</div>
+        if (!menuItems?.length) return <div>No menu items found</div>
+
+        return (
+          <div>
+            <h2>Menu Items</h2>
+            <ul>
+              {menuItems.map((item) => (
+                <li key={item.id}>
+                  <h3>{item.name}</h3>
+                  <p>{item.description}</p>
+                  <p>${item.price.toFixed(2)}</p>
+                  <button
+                    onClick={() => deleteMenuItem.mutate(item.id)}
+                    disabled={deleteMenuItem.isPending}
+                  >
+                    {deleteMenuItem.isPending ? 'Deleting...' : 'Delete'}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+      ```
+
+  - type: reject
+    conditions:
+      - pattern: "useQuery\\(\\{[^}]*\\}\\)(?!.*credentials\\s*:\\s*['\"]include['\"])"
+        message: "When using TanStack Query with authenticated endpoints, ensure your fetch calls include 'credentials: 'include'' to send cookies with the request."
+      
+      - pattern: "useMutation\\(\\{[^}]*\\}\\)(?!.*credentials\\s*:\\s*['\"]include['\"])"
+        message: "When using TanStack Query mutations with authenticated endpoints, ensure your fetch calls include 'credentials: 'include'' to send cookies with the request."
+      
+      - pattern: "fetch\\([^)]*\\)(?!.*credentials\\s*:\\s*['\"]include['\"])"
+        message: "When making fetch calls to authenticated endpoints, always include 'credentials: 'include'' to ensure cookies are sent with the request."
+
+examples:
+  - input: |
+      // src/hooks/use-products.ts
+      export function useProducts() {
+        return useQuery({
+          queryKey: ['products'],
+          queryFn: async () => {
+            const response = await fetch('/api/products')
+            if (!response.ok) throw new Error('Failed to fetch products')
+            return response.json()
+          }
+        })
+      }
+    output: |
+      // src/hooks/use-products.ts
+      export function useProducts() {
+        return useQuery({
+          queryKey: ['products'],
+          queryFn: async () => {
+            const response = await fetch('/api/products', {
+              credentials: 'include'  // Add this to send cookies with the request
+            })
+            if (!response.ok) {
+              if (response.status === 401) {
+                // Handle authentication error
+                router.push('/api/auth')
+              }
+              throw new Error('Failed to fetch products')
+            }
+            return response.json()
+          }
+        })
+      }
+
+  - input: |
+      // src/hooks/use-product-mutations.ts
+      export function useCreateProduct() {
+        const queryClient = useQueryClient()
+        
+        return useMutation({
+          mutationFn: (newProduct) => {
+            return fetch('/api/products', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newProduct)
+            }).then(res => res.json())
+          },
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] })
+          }
+        })
+      }
+    output: |
+      // src/hooks/use-product-mutations.ts
+      export function useCreateProduct() {
+        const queryClient = useQueryClient()
+        
+        return useMutation({
+          mutationFn: (newProduct) => {
+            return fetch('/api/products', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newProduct),
+              credentials: 'include'  // Add this to send cookies with the request
+            }).then(res => {
+              if (!res.ok) {
+                throw new Error(`API error: ${res.status}`)
+              }
+              return res.json()
+            })
+          },
+          onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] })
+          }
+        })
+      }
+
+metadata:
+  priority: high
+  version: 1.0
+</rule>
