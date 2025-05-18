@@ -53,10 +53,10 @@ export async function createCheckoutSession(
       line_items: lineItems,
       mode: "payment",
       success_url: `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
       }/checkout?status=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${
-        process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3001"
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"
       }/checkout?status=canceled`,
       metadata: {
         orderId: orderId || "",

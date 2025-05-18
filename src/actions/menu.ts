@@ -23,10 +23,10 @@ export async function getCategories(): Promise<ActionResult<Category[]>> {
     const transformedData = result.data.map((item) => ({
       id: item.id,
       name: item.name,
-      description: item.description ?? "",
-      image_url: item.image_url ?? "",
-      image_alt_text: item.image_alt_text ?? "",
-      display_order: item.display_order ?? 0,
+      description: item.description,
+      imageUrl: item.imageUrl,
+      imageAltText: item.imageAltText,
+      displayOrder: item.displayOrder,
     }));
 
     return {

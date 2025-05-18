@@ -22,8 +22,8 @@ export function MenuCard({ item }: MenuCardProps) {
       <div className="flex flex-col">
         <div className="relative w-full h-[12.5rem]">
           <Image
-            src={item.image_url || "/default-menu-item.jpg"}
-            alt={item.image_alt_text}
+            src={item.imageUrl}
+            alt={item.imageAltText}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"

@@ -30,10 +30,10 @@ export const menuItemSchema = z.object({
 export const categorySchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
-  display_order: z.number(),
-  description: z.string(),
-  image_url: z.string(),
-  image_alt_text: z.string(),
+  displayOrder: z.number().optional().default(0),
+  description: z.string().optional().default(""),
+  imageUrl: z.string().optional().default("/images/menu-placeholder.jpg"),
+  imageAltText: z.string().optional().default("Menu placeholder image"),
 });
 
 // Type exports

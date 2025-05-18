@@ -13,6 +13,7 @@ export const categorySchema = z.object({
 export type Category = z.infer<typeof categorySchema>;
 
 export function useCategories() {
+  console.log("useCategories #######");
   return useQuery({
     queryKey: ["categories"],
     queryFn: async () => {

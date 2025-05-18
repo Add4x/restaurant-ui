@@ -15,18 +15,21 @@ export type ActionResult<T> =
 
 // Define schemas for API responses
 const categoryResponseSchema = z.object({
-  id: z.string(),
+  categoryId: z.number(),
   name: z.string(),
-  display_order: z.number().optional(),
-  description: z.string().optional(),
-  image_url: z.string().optional(),
-  image_alt_text: z.string().optional(),
+  displayOrder: z.number().optional().default(0),
+  description: z
+    .string()
+    .optional()
+    .default("One of our most popular categories"),
+  imageUrl: z.string().optional().default("/images/menu-placeholder.jpg"),
+  imageAltText: z.string().optional().default("Menu placeholder image"),
 });
 
 const favoriteMenuItemSchema = z.object({
   id: z.string(),
   name: z.string(),
-  short_description: z.string().optional().default(""),
+  shortDescription: z.string().optional().default(""),
   image_url: z.string().optional().default(""),
   image_alt_text: z.string().optional().default(""),
 });
@@ -39,10 +42,21 @@ export type MenuItemView = z.infer<typeof menuItemSchema>;
  * Get all categories
  */
 export async function getCategories(): Promise<
-  ActionResult<z.infer<typeof categoryResponseSchema>[]>
+  ActionResult<
+    {
+      id: string;
+      name: string;
+      description: string;
+      imageUrl: string;
+      imageAltText: string;
+      displayOrder: number;
+    }[]
+  >
 > {
   try {
-    const response = await authorizedFetch(`${BASE_URL}/api/categories`);
+    const response = await authorizedFetch(
+      `${BASE_URL}/api/restaurants/locations/1/categories`
+    );
     const rawData = await response.json();
 
     // Validate and transform the data
@@ -50,12 +64,12 @@ export async function getCategories(): Promise<
 
     // Process the data to match the expected format
     const categories = parsedData.map((category) => ({
-      id: category.id,
+      id: String(category.categoryId),
       name: category.name,
-      description: category.description ?? "",
-      image_url: category.image_url ?? "",
-      image_alt_text: category.image_alt_text ?? "",
-      display_order: category.display_order ?? 0,
+      description: category.description,
+      imageUrl: category.imageUrl || "/images/menu-placeholder.jpg",
+      imageAltText: category.imageAltText || "Menu placeholder image",
+      displayOrder: category.displayOrder,
     }));
 
     return { success: true, data: categories };
@@ -86,7 +100,7 @@ export async function getFavoriteMenuItems(): Promise<
 > {
   try {
     const response = await authorizedFetch(
-      `${BASE_URL}/api/menu-items/favorites`
+      `${BASE_URL}/api/menu-items/by-tag/favorite`
     );
     const rawData = await response.json();
 
