@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getCategories, getMenuItemsByCategory } from "@/actions/api";
+import { useLocationStore } from "@/stores/location-store";
 import { z } from "zod";
 
 export const categorySchema = z.object({
@@ -13,11 +14,18 @@ export const categorySchema = z.object({
 export type Category = z.infer<typeof categorySchema>;
 
 export function useCategories() {
-  console.log("useCategories #######");
+  const { brandName, selectedLocation } = useLocationStore();
+  console.log("brandName #######", brandName);
+  console.log("selectedLocation #######", selectedLocation);
+
   return useQuery({
-    queryKey: ["categories"],
+    queryKey: ["categories", brandName, selectedLocation?.slug],
     queryFn: async () => {
-      const result = await getCategories();
+      if (!brandName || !selectedLocation?.slug) {
+        throw new Error("Brand name and location are required");
+      }
+
+      const result = await getCategories(brandName, selectedLocation.slug);
 
       if (!result.success) {
         throw new Error(result.error);
@@ -25,6 +33,7 @@ export function useCategories() {
 
       return result.data;
     },
+    enabled: !!brandName && !!selectedLocation?.slug,
   });
 }
 

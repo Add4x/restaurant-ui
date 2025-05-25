@@ -36,8 +36,24 @@ export const categorySchema = z.object({
   imageAltText: z.string().optional().default("Menu placeholder image"),
 });
 
+// Location schema
+export const locationSchema = z.object({
+  locationId: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  address: z.string(),
+  phoneNumber: z.string(),
+  email: z.string(),
+  openingHours: z.string(),
+  cuisineType: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+  active: z.boolean(),
+});
+
 // Type exports
 export type MenuItem = z.infer<typeof menuItemSchema>;
 export type Category = z.infer<typeof categorySchema>;
 export type ProteinOption = z.infer<typeof proteinOptionSchema>;
 export type MenuItemProtein = z.infer<typeof menuItemProteinSchema>;
+export type Location = z.infer<typeof locationSchema>;

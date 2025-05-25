@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { authorizedFetch } from "@/actions/auth";
-import { menuItemSchema } from "@/lib/types";
+import { menuItemSchema, locationSchema } from "@/lib/types";
 import { ApiError } from "@/lib/api-client";
 
 const BASE_URL =
@@ -14,17 +14,6 @@ export type ActionResult<T> =
   | { success: false; error: string; code?: string; status?: number };
 
 // Define schemas for API responses
-const categoryResponseSchema = z.object({
-  categoryId: z.number(),
-  name: z.string(),
-  displayOrder: z.number().optional().default(0),
-  description: z
-    .string()
-    .optional()
-    .default("One of our most popular categories"),
-  imageUrl: z.string().optional().default("/images/menu-placeholder.jpg"),
-  imageAltText: z.string().optional().default("Menu placeholder image"),
-});
 
 const favoriteMenuItemSchema = z.object({
   id: z.string(),
@@ -37,11 +26,16 @@ const favoriteMenuItemSchema = z.object({
 // Type exports
 export type FavoriteMenuItem = z.infer<typeof favoriteMenuItemSchema>;
 export type MenuItemView = z.infer<typeof menuItemSchema>;
+export type LocationData = z.infer<typeof locationSchema>;
 
 /**
- * Get all categories
+ * Get categories with brand name and location slug (primary API)
  */
-export async function getCategories(): Promise<
+export async function getCategories(
+  brandName: string,
+  locationSlug: string,
+  menuSlug: string = "main-menu"
+): Promise<
   ActionResult<
     {
       id: string;
@@ -53,43 +47,10 @@ export async function getCategories(): Promise<
     }[]
   >
 > {
-  try {
-    const response = await authorizedFetch(
-      `${BASE_URL}/api/restaurants/locations/1/categories`
-    );
-    const rawData = await response.json();
-
-    // Validate and transform the data
-    const parsedData = z.array(categoryResponseSchema).parse(rawData);
-
-    // Process the data to match the expected format
-    const categories = parsedData.map((category) => ({
-      id: String(category.categoryId),
-      name: category.name,
-      description: category.description,
-      imageUrl: category.imageUrl || "/images/menu-placeholder.jpg",
-      imageAltText: category.imageAltText || "Menu placeholder image",
-      displayOrder: category.displayOrder,
-    }));
-
-    return { success: true, data: categories };
-  } catch (error) {
-    console.error("Failed to fetch categories:", error);
-
-    if (error instanceof ApiError) {
-      return {
-        success: false,
-        error: error.message,
-        code: error.code,
-        status: error.status,
-      };
-    }
-
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Unknown error",
-    };
-  }
+  console.log("brandName #######", brandName);
+  console.log("locationSlug #######", locationSlug);
+  console.log("menuSlug #######", menuSlug);
+  return getCategoriesWithLocation(brandName, locationSlug, menuSlug);
 }
 
 /**
@@ -176,6 +137,126 @@ export async function getMenuItemsByCategory(
         success: false,
         error: `Invalid data format: ${error.message}`,
         code: "VALIDATION_ERROR",
+      };
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Get restaurant locations by brand name
+ */
+export async function getLocationsByBrandName(
+  brandName: string
+): Promise<ActionResult<LocationData[]>> {
+  try {
+    const encodedBrandName = encodeURIComponent(brandName);
+    const response = await authorizedFetch(
+      `${BASE_URL}/api/restaurants/locations?brandName=${encodedBrandName}`
+    );
+    const rawData = await response.json();
+
+    // Validate the data
+    const locations = z.array(locationSchema).parse(rawData);
+
+    return { success: true, data: locations };
+  } catch (error) {
+    console.error(`Failed to fetch locations for brand ${brandName}:`, error);
+
+    if (error instanceof ApiError) {
+      return {
+        success: false,
+        error: error.message,
+        code: error.code,
+        status: error.status,
+      };
+    }
+
+    // Handle Zod validation errors specially
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: `Invalid data format: ${error.message}`,
+        code: "VALIDATION_ERROR",
+      };
+    }
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * Get categories with brand name and location slug
+ */
+export async function getCategoriesWithLocation(
+  brandName: string,
+  locationSlug: string,
+  menuSlug: string = "main-menu"
+): Promise<
+  ActionResult<
+    {
+      id: string;
+      name: string;
+      description: string;
+      imageUrl: string;
+      imageAltText: string;
+      displayOrder: number;
+    }[]
+  >
+> {
+  try {
+    const encodedBrandName = encodeURIComponent(brandName);
+    const encodedLocationSlug = encodeURIComponent(locationSlug);
+    const encodedMenuSlug = encodeURIComponent(menuSlug);
+
+    console.log(
+      "url #######",
+      `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
+    );
+
+    const response = await authorizedFetch(
+      `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
+    );
+    const rawData = await response.json();
+
+    // Parse categories response (different structure than the hardcoded one)
+    const categoryResponseSchema = z.object({
+      id: z.number(),
+      name: z.string(),
+      slug: z.string(),
+      description: z.string(),
+      displayOrder: z.number(),
+    });
+
+    const parsedData = z.array(categoryResponseSchema).parse(rawData);
+
+    // Process the data to match the expected format
+    const categories = parsedData.map((category) => ({
+      id: String(category.id),
+      name: category.name,
+      description: category.description,
+      imageUrl: "/images/menu-placeholder.jpg",
+      imageAltText: "Menu placeholder image",
+      displayOrder: category.displayOrder,
+    }));
+
+    return { success: true, data: categories };
+  } catch (error) {
+    console.error("Failed to fetch categories with location:", error);
+
+    if (error instanceof ApiError) {
+      return {
+        success: false,
+        error: error.message,
+        code: error.code,
+        status: error.status,
       };
     }
 

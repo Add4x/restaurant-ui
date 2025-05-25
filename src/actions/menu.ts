@@ -15,8 +15,12 @@ import { ApiError } from "@/lib/api-client";
 export type ActionResult<T> = ApiActionResult<T>;
 
 // Re-export the API functions with proper type handling
-export async function getCategories(): Promise<ActionResult<Category[]>> {
-  const result = await getApiCategories();
+export async function getCategories(
+  brandName: string,
+  locationSlug: string,
+  menuSlug: string = "main-menu"
+): Promise<ActionResult<Category[]>> {
+  const result = await getApiCategories(brandName, locationSlug, menuSlug);
 
   // Transform the result to match the expected Category type
   if (result.success) {
