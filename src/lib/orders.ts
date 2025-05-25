@@ -15,11 +15,7 @@ export async function createOrder(
   paymentMethod: "stripe" | "in-store"
 ) {
   // In a real application, this would create an order in your database
-  console.log(
-    `Creating new order with ${items.length} items, total: $${total.toFixed(
-      2
-    )}, payment method: ${paymentMethod}`
-  );
+  // TODO: Add proper logging when database is implemented
 
   // Generate a random order ID for demonstration purposes
   const orderId = `ORD-${Math.floor(Math.random() * 10000)}-${Date.now()
@@ -53,11 +49,12 @@ export async function createOrder(
  * @param status The new payment status ('paid', 'pending', 'failed')
  */
 export async function updateOrderPaymentStatus(
-  orderId: string,
-  status: "paid" | "pending" | "failed"
+  _orderId: string,
+  _status: "paid" | "pending" | "failed"
 ) {
   // In a real application, this would update the order in your database
-  console.log(`Updating order ${orderId} payment status to ${status}`);
+  // TODO: Add proper logging when database is implemented
+  // Will update order: ${orderId} with status: ${status}
 
   // TODO: Implement database update
   // For example with Supabase:

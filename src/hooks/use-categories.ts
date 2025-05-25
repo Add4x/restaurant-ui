@@ -15,8 +15,6 @@ export type Category = z.infer<typeof categorySchema>;
 
 export function useCategories() {
   const { brandName, selectedLocation } = useLocationStore();
-  console.log("brandName #######", brandName);
-  console.log("selectedLocation #######", selectedLocation);
 
   return useQuery({
     queryKey: ["categories", brandName, selectedLocation?.slug],

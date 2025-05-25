@@ -15,8 +15,6 @@ import { useRouter } from "next/navigation";
 // import Image from "next/image";
 export function MenuCategoryGrid() {
   const { data: categories, error } = useCategories();
-  console.log(categories);
-  console.log(error);
   const router = useRouter();
 
   if (error) return <div>Error loading categories</div>;

@@ -86,7 +86,6 @@ export default function OrderItemPage() {
       setSpiceLevelError(false);
       // In a real implementation, we'd include spiceLevel and specialInstructions
       // with the order details
-      console.log(`Adding to cart with spice level: ${spiceLevel}`);
       addItem(item, selectedProtein);
       router.push("/checkout");
     }

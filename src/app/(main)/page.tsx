@@ -10,9 +10,6 @@ export default async function Home() {
   const defaultLocationSlug =
     process.env.MAIN_LOCATION_SLUG || "burger-palace-downtown";
 
-  console.log("brandName #######", brandName);
-  console.log("defaultLocationSlug #######", defaultLocationSlug);
-
   // Fetch both locations and favorite items in parallel
   const [locationsResult] = await Promise.all([
     getLocationsByBrandName(brandName),

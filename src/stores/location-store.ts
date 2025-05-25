@@ -16,15 +16,12 @@ export const useLocationStore = create<LocationState>((set, get) => ({
   locations: [],
   selectedLocation: null,
   setBrandName: (brandName) => {
-    console.log("Setting brandName:", brandName);
     set({ brandName });
   },
   setLocations: (locations) => {
-    console.log("Setting locations:", locations);
     set({ locations });
   },
   setSelectedLocation: (location) => {
-    console.log("Setting selectedLocation:", location);
     set({ selectedLocation: location });
   },
   getSelectedLocationSlug: () => {

@@ -47,9 +47,6 @@ export async function getCategories(
     }[]
   >
 > {
-  console.log("brandName #######", brandName);
-  console.log("locationSlug #######", locationSlug);
-  console.log("menuSlug #######", menuSlug);
   return getCategoriesWithLocation(brandName, locationSlug, menuSlug);
 }
 
@@ -215,11 +212,6 @@ export async function getCategoriesWithLocation(
     const encodedBrandName = encodeURIComponent(brandName);
     const encodedLocationSlug = encodeURIComponent(locationSlug);
     const encodedMenuSlug = encodeURIComponent(menuSlug);
-
-    console.log(
-      "url #######",
-      `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
-    );
 
     const response = await authorizedFetch(
       `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
