@@ -73,11 +73,11 @@ function MenuItemCard({ menuItem }: MenuItemCardProps) {
               Gluten Free
             </Badge>
           )}
-          {menuItem.tags.map((tag) => (
+          {/* {menuItem.tags.map((tag) => (
             <Badge key={tag.id} variant="secondary" className="text-xs">
               {tag.name}
             </Badge>
-          ))}
+          ))} */}
         </div>
 
         {/* Placeholder for Order Now button - to be implemented later */}

@@ -115,3 +115,20 @@ export type Category = z.infer<typeof categorySchema>;
 export type ProteinOption = z.infer<typeof proteinOptionSchema>;
 export type MenuItemProtein = z.infer<typeof menuItemProteinSchema>;
 export type Location = z.infer<typeof locationSchema>;
+
+// Shared types for the restaurant application
+
+export type FavoriteMenuItem = {
+  id: string;
+  name: string;
+  shortDescription: string;
+  image_url: string;
+  image_alt_text: string;
+};
+
+export type ActionResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string; code?: string; status?: number };
+
+// Re-export from api.ts to avoid circular dependencies
+export type { MenuItemView, LocationData } from "@/actions/api";

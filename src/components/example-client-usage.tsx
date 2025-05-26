@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useApiQuery, useApiMutation } from "@/hooks/use-api";
-import { FavoriteMenuItem } from "@/actions/menu";
+import { FavoriteMenuItem } from "@/lib/types";
 
 // Define protein option type
 interface ProteinOption {
