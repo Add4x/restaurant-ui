@@ -31,7 +31,6 @@ export function useCategories() {
       const result = await getCategories(brandName, selectedLocation.slug);
 
       if (!result.success) {
-        // Instead of throwing, return a structured error that components can handle
         return {
           error: true,
           message: result.error,
@@ -47,14 +46,17 @@ export function useCategories() {
     },
     enabled: !!brandName && !!selectedLocation?.slug,
     retry: (failureCount, error) => {
-      // Don't retry on 404 errors (categories not found)
       if (error?.message?.includes("404")) {
         return false;
       }
-      // Retry up to 2 times for other errors
       return failureCount < 2;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    // Add initial data state for better UX
+    placeholderData: {
+      error: false,
+      data: [],
+    },
   });
 }
 
