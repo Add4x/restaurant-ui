@@ -1,9 +1,12 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import { Category } from "@/lib/types";
 import { Divider } from "@/components/divider";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useMenuStore } from "@/stores/menu-store";
 
 interface MenuCardProps {
   item: Category;
@@ -11,10 +14,14 @@ interface MenuCardProps {
 
 export function MenuCard({ item }: MenuCardProps) {
   const router = useRouter();
+  const { setCurrentCategory } = useMenuStore();
 
   const handleViewMore = () => {
-    const slug = item.name.toLowerCase().replace(/\s+/g, "-");
-    router.push(`/menu/${slug}`);
+    // Set the current category in the store
+    setCurrentCategory(item.slug);
+
+    // Navigate to the category page
+    router.push(`/menu/${item.slug}`);
   };
 
   return (

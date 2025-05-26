@@ -1,9 +1,9 @@
-import Link from "next/link"
-import Image from "next/image"
-import { type Category } from "@/lib/types"
+import Link from "next/link";
+import Image from "next/image";
+import { type Category } from "@/lib/types";
 
 interface CategoryCardProps {
-  category: Category
+  category: Category;
 }
 
 export function CategoryCard({ category }: CategoryCardProps) {
@@ -11,8 +11,8 @@ export function CategoryCard({ category }: CategoryCardProps) {
     <div className="bg-gray-100 rounded-lg overflow-hidden">
       <div className="relative aspect-square">
         <Image
-          src={category.image_url}
-          alt={category.name}
+          src={category.imageUrl}
+          alt={category.imageAltText}
           fill
           className="object-cover"
         />
@@ -21,13 +21,12 @@ export function CategoryCard({ category }: CategoryCardProps) {
         <h3 className="text-xl font-semibold mb-2">{category.name}</h3>
         <p className="text-gray-600 mb-4">{category.description}</p>
         <Link
-          href={`/menu/${category.id}`}
+          href={`/menu/${category.slug}`}
           className="inline-block bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors"
         >
           View all {category.name.toLowerCase()}
         </Link>
       </div>
     </div>
-  )
+  );
 }
-

@@ -43,25 +43,25 @@ export async function createOrder(
   };
 }
 
-/**
- * Updates the payment status of an order
- * @param orderId The ID of the order to update
- * @param status The new payment status ('paid', 'pending', 'failed')
- */
-export async function updateOrderPaymentStatus(
-  _orderId: string,
-  _status: "paid" | "pending" | "failed"
-) {
-  // In a real application, this would update the order in your database
-  // TODO: Add proper logging when database is implemented
-  // Will update order: ${orderId} with status: ${status}
+// /**
+//  * Updates the payment status of an order
+//  * @param orderId The ID of the order to update
+//  * @param status The new payment status ('paid', 'pending', 'failed')
+//  */
+// export async function updateOrderPaymentStatus(
+//   _orderId: string,
+//   _status: "paid" | "pending" | "failed"
+// ) {
+//   // In a real application, this would update the order in your database
+//   // TODO: Add proper logging when database is implemented
+//   // Will update order: ${orderId} with status: ${status}
 
-  // TODO: Implement database update
-  // For example with Supabase:
-  // const { error } = await supabase
-  //   .from('orders')
-  //   .update({ payment_status: status })
-  //   .eq('id', orderId);
+//   // TODO: Implement database update
+//   // For example with Supabase:
+//   // const { error } = await supabase
+//   //   .from('orders')
+//   //   .update({ payment_status: status })
+//   //   .eq('id', orderId);
 
-  return { success: true };
-}
+//   return { success: true };
+// }

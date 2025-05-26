@@ -1,31 +1,94 @@
 "use client";
 
-import { MenuItemCard } from "@/app/(main)/menu/components/menu-item-card";
-import { LoadingGrid } from "@/components/loading-grid";
-import { useMenuItems } from "@/hooks/use-menu-items";
-import { notFound } from "next/navigation";
+import { MenuItem } from "@/lib/types";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 interface MenuItemsGridProps {
-  categoryId: string;
+  menuItems: MenuItem[];
 }
 
-export function MenuItemsGrid({ categoryId }: MenuItemsGridProps) {
-  const { data: items, isLoading, isError } = useMenuItems(categoryId);
+interface MenuItemCardProps {
+  menuItem: MenuItem;
+}
 
-  if (isLoading) return <LoadingGrid />;
+function MenuItemCard({ menuItem }: MenuItemCardProps) {
+  return (
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+      <div className="relative h-48 w-full">
+        <Image
+          src={menuItem.image_url}
+          alt={menuItem.image_alt_text}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      </div>
 
-  if (isError) {
-    throw new Error("Failed to load menu items");
-  }
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-start">
+          <CardTitle className="text-lg font-bold line-clamp-2">
+            {menuItem.name}
+          </CardTitle>
+          <div className="text-right ml-2">
+            <p className="text-lg font-bold text-primary">
+              ${menuItem.base_price.toFixed(2)}
+              {menuItem.max_price > menuItem.base_price && (
+                <span className="text-sm text-muted-foreground">
+                  - ${menuItem.max_price.toFixed(2)}
+                </span>
+              )}
+            </p>
+          </div>
+        </div>
 
-  if (!items?.length) {
-    notFound();
+        <CardDescription className="text-sm line-clamp-2">
+          {menuItem.short_description}
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent className="pt-0">
+        <div className="flex flex-wrap gap-1 mb-3">
+          {menuItem.has_protein_options && (
+            <Badge variant="outline" className="text-xs">
+              Protein Options
+            </Badge>
+          )}
+          {/* Add more badges based on menu item properties if available */}
+        </div>
+
+        {/* Placeholder for Order Now button - to be implemented later */}
+        <Button className="w-full" size="sm" disabled>
+          Order Now (Coming Soon)
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+export function MenuItemsGrid({ menuItems }: MenuItemsGridProps) {
+  if (!menuItems || menuItems.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-500 text-lg">
+          No menu items found in this category.
+        </p>
+      </div>
+    );
   }
 
   return (
-    <div className="mx-4 grid grid-cols-1 md:grid-cols-3 gap-6 sm:mx-0">
-      {items.map((item) => (
-        <MenuItemCard key={item.id} item={item} />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {menuItems.map((menuItem) => (
+        <MenuItemCard key={menuItem.id} menuItem={menuItem} />
       ))}
     </div>
   );

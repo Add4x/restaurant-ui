@@ -2,7 +2,7 @@
 
 import { CartItem } from "@/stores/cart-store";
 import { z } from "zod";
-import { authorizedFetch } from "@/lib/auth";
+import { authorizedFetch } from "@/actions/auth";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";

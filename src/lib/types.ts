@@ -26,10 +26,47 @@ export const menuItemSchema = z.object({
   menu_item_proteins: z.array(menuItemProteinSchema),
 });
 
+// Schema for tags in detailed menu item
+export const menuItemTagSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+});
+
+// Schema for proteins in detailed menu item
+export const menuItemDetailProteinSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  additionalCost: z.number(),
+});
+
+// Schema for modifications in detailed menu item
+export const menuItemModificationSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string(),
+  additionalCost: z.number(),
+});
+
+// Detailed menu item schema for the new API endpoint
+export const menuItemDetailSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  price: z.number(),
+  isVegetarian: z.boolean(),
+  isGlutenFree: z.boolean(),
+  tags: z.array(menuItemTagSchema),
+  proteins: z.array(menuItemDetailProteinSchema),
+  modifications: z.array(menuItemModificationSchema),
+});
+
 // Category schema
 export const categorySchema = z.object({
   id: z.string().uuid(),
   name: z.string(),
+  slug: z.string(),
   displayOrder: z.number().optional().default(0),
   description: z.string().optional().default(""),
   imageUrl: z.string().optional().default("/images/menu-placeholder.jpg"),
@@ -53,6 +90,10 @@ export const locationSchema = z.object({
 
 // Type exports
 export type MenuItem = z.infer<typeof menuItemSchema>;
+export type MenuItemDetail = z.infer<typeof menuItemDetailSchema>;
+export type MenuItemTag = z.infer<typeof menuItemTagSchema>;
+export type MenuItemDetailProtein = z.infer<typeof menuItemDetailProteinSchema>;
+export type MenuItemModification = z.infer<typeof menuItemModificationSchema>;
 export type Category = z.infer<typeof categorySchema>;
 export type ProteinOption = z.infer<typeof proteinOptionSchema>;
 export type MenuItemProtein = z.infer<typeof menuItemProteinSchema>;

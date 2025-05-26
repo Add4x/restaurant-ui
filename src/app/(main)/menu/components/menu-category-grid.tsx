@@ -12,17 +12,22 @@ import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/divider";
 import { useCategories } from "@/hooks/use-categories";
 import { useRouter } from "next/navigation";
+import { useMenuStore } from "@/stores/menu-store";
 // import Image from "next/image";
 export function MenuCategoryGrid() {
   const { data: categories, error } = useCategories();
   const router = useRouter();
+  const { setCurrentCategory } = useMenuStore();
 
   if (error) return <div>Error loading categories</div>;
   if (!categories) return null;
 
-  const handleViewMore = (categoryName: string) => {
-    const slug = categoryName.toLowerCase().replace(/\s+/g, "-");
-    router.push(`/menu/${slug}`);
+  const handleViewMore = (categorySlug: string) => {
+    // Set the current category in the store
+    setCurrentCategory(categorySlug);
+
+    // Navigate to the category page
+    router.push(`/menu/${categorySlug}`);
   };
   return (
     <div className="container mx-auto">
@@ -60,7 +65,7 @@ export function MenuCategoryGrid() {
                   {categories[0].description}
                 </p>
                 <Button
-                  onClick={() => handleViewMore(categories[0].name)}
+                  onClick={() => handleViewMore(categories[0].slug)}
                   className="self-start cursor-pointer"
                 >
                   View More

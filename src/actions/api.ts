@@ -15,16 +15,14 @@ export type ActionResult<T> =
 
 // Define schemas for API responses
 
-const favoriteMenuItemSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  shortDescription: z.string().optional().default(""),
-  image_url: z.string().optional().default(""),
-  image_alt_text: z.string().optional().default(""),
-});
-
-// Type exports
-export type FavoriteMenuItem = z.infer<typeof favoriteMenuItemSchema>;
+// Type exports - define the type directly since we're transforming the API response
+export type FavoriteMenuItem = {
+  id: string;
+  name: string;
+  shortDescription: string;
+  image_url: string;
+  image_alt_text: string;
+};
 export type MenuItemView = z.infer<typeof menuItemSchema>;
 export type LocationData = z.infer<typeof locationSchema>;
 
@@ -40,6 +38,7 @@ export async function getCategories(
     {
       id: string;
       name: string;
+      slug: string;
       description: string;
       imageUrl: string;
       imageAltText: string;
@@ -51,19 +50,47 @@ export async function getCategories(
 }
 
 /**
- * Get favorite menu items
+ * Get favorite menu items by tag (popular)
  */
-export async function getFavoriteMenuItems(): Promise<
-  ActionResult<FavoriteMenuItem[]>
-> {
+export async function getFavoriteMenuItems(
+  brandName: string,
+  locationSlug: string,
+  menuSlug: string = "main-menu",
+  tagSlug: string = "popular"
+): Promise<ActionResult<FavoriteMenuItem[]>> {
   try {
+    const encodedBrandName = encodeURIComponent(brandName);
+    const encodedLocationSlug = encodeURIComponent(locationSlug);
+    const encodedMenuSlug = encodeURIComponent(menuSlug);
+    const encodedTagSlug = encodeURIComponent(tagSlug);
+
     const response = await authorizedFetch(
-      `${BASE_URL}/api/menu-items/by-tag/favorite`
+      `${BASE_URL}/api/menu/items-by-tag?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&tagSlug=${encodedTagSlug}`
     );
     const rawData = await response.json();
 
-    // Validate the data
-    const favorites = z.array(favoriteMenuItemSchema).parse(rawData);
+    // Define schema for the API response
+    const apiMenuItemSchema = z.object({
+      id: z.number(),
+      name: z.string(),
+      description: z.string(),
+      image_url: z.string().optional(),
+      image_alt_text: z.string().optional(),
+      // We only need these fields from the API response
+      // Other fields like price, tags, proteins, modifications are ignored
+    });
+
+    // Validate the API response
+    const apiMenuItems = z.array(apiMenuItemSchema).parse(rawData);
+
+    // Transform API response to match favoriteMenuItemSchema
+    const favorites: FavoriteMenuItem[] = apiMenuItems.map((item) => ({
+      id: String(item.id),
+      name: item.name,
+      shortDescription: item.description,
+      image_url: item.image_url || "/images/menu-placeholder.jpg", // Default placeholder image
+      image_alt_text: item.image_alt_text || "Menu placeholder image", // Default alt text
+    }));
 
     return { success: true, data: favorites };
   } catch (error) {
@@ -201,6 +228,7 @@ export async function getCategoriesWithLocation(
     {
       id: string;
       name: string;
+      slug: string;
       description: string;
       imageUrl: string;
       imageAltText: string;
@@ -212,6 +240,11 @@ export async function getCategoriesWithLocation(
     const encodedBrandName = encodeURIComponent(brandName);
     const encodedLocationSlug = encodeURIComponent(locationSlug);
     const encodedMenuSlug = encodeURIComponent(menuSlug);
+
+    console.log(
+      "categgory url #######",
+      `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
+    );
 
     const response = await authorizedFetch(
       `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
@@ -225,6 +258,8 @@ export async function getCategoriesWithLocation(
       slug: z.string(),
       description: z.string(),
       displayOrder: z.number(),
+      image_url: z.string().optional(),
+      image_alt_text: z.string().optional(),
     });
 
     const parsedData = z.array(categoryResponseSchema).parse(rawData);
@@ -233,9 +268,10 @@ export async function getCategoriesWithLocation(
     const categories = parsedData.map((category) => ({
       id: String(category.id),
       name: category.name,
+      slug: category.slug,
       description: category.description,
-      imageUrl: "/images/menu-placeholder.jpg",
-      imageAltText: "Menu placeholder image",
+      imageUrl: category.image_url || "/images/menu-placeholder.jpg",
+      imageAltText: category.image_alt_text || "Menu placeholder image",
       displayOrder: category.displayOrder,
     }));
 
