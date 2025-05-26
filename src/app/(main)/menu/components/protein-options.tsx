@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { MenuItem } from "@/lib/types";
 
 interface ProteinOptionsProps {
-  proteins: MenuItem["menu_item_proteins"];
+  proteins: MenuItem["proteins"];
   basePrice: number;
 }
 
@@ -13,18 +13,14 @@ export function ProteinOptions({ proteins, basePrice }: ProteinOptionsProps) {
       <div className="flex flex-row items-center justify-start gap-2 flex-wrap">
         {proteins.map((protein) => (
           <Badge
-            key={protein.protein_options.name}
+            key={protein.id}
             variant="secondary"
-            className={`${
-              protein.protein_options.is_vegetarian
-                ? "bg-green-500/10 hover:bg-green-500/10 text-green-700"
-                : "bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark"
-            } flex items-center gap-1.5`}
+            className="bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark flex items-center gap-1.5"
           >
-            <span>{protein.protein_options.name}</span>
+            <span>{protein.name}</span>
             <span className="text-gray-500/70">|</span>
             <span className="text-xs">
-              ${(basePrice + protein.protein_options.price_addition).toFixed(2)}
+              ${(basePrice + protein.additionalCost).toFixed(2)}
             </span>
           </Badge>
         ))}

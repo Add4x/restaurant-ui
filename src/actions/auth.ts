@@ -14,7 +14,7 @@ export async function authenticate(): Promise<string | undefined> {
   try {
     const formData = new URLSearchParams();
     formData.append("grant_type", "client_credentials");
-    formData.append("scope", "write");
+    // Remove scope parameter as the server doesn't support it
 
     const authUrl = `${BASE_URL}/oauth2/token`;
 

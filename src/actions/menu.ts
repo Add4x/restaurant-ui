@@ -52,6 +52,8 @@ export async function getMenuItemsByCategorySlug(
   menuSlug: string,
   categorySlug: string
 ): Promise<ActionResult<MenuItem[]>> {
+  let rawData: unknown = null;
+
   try {
     // Validate inputs
     if (!brandName?.trim()) {
@@ -88,10 +90,8 @@ export async function getMenuItemsByCategorySlug(
 
     const url = `${BASE_URL}/api/menu/items?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&categorySlug=${encodedCategorySlug}`;
 
-    console.log("Fetching menu items by category from:", url);
-
     const response = await authorizedFetch(url);
-    const rawData = await response.json();
+    rawData = await response.json();
 
     // Validate the data using Zod schema
     const menuItems = z.array(menuItemSchema).parse(rawData);
@@ -130,6 +130,10 @@ export async function getMenuItemsByCategorySlug(
     // Handle Zod validation errors specially
     if (error instanceof z.ZodError) {
       console.error("Data validation error:", error.errors);
+      console.error(
+        "Failed validation for data:",
+        JSON.stringify(rawData, null, 2)
+      );
       return {
         success: false,
         error: "The menu items data format is invalid. Please try again later.",

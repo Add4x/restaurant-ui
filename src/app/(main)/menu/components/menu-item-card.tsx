@@ -54,17 +54,8 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     };
   }, [isModalOpen, handleClose]);
 
-  const hasVegetarianOptions =
-    item.has_protein_options &&
-    item.menu_item_proteins.some(
-      (protein) => protein.protein_options.is_vegetarian
-    );
-
-  const hasNonVegetarianOptions =
-    item.has_protein_options &&
-    item.menu_item_proteins.some(
-      (protein) => !protein.protein_options.is_vegetarian
-    );
+  const hasVegetarianOptions = item.isVegetarian;
+  const hasNonVegetarianOptions = !item.isVegetarian;
 
   return (
     <>
@@ -111,9 +102,12 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
               </div>
             </div>
             <span className="text-sm font-medium mx-2">
-              ${item.base_price.toFixed(2)}
-              {item.menu_item_proteins.length > 1 &&
-                ` - $${item.max_price.toFixed(2)}`}
+              ${item.price.toFixed(2)}
+              {item.proteins.length > 1 && (
+                <span className="text-xs text-gray-500 ml-1">
+                  (+ protein options)
+                </span>
+              )}
             </span>
           </div>
         </div>
@@ -121,45 +115,34 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
         <div className="p-4 flex flex-col flex-1">
           <div className="flex flex-col items-start justify-start gap-2 flex-1">
             <p className="text-xs text-gray-700 mb-2 normal-case">
-              {item.short_description
-                ? capitalizeFirstLetter(item.short_description)
+              {item.description
+                ? capitalizeFirstLetter(item.description)
                 : "No description available"}
             </p>
-            {item.has_protein_options && item.menu_item_proteins.length > 1 && (
+            {item.proteins.length > 0 && (
               <div className="flex flex-col items-start justify-start gap-2">
-                <h4 className="text-xs">Available in</h4>
-                {item.has_protein_options && (
-                  <div className="flex flex-row items-center justify-start gap-2 flex-wrap">
-                    {item.menu_item_proteins
-                      .sort(
-                        (a, b) =>
-                          a.protein_options.price_addition +
-                          item.base_price -
-                          (b.protein_options.price_addition + item.base_price)
-                      )
-                      .map((protein) => (
-                        <Badge
-                          key={protein.protein_options.name}
-                          variant="secondary"
-                          className={`${
-                            protein.protein_options.is_vegetarian
-                              ? "bg-green-500/10 hover:bg-green-500/10 text-green-700"
-                              : "bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark"
-                          } flex items-center gap-1.5`}
-                        >
-                          <span>{protein.protein_options.name}</span>
-                          <span className="text-gray-500/70">|</span>
-                          <span className="text-xs">
-                            $
-                            {(
-                              item.base_price +
-                              protein.protein_options.price_addition
-                            ).toFixed(2)}
-                          </span>
-                        </Badge>
-                      ))}
-                  </div>
-                )}
+                <h4 className="text-xs">Available proteins</h4>
+                <div className="flex flex-row items-center justify-start gap-2 flex-wrap">
+                  {item.proteins
+                    .sort((a, b) => a.additionalCost - b.additionalCost)
+                    .map((protein) => (
+                      <Badge
+                        key={protein.id}
+                        variant="secondary"
+                        className="bg-orange-500/10 hover:bg-orange-500/10 text-primaryDark flex items-center gap-1.5"
+                      >
+                        <span>{protein.name}</span>
+                        {protein.additionalCost > 0 && (
+                          <>
+                            <span className="text-gray-500/70">|</span>
+                            <span className="text-xs">
+                              +${protein.additionalCost.toFixed(2)}
+                            </span>
+                          </>
+                        )}
+                      </Badge>
+                    ))}
+                </div>
               </div>
             )}
           </div>

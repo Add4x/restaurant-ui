@@ -74,8 +74,8 @@ export async function getFavoriteMenuItems(
       id: z.number(),
       name: z.string(),
       description: z.string(),
-      image_url: z.string().optional(),
-      image_alt_text: z.string().optional(),
+      image_url: z.string().optional().default("/images/menu-placeholder.jpg"),
+      image_alt_text: z.string().optional().default("Menu placeholder image"),
       // We only need these fields from the API response
       // Other fields like price, tags, proteins, modifications are ignored
     });
@@ -88,8 +88,8 @@ export async function getFavoriteMenuItems(
       id: String(item.id),
       name: item.name,
       shortDescription: item.description,
-      image_url: item.image_url || "/images/menu-placeholder.jpg", // Default placeholder image
-      image_alt_text: item.image_alt_text || "Menu placeholder image", // Default alt text
+      image_url: item.image_url,
+      image_alt_text: item.image_alt_text,
     }));
 
     return { success: true, data: favorites };
@@ -179,6 +179,8 @@ export async function getLocationsByBrandName(
 ): Promise<ActionResult<LocationData[]>> {
   try {
     const encodedBrandName = encodeURIComponent(brandName);
+
+
     const response = await authorizedFetch(
       `${BASE_URL}/api/restaurants/locations?brandName=${encodedBrandName}`
     );

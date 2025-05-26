@@ -12,35 +12,21 @@ export const menuItemProteinSchema = z.object({
   protein_options: proteinOptionSchema,
 });
 
-// Menu item schema
-export const menuItemSchema = z.object({
-  id: z.string().uuid(),
-  name: z.string(),
-  base_price: z.number(),
-  max_price: z.number(),
-  short_description: z.string(),
-  has_protein_options: z.boolean(),
-  category_name: z.string(),
-  image_url: z.string(),
-  image_alt_text: z.string(),
-  menu_item_proteins: z.array(menuItemProteinSchema),
-});
-
-// Schema for tags in detailed menu item
+// Schema for tags in menu items
 export const menuItemTagSchema = z.object({
   id: z.number(),
   name: z.string(),
   slug: z.string(),
 });
 
-// Schema for proteins in detailed menu item
-export const menuItemDetailProteinSchema = z.object({
+// Schema for proteins in menu items
+export const menuItemProteinResponseSchema = z.object({
   id: z.number(),
   name: z.string(),
   additionalCost: z.number(),
 });
 
-// Schema for modifications in detailed menu item
+// Schema for modifications in menu items
 export const menuItemModificationSchema = z.object({
   id: z.number(),
   name: z.string(),
@@ -48,8 +34,8 @@ export const menuItemModificationSchema = z.object({
   additionalCost: z.number(),
 });
 
-// Detailed menu item schema for the new API endpoint
-export const menuItemDetailSchema = z.object({
+// Updated menu item schema to match API response
+export const menuItemSchema = z.object({
   id: z.number(),
   name: z.string(),
   slug: z.string(),
@@ -58,6 +44,37 @@ export const menuItemDetailSchema = z.object({
   isVegetarian: z.boolean(),
   isGlutenFree: z.boolean(),
   tags: z.array(menuItemTagSchema),
+  proteins: z.array(menuItemProteinResponseSchema),
+  modifications: z.array(menuItemModificationSchema),
+  // Add default values for image fields since they're not in the API response
+  image_url: z.string().optional().default("/images/menu-placeholder.jpg"),
+  image_alt_text: z.string().optional().default("Menu placeholder image"),
+});
+
+// Schema for tags in detailed menu item (keeping for backward compatibility)
+export const menuItemDetailTagSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+});
+
+// Schema for proteins in detailed menu item (keeping for backward compatibility)
+export const menuItemDetailProteinSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  additionalCost: z.number(),
+});
+
+// Detailed menu item schema for the item-details API endpoint (keeping existing)
+export const menuItemDetailSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  slug: z.string(),
+  description: z.string(),
+  price: z.number(),
+  isVegetarian: z.boolean(),
+  isGlutenFree: z.boolean(),
+  tags: z.array(menuItemDetailTagSchema),
   proteins: z.array(menuItemDetailProteinSchema),
   modifications: z.array(menuItemModificationSchema),
 });

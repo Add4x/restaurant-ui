@@ -40,29 +40,44 @@ function MenuItemCard({ menuItem }: MenuItemCardProps) {
           </CardTitle>
           <div className="text-right ml-2">
             <p className="text-lg font-bold text-primary">
-              ${menuItem.base_price.toFixed(2)}
-              {menuItem.max_price > menuItem.base_price && (
-                <span className="text-sm text-muted-foreground">
-                  - ${menuItem.max_price.toFixed(2)}
-                </span>
-              )}
+              ${menuItem.price.toFixed(2)}
             </p>
           </div>
         </div>
 
         <CardDescription className="text-sm line-clamp-2">
-          {menuItem.short_description}
+          {menuItem.description}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="pt-0">
         <div className="flex flex-wrap gap-1 mb-3">
-          {menuItem.has_protein_options && (
+          {menuItem.proteins.length > 0 && (
             <Badge variant="outline" className="text-xs">
               Protein Options
             </Badge>
           )}
-          {/* Add more badges based on menu item properties if available */}
+          {menuItem.isVegetarian && (
+            <Badge
+              variant="outline"
+              className="text-xs text-green-600 border-green-600"
+            >
+              Vegetarian
+            </Badge>
+          )}
+          {menuItem.isGlutenFree && (
+            <Badge
+              variant="outline"
+              className="text-xs text-blue-600 border-blue-600"
+            >
+              Gluten Free
+            </Badge>
+          )}
+          {menuItem.tags.map((tag) => (
+            <Badge key={tag.id} variant="secondary" className="text-xs">
+              {tag.name}
+            </Badge>
+          ))}
         </div>
 
         {/* Placeholder for Order Now button - to be implemented later */}
