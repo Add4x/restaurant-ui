@@ -16,6 +16,7 @@ import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocationStore } from "@/stores/location-store";
 import { ImageModal } from "../image-modal";
+import { DataNotFoundError } from "../ui/error-state";
 
 export function FavoritesSection() {
   const { brandName, selectedLocation } = useLocationStore();
@@ -78,20 +79,7 @@ export function FavoritesSection() {
 
   // Don't render if no items
   if (items.length === 0) {
-    return (
-      <section className="container py-8 md:py-12">
-        <div className="mx-auto px-8 md:px-12">
-          <h2 className="text-3xl font-bold text-center mb-6 font-playfair text-primaryDark">
-            Our Favorites
-          </h2>
-          <div className="w-full max-w-5xl mx-auto flex items-center justify-center h-96">
-            <div className="text-gray-500">
-              No favorites available at the moment.
-            </div>
-          </div>
-        </div>
-      </section>
-    );
+    return null;
   }
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import { MenuItem } from "@/lib/types";
-import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,

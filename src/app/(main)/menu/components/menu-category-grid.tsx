@@ -10,30 +10,55 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/divider";
+import {
+  ErrorState,
+  DataNotFoundError,
+  NetworkError,
+} from "@/components/ui/error-state";
+import { ComponentLoading } from "@/components/ui/loading-state";
 import { useCategories } from "@/hooks/use-categories";
 import { useRouter } from "next/navigation";
 import { useMenuStore } from "@/stores/menu-store";
 // import Image from "next/image";
 export function MenuCategoryGrid() {
-  const { data: result, error, isLoading } = useCategories();
+  const { data: result, error, isLoading, refetch } = useCategories();
   const router = useRouter();
   const { setCurrentCategory } = useMenuStore();
 
   // Handle loading state
-  if (isLoading) return <div>Loading categories...</div>;
+  if (isLoading)
+    return <ComponentLoading message="Loading menu categories..." />;
 
   // Handle query error (network error, etc.)
-  if (error) return <div>Error loading categories: {error.message}</div>;
+  if (error) {
+    return <NetworkError onRetry={() => refetch()} />;
+  }
 
   // Handle API error response
   if (result?.error) {
-    return <div>Error loading categories: {result.message}</div>;
+    return (
+      <ErrorState
+        title="Failed to Load Menu Categories"
+        message={
+          result.message ||
+          "We couldn't load the menu categories. Please try again."
+        }
+        onRetry={() => refetch()}
+        variant="default"
+      />
+    );
   }
 
   // Handle no data
   const categories = result?.data;
   if (!categories || categories.length === 0) {
-    return <div>No categories available</div>;
+    return (
+      <DataNotFoundError
+        title="No Menu Categories Available"
+        message="We don't have any menu categories to show right now. Please check back later or contact us if this problem persists."
+        onRetry={() => refetch()}
+      />
+    );
   }
 
   const handleViewMore = (categorySlug: string) => {
