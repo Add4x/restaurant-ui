@@ -32,7 +32,7 @@ export function ExampleClientComponent() {
 
   // Fetch favorite menu items
   const {
-    data: favoriteItems,
+    data: result,
     isLoading,
     error,
   } = useApiQuery<FavoriteMenuItem[]>("/api/menu-items/favorites", [
@@ -51,7 +51,8 @@ export function ExampleClientComponent() {
 
   // Handle order submission
   const handleOrderSubmit = () => {
-    if (selectedItemId && favoriteItems) {
+    if (selectedItemId && result && !result.error) {
+      const favoriteItems = result.data;
       const selectedItem = favoriteItems.find(
         (item) => item.id === selectedItemId
       );
@@ -76,6 +77,14 @@ export function ExampleClientComponent() {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
+  // Handle API error response
+  if (result?.error) {
+    return <div>Error: {result.message}</div>;
+  }
+
+  // Get the actual data
+  const favoriteItems = result?.data;
+
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">Favorite Menu Items</h2>
@@ -98,7 +107,7 @@ export function ExampleClientComponent() {
                 className="w-full h-40 object-cover rounded mb-2"
               />
               <h3 className="font-bold">{item.name}</h3>
-              <p className="text-sm text-gray-600">{item.short_description}</p>
+              <p className="text-sm text-gray-600">{item.shortDescription}</p>
             </div>
           ))}
         </div>

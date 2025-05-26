@@ -180,7 +180,6 @@ export async function getLocationsByBrandName(
   try {
     const encodedBrandName = encodeURIComponent(brandName);
 
-
     const response = await authorizedFetch(
       `${BASE_URL}/api/restaurants/locations?brandName=${encodedBrandName}`
     );
@@ -191,7 +190,7 @@ export async function getLocationsByBrandName(
 
     return { success: true, data: locations };
   } catch (error) {
-    console.error(`Failed to fetch locations for brand ${brandName}:`, error);
+    console.error(`Failed to fetch locations for brand: ${brandName}`, error);
 
     if (error instanceof ApiError) {
       return {
@@ -242,11 +241,6 @@ export async function getCategoriesWithLocation(
     const encodedBrandName = encodeURIComponent(brandName);
     const encodedLocationSlug = encodeURIComponent(locationSlug);
     const encodedMenuSlug = encodeURIComponent(menuSlug);
-
-    console.log(
-      "categgory url #######",
-      `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
-    );
 
     const response = await authorizedFetch(
       `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`

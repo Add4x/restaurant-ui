@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
 
+// Define the API response type
+export type ApiResponse<T> =
+  | { error: true; message: string; code: string; status: number }
+  | { error: false; data: T };
+
 /**
  * Ensure user is authenticated
  * This will redirect to the auth endpoint if needed
@@ -42,9 +47,9 @@ async function ensureAuthenticated() {
 export function useApiQuery<T>(endpoint: string, queryKey: string[]) {
   const router = useRouter();
 
-  return useQuery<T>({
+  return useQuery<ApiResponse<T>>({
     queryKey,
-    queryFn: async () => {
+    queryFn: async (): Promise<ApiResponse<T>> => {
       try {
         // Ensure we're authenticated before making the request
         await ensureAuthenticated();
@@ -61,17 +66,49 @@ export function useApiQuery<T>(endpoint: string, queryKey: string[]) {
           if (response.status === 401) {
             // If unauthorized, redirect to authenticate
             router.push("/api/auth");
-            throw new Error("Authentication required");
+            return {
+              error: true,
+              message: "Authentication required",
+              code: "UNAUTHORIZED",
+              status: 401,
+            };
           }
-          throw new Error(`API error: ${response.status}`);
+
+          return {
+            error: true,
+            message: `API error: ${response.status}`,
+            code: "API_ERROR",
+            status: response.status,
+          };
         }
 
-        return response.json();
+        const data = await response.json();
+        return {
+          error: false,
+          data,
+        };
       } catch (error) {
         console.error(`Error fetching ${endpoint}:`, error);
-        throw error;
+        return {
+          error: true,
+          message: error instanceof Error ? error.message : "Unknown error",
+          code: "FETCH_ERROR",
+          status: 500,
+        };
       }
     },
+    retry: (failureCount, error) => {
+      // Don't retry on authentication errors
+      if (
+        error?.message?.includes("401") ||
+        error?.message?.includes("Authentication")
+      ) {
+        return false;
+      }
+      // Retry up to 2 times for other errors
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }
 

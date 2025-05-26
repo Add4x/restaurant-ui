@@ -15,14 +15,42 @@ export function useMenuItems(categoryId: string) {
   return useQuery({
     queryKey: ["menu-items", categoryId],
     queryFn: async () => {
+      if (!categoryId) {
+        return {
+          error: true,
+          message: "Category ID is required",
+          code: "MISSING_PARAMS",
+          status: 400,
+        };
+      }
+
       const result = await getMenuItemsByCategory(categoryId);
 
       if (!result.success) {
-        throw new Error(result.error);
+        // Instead of throwing, return a structured error that components can handle
+        return {
+          error: true,
+          message: result.error,
+          code: result.code,
+          status: result.status,
+        };
       }
 
-      return result.data;
+      return {
+        error: false,
+        data: result.data,
+      };
     },
+    enabled: !!categoryId,
+    retry: (failureCount, error) => {
+      // Don't retry on 404 errors (category not found)
+      if (error?.message?.includes("404")) {
+        return false;
+      }
+      // Retry up to 2 times for other errors
+      return failureCount < 2;
+    },
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 }
 

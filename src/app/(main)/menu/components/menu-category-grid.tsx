@@ -15,12 +15,26 @@ import { useRouter } from "next/navigation";
 import { useMenuStore } from "@/stores/menu-store";
 // import Image from "next/image";
 export function MenuCategoryGrid() {
-  const { data: categories, error } = useCategories();
+  const { data: result, error, isLoading } = useCategories();
   const router = useRouter();
   const { setCurrentCategory } = useMenuStore();
 
-  if (error) return <div>Error loading categories</div>;
-  if (!categories) return null;
+  // Handle loading state
+  if (isLoading) return <div>Loading categories...</div>;
+
+  // Handle query error (network error, etc.)
+  if (error) return <div>Error loading categories: {error.message}</div>;
+
+  // Handle API error response
+  if (result?.error) {
+    return <div>Error loading categories: {result.message}</div>;
+  }
+
+  // Handle no data
+  const categories = result?.data;
+  if (!categories || categories.length === 0) {
+    return <div>No categories available</div>;
+  }
 
   const handleViewMore = (categorySlug: string) => {
     // Set the current category in the store
