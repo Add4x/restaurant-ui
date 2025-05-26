@@ -1,0 +1,49 @@
+/* Image Clipping Effects */
+
+/* Ultra-smooth custom clip path with extra smoothness */
+.clip-bottom-subtle {
+  clip-path: polygon(0 0, 0 17%, 0 34%, 0 43%, 0 52%, 0 76%, 0 88%, 0 94%, 0 100%, 9% 99%, 14% 98.5%, 19% 98%, 29% 97%, 39% 96%, 49% 95%, 58% 94%, 64% 94.2%, 70% 94.5%, 75% 94.7%, 80% 95%, 85% 96%, 90% 97%, 95% 98.5%, 100% 100%, 100% 75%, 100% 50%, 100% 25%, 100% 0, 90% 0%, 80% 0%, 65% 0%, 50% 0, 25% 0);
+}
+
+/* Gentle bottom curve */
+.clip-bottom-gentle {
+  clip-path: polygon(0 0, 100% 0, 100% 94%, 50% 100%, 0 94%);
+}
+
+/* Bottom curved clip - moderate */
+.clip-bottom-curve {
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%);
+}
+
+/* Bottom angled clip - like the burger image */
+.clip-bottom-angled {
+  clip-path: polygon(0 0, 100% 0, 100% 85%, 85% 100%, 15% 100%, 0 85%);
+}
+
+/* Bottom wave clip - more dramatic */
+.clip-bottom-wave {
+  clip-path: polygon(0 0, 100% 0, 100% 80%, 90% 90%, 80% 100%, 70% 95%, 60% 100%, 50% 90%, 40% 100%, 30% 95%, 20% 100%, 10% 90%, 0 80%);
+}
+
+/* Bottom rounded clip */
+.clip-bottom-rounded {
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 75% 100%, 25% 100%, 0 75%);
+}
+
+/* Spill effect - image extends beyond container */
+.spill-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 95%, 90% 100%, 85% 105%, 80% 100%, 75% 105%, 70% 100%, 65% 105%, 60% 100%, 55% 105%, 50% 100%, 45% 105%, 40% 100%, 35% 105%, 30% 100%, 25% 105%, 20% 100%, 15% 105%, 10% 100%, 5% 95%, 0 90%);
+}
+
+/* Hover effects */
+.clip-hover-expand:hover {
+  clip-path: polygon(0 0, 100% 0, 100% 95%, 95% 100%, 5% 100%, 0 95%);
+  transition: clip-path 0.3s ease-in-out;
+}
+
+/* Responsive clipping */
+@media (max-width: 768px) {
+  .clip-bottom-angled {
+    clip-path: polygon(0 0, 100% 0, 100% 90%, 90% 100%, 10% 100%, 0 90%);
+  }
+} 

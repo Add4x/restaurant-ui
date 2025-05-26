@@ -51,7 +51,7 @@ function MenuItemCard({ menuItem }: MenuItemCardProps) {
   return (
     <TooltipProvider>
       <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-gray-50/50 border-0 shadow-md">
-        <div className="relative h-48 w-full overflow-hidden">
+        <div className="relative h-64 w-full overflow-hidden">
           <Image
             src={menuItem.image_url}
             alt={menuItem.image_alt_text}
@@ -60,31 +60,33 @@ function MenuItemCard({ menuItem }: MenuItemCardProps) {
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
 
-          {/* Overlay badges for spicy and popular */}
-          <div className="absolute top-2 right-2 flex gap-1">
+          {/* Fancy ribbon badges for spicy and popular */}
+          <div className="absolute top-0 right-0 flex flex-col gap-2">
             {isSpicyItem(menuItem) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="bg-white backdrop-blur-sm rounded-full p-1.5 shadow-lg cursor-help">
-                    <Flame className="h-4 w-4 text-red-500 fill-red-500" />
+              <div className="relative group cursor-help">
+                {/* Spicy ribbon badge */}
+                <div className="bg-gradient-to-l from-red-400 to-red-600 text-white px-4 py-2 pr-6 shadow-lg transform translate-x-2 hover:translate-x-0 transition-transform duration-300 ease-out rounded-tl-lg rounded-bl-lg overflow-hidden">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Flame className="h-4 w-4 fill-white" />
+                    <span>Spicy</span>
                   </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Spicy Item 🌶️</p>
-                </TooltipContent>
-              </Tooltip>
+                  {/* Triangle cutout on the left */}
+                  <div className="absolute left-0 top-0 w-0 h-0 border-t-[20px] border-b-[20px] border-r-[8px] border-t-transparent border-b-transparent border-r-red-600"></div>
+                  {/* Right side triangle */}
+                  <div className="absolute right-0 top-0 w-0 h-0 border-t-[20px] border-b-[20px] border-l-[8px] border-t-red-400 border-b-red-400 border-l-transparent"></div>
+                </div>
+              </div>
             )}
             {isPopularItem(menuItem) && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="bg-white backdrop-blur-sm rounded-full p-1.5 shadow-lg cursor-help">
-                    <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+              <div className="relative group cursor-help">
+                {/* Popular ribbon badge */}
+                <div className="bg-gradient-to-l from-yellow-500 to-orange-500 text-white px-4 py-2 pr-6 shadow-lg transform translate-x-2 hover:translate-x-0 transition-transform duration-300 ease-out rounded-tl-lg rounded-bl-lg overflow-hidden">
+                  <div className="flex items-center gap-2 text-sm font-semibold">
+                    <Star className="h-4 w-4 fill-white" />
+                    <span>Popular</span>
                   </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Popular Item ⭐</p>
-                </TooltipContent>
-              </Tooltip>
+                </div>
+              </div>
             )}
           </div>
         </div>
