@@ -52,11 +52,6 @@ export function useCategories() {
       return failureCount < 2;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-    // Add initial data state for better UX
-    placeholderData: {
-      error: false,
-      data: [],
-    },
   });
 }
 

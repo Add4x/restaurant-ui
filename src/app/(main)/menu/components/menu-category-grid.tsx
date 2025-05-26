@@ -19,14 +19,16 @@ import { ComponentLoading } from "@/components/ui/loading-state";
 import { useCategories } from "@/hooks/use-categories";
 import { useRouter } from "next/navigation";
 import { useMenuStore } from "@/stores/menu-store";
+import { useLocationStore } from "@/stores/location-store";
 // import Image from "next/image";
 export function MenuCategoryGrid() {
   const { data: result, error, isLoading, refetch } = useCategories();
   const router = useRouter();
   const { setCurrentCategory } = useMenuStore();
+  const { brandName, selectedLocation } = useLocationStore();
 
-  // Handle loading state
-  if (isLoading)
+  // Handle loading state or when location data is not ready
+  if (isLoading || !brandName || !selectedLocation?.slug)
     return <ComponentLoading message="Loading menu categories..." />;
 
   // Handle query error (network error, etc.)
@@ -49,9 +51,9 @@ export function MenuCategoryGrid() {
     );
   }
 
-  // Handle no data
+  // Handle no data - only show this if we have a successful result but no categories
   const categories = result?.data;
-  if (!categories || categories.length === 0) {
+  if (result && (!categories || categories.length === 0)) {
     return (
       <DataNotFoundError
         title="No Menu Categories Available"
@@ -59,6 +61,11 @@ export function MenuCategoryGrid() {
         onRetry={() => refetch()}
       />
     );
+  }
+
+  // If we don't have result yet, don't render anything (let loading state handle it)
+  if (!result || !categories) {
+    return <ComponentLoading message="Loading menu categories..." />;
   }
 
   const handleViewMore = (categorySlug: string) => {

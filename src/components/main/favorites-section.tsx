@@ -16,7 +16,6 @@ import { useCallback, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useLocationStore } from "@/stores/location-store";
 import { ImageModal } from "../image-modal";
-import { DataNotFoundError } from "../ui/error-state";
 
 export function FavoritesSection() {
   const { brandName, selectedLocation } = useLocationStore();
@@ -105,7 +104,7 @@ export function FavoritesSection() {
                     <CardContent className="flex flex-col items-center p-0 rounded-md overflow-hidden h-full">
                       <div
                         onClick={() => handleOpenModal(item)}
-                        className="relative w-full aspect-square mb-4 h-48 cursor-pointer"
+                        className="relative w-full aspect-square mb-4 h-54 cursor-pointer"
                         onKeyDown={(e) =>
                           e.key === "Enter" && handleOpenModal(item)
                         }

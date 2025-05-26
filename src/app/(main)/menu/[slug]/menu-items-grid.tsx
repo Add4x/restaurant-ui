@@ -118,7 +118,7 @@ function MenuItemCard({ menuItem }: MenuItemCardProps) {
 
       <CardContent className="pt-2 space-y-3 flex-grow">
         {/* Protein Options */}
-        {menuItem.proteins.length > 0 && (
+        {menuItem.proteins.length > 1 && (
           <div>
             <h4 className="text-sm font-bold text-gray-900 uppercase">
               Protein Options
