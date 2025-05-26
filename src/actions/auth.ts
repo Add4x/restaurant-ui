@@ -11,12 +11,20 @@ export async function authenticate(): Promise<string | undefined> {
   const clientId = process.env.API_CLIENT_ID || "client";
   const clientSecret = process.env.API_CLIENT_SECRET || "secret";
 
+  console.log("🔧 [auth] Debug info:", {
+    BASE_URL,
+    clientId,
+    clientSecret: clientSecret ? "***SET***" : "***NOT SET***",
+    NODE_ENV: process.env.NODE_ENV,
+  });
+
   try {
     const formData = new URLSearchParams();
     formData.append("grant_type", "client_credentials");
     // Remove scope parameter as the server doesn't support it
 
     const authUrl = `${BASE_URL}/oauth2/token`;
+    console.log("🔗 [auth] Attempting to authenticate at:", authUrl);
 
     const authHeader = `Basic ${Buffer.from(
       `${clientId}:${clientSecret}`
@@ -50,30 +58,79 @@ export async function authenticate(): Promise<string | undefined> {
       return undefined;
     }
 
+    console.log("✅ [auth] Successfully authenticated");
     return accessToken;
   } catch (error) {
     console.error("🔴 [auth] Authentication error:", error);
+
+    if (error instanceof Error) {
+      if (error.message.includes("ECONNREFUSED")) {
+        console.error("❌ [auth] Backend server is not running on", BASE_URL);
+        console.error("💡 [auth] Please start your Java backend server");
+      } else if (error.message.includes("ENOTFOUND")) {
+        console.error("❌ [auth] Cannot resolve hostname:", BASE_URL);
+        console.error("💡 [auth] Check your BASE_URL configuration");
+      }
+    }
+
     return undefined;
   }
 }
 
 // Store the token in memory (server-side only)
 let accessToken: string | undefined;
+let tokenExpiry: number | undefined;
 
 /**
- * Fetch wrapper with authorization token
+ * Check if the current token is expired or about to expire
  */
+function isTokenExpired(): boolean {
+  if (!accessToken || !tokenExpiry) {
+    return true;
+  }
+  // Consider token expired if it expires within the next 30 seconds
+  return Date.now() >= tokenExpiry - 30000;
+}
+
+/**
+ * Parse JWT token to extract expiry time
+ */
+function parseTokenExpiry(token: string): number | undefined {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp ? payload.exp * 1000 : undefined; // Convert to milliseconds
+  } catch (error) {
+    console.warn("⚠️ [auth] Could not parse token expiry:", error);
+    return undefined;
+  }
+}
+
 // Track authentication state to prevent infinite loops
 let isAuthenticating = false;
 
 /**
- * Wrapper for fetch that handles authentication with Bearer token
+ * Wrapper for fetch that handles JWT authentication with Bearer token
  */
 export async function authorizedFetch(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  // If we have a token, use it
+  // Check if we need to authenticate or refresh token
+  if (!accessToken || isTokenExpired()) {
+    if (!isAuthenticating) {
+      isAuthenticating = true;
+      try {
+        accessToken = await authenticate();
+        if (accessToken) {
+          tokenExpiry = parseTokenExpiry(accessToken);
+        }
+      } finally {
+        isAuthenticating = false;
+      }
+    }
+  }
+
+  // Prepare headers with JWT Bearer token
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
@@ -84,7 +141,7 @@ export async function authorizedFetch(
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
 
-  // Initial request with token
+  // Make the request with JWT token
   const response = await fetch(url, {
     ...options,
     headers,
@@ -95,14 +152,22 @@ export async function authorizedFetch(
     isAuthenticating = true;
 
     try {
-      // Get a new token
-      accessToken = await authenticate();
+      console.log("🔄 [auth] Token expired or invalid, refreshing...");
 
-      if (!accessToken) {
+      // Clear the old token and get a new one
+      accessToken = undefined;
+      tokenExpiry = undefined;
+
+      const newToken = await authenticate();
+
+      if (!newToken) {
         throw new Error("Authentication failed after 401 response");
       }
 
-      // Update headers with new token
+      accessToken = newToken;
+      tokenExpiry = parseTokenExpiry(newToken);
+
+      // Update headers with new JWT token
       const newHeaders: Record<string, string> = {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -110,7 +175,7 @@ export async function authorizedFetch(
         ...(options.headers as Record<string, string>),
       };
 
-      // Retry the original request with new token
+      // Retry the original request with new JWT token
       const retryResponse = await fetch(url, {
         ...options,
         headers: newHeaders,
@@ -120,15 +185,15 @@ export async function authorizedFetch(
       if (retryResponse.status === 401) {
         const errorText = await retryResponse.text();
         console.error(
-          "🔴 [fetch] Still unauthorized after authentication:",
+          "🔴 [fetch] Still unauthorized after JWT refresh:",
           errorText
         );
-        throw new Error(`Authentication failed: ${errorText}`);
+        throw new Error(`JWT authentication failed: ${errorText}`);
       }
 
       return retryResponse;
     } catch (error) {
-      console.error("🔴 [fetch] Error during authentication:", error);
+      console.error("🔴 [fetch] Error during JWT authentication:", error);
       throw error;
     } finally {
       isAuthenticating = false;
@@ -143,4 +208,19 @@ export async function authorizedFetch(
   }
 
   return response;
+}
+
+/**
+ * Get the current access token (for debugging purposes)
+ */
+export async function getCurrentToken(): Promise<string | undefined> {
+  return accessToken;
+}
+
+/**
+ * Clear the current token (useful for logout)
+ */
+export async function clearToken(): Promise<void> {
+  accessToken = undefined;
+  tokenExpiry = undefined;
 }
