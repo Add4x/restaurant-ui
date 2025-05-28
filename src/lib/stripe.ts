@@ -1,10 +1,16 @@
 "use server";
 import Stripe from "stripe";
 
-// Initialize Stripe with your secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-24.acacia",
-});
+// Helper function to get Stripe instance
+function getStripeInstance(): Stripe {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("Missing Stripe secret key");
+  }
+
+  return new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: "2025-02-24.acacia",
+  });
+}
 
 type LineItem = {
   price_data: {
@@ -24,9 +30,7 @@ export async function createCheckoutSession(
   orderId?: string
 ) {
   try {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      throw new Error("Missing Stripe secret key");
-    }
+    const stripe = getStripeInstance();
 
     // Validate line items
     if (!lineItems || lineItems.length === 0) {
@@ -94,6 +98,7 @@ export async function getCheckoutSession(sessionId: string) {
       throw new Error("Session ID is required");
     }
 
+    const stripe = getStripeInstance();
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     return {
       url: session.url,
@@ -130,6 +135,8 @@ export async function verifyPaymentSession(sessionId: string): Promise<{
         message: "Session ID is required",
       };
     }
+
+    const stripe = getStripeInstance();
 
     // Expand customer details when retrieving the session
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
