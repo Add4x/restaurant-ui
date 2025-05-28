@@ -23,7 +23,7 @@ export function CartItemComponent({ item }: CartItemProps) {
   };
 
   const itemPrice =
-    item.menuItem.base_price +
+    item.menuItem.price +
     (item.selectedProtein?.protein_options.price_addition || 0);
 
   return (

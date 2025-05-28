@@ -45,14 +45,14 @@ export const useCartStore = create<CartState>()(
           updatedItems[existingItemIndex].quantity += 1;
           updatedItems[existingItemIndex].totalPrice =
             updatedItems[existingItemIndex].quantity *
-            (menuItem.base_price +
+            (menuItem.price +
               (selectedProtein?.protein_options.price_addition || 0));
 
           set({ items: updatedItems });
         } else {
           // Calculate item price based on base price and protein option
           const itemPrice =
-            menuItem.base_price +
+            menuItem.price +
             (selectedProtein?.protein_options.price_addition || 0);
 
           // Add new item
@@ -80,7 +80,7 @@ export const useCartStore = create<CartState>()(
           items: state.items.map((item) => {
             if (item.id === id) {
               const price =
-                item.menuItem.base_price +
+                item.menuItem.price +
                 (item.selectedProtein?.protein_options.price_addition || 0);
 
               return {
