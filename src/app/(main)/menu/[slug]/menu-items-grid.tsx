@@ -42,6 +42,15 @@ const isPopularItem = (menuItem: MenuItem): boolean => {
   );
 };
 
+const isGlutenFreeItem = (menuItem: MenuItem): boolean => {
+  return menuItem.tags.some(
+    (tag) =>
+      tag.name.toLowerCase().includes("gluten free") ||
+      tag.name.toLowerCase().includes("gluten-free") ||
+      tag.name.toLowerCase().includes("gf")
+  );
+};
+
 function MenuItemCard({ menuItem }: MenuItemCardProps) {
   return (
     <Card className="group overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br from-white to-gray-50/50 border-0 shadow-md flex flex-col h-full">
@@ -53,51 +62,54 @@ function MenuItemCard({ menuItem }: MenuItemCardProps) {
           className="object-cover group-hover:scale-105 transition-transform duration-300"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
+      </div>
 
-        {/* Fancy ribbon badges for spicy, popular and gluten free*/}
-        <div className="absolute top-0 right-0 flex flex-col gap-2">
+      {/* Shield/Banner flags directly below the image */}
+      <div className="relative -mt-2 z-10 px-4">
+        <div className="flex gap-2 justify-end">
           {isSpicyItem(menuItem) && (
-            <div className="relative group cursor-help">
-              {/* Spicy ribbon badge */}
-              <div className="bg-gradient-to-l from-red-400 to-red-600 text-white px-4 py-2 pr-6 shadow-lg transform translate-x-2 hover:translate-x-0 transition-transform duration-300 ease-out rounded-tl-lg rounded-bl-lg overflow-hidden">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Flame className="h-4 w-4 fill-white" />
-                  <span>Spicy</span>
-                </div>
-                {/* Triangle cutout on the left */}
-                <div className="absolute left-0 top-0 w-0 h-0 border-t-[20px] border-b-[20px] border-r-[8px] border-t-transparent border-b-transparent border-r-red-600"></div>
-                {/* Right side triangle */}
-                <div className="absolute right-0 top-0 w-0 h-0 border-t-[20px] border-b-[20px] border-l-[8px] border-t-red-400 border-b-red-400 border-l-transparent"></div>
+            <div
+              className="bg-gradient-to-b from-red-400 to-red-600 text-white px-4 py-3 shadow-lg rounded-lg w-14"
+              style={{
+                clipPath: "polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%)",
+              }}
+            >
+              <div className="flex flex-col items-center justify-start gap-1">
+                <Flame className="h-4 w-4 fill-white" />
+                <span className="text-xs font-bold">Spicy</span>
               </div>
             </div>
           )}
           {isPopularItem(menuItem) && (
-            <div className="relative group cursor-help">
-              {/* Popular ribbon badge */}
-              <div className="bg-gradient-to-l from-yellow-500 to-orange-500 text-white px-4 py-2 pr-6 shadow-lg transform translate-x-2 hover:translate-x-0 transition-transform duration-300 ease-out rounded-tl-lg rounded-bl-lg overflow-hidden">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Star className="h-4 w-4 fill-white" />
-                  <span>Popular</span>
-                </div>
+            <div
+              className="bg-gradient-to-b from-yellow-500 to-orange-600 text-white px-4 py-3 shadow-lg rounded-lg w-14"
+              style={{
+                clipPath: "polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%)",
+              }}
+            >
+              <div className="flex flex-col items-center justify-start gap-1">
+                <Star className="h-4 w-4 fill-white" />
+                <span className="text-xs font-bold">Popular</span>
               </div>
             </div>
           )}
-          {/* {menuItem.isGlutenFree && ( */}
-          {isPopularItem(menuItem) && (
-            <div className="relative group cursor-help">
-              {/* Gluten free ribbon badge */}
-              <div className="bg-gradient-to-l from-green-500 to-green-600 text-white px-4 py-2 pr-6 shadow-lg transform translate-x-2 hover:translate-x-0 transition-transform duration-300 ease-out rounded-tl-lg rounded-bl-lg overflow-hidden">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <p className="font-bold">GF</p>
-                  <span>Gluten Free</span>
-                </div>
+          {isGlutenFreeItem(menuItem) && (
+            <div
+              className="bg-gradient-to-b from-orange-400 to-orange-500 text-white px-3 py-3 shadow-lg rounded-lg"
+              style={{
+                clipPath: "polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%)",
+              }}
+            >
+              <div className="flex flex-col items-center justify-start gap-1">
+                <span className="text-xs font-bold">GF</span>
+                <span className="text-xs font-bold">Gluten Free</span>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 pt-4">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-2 flex-1">
             <CardTitle className="text-lg font-bold line-clamp-2 flex-1">
@@ -148,6 +160,7 @@ function MenuItemCard({ menuItem }: MenuItemCardProps) {
           </div>
         )}
       </CardContent>
+
       <CardFooter>
         {/* Order Button */}
         <Button
