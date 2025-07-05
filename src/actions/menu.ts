@@ -9,13 +9,12 @@ import {
   MenuItemView,
 } from "@/actions/api";
 import { Category, MenuItemDetail, MenuItem } from "@/lib/types";
-import { ApiError } from "@/lib/api-client";
-import { authorizedFetch } from "@/actions/auth";
 import { menuItemDetailSchema, menuItemSchema } from "@/lib/types";
 import { z } from "zod";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || "v1/public";
 
 /**
  * Get categories for a specific brand and location
@@ -82,9 +81,13 @@ export async function getMenuItemsByCategorySlug(
     const encodedMenuSlug = encodeURIComponent(menuSlug);
     const encodedCategorySlug = encodeURIComponent(categorySlug);
 
-    const url = `${BASE_URL}/api/menu/items?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&categorySlug=${encodedCategorySlug}`;
+    const url = `${BASE_URL}/api/${API_VERSION}/menu/items?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&categorySlug=${encodedCategorySlug}`;
 
-    const response = await authorizedFetch(url);
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     rawData = await response.json();
 
     // Validate the data using Zod schema
@@ -94,12 +97,13 @@ export async function getMenuItemsByCategorySlug(
   } catch (error) {
     console.error("Failed to fetch menu items by category slug:", error);
 
-    if (error instanceof ApiError) {
+    if (error instanceof Error && error.message.includes('HTTP error')) {
+      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
       return {
         success: false,
         error: error.message,
-        code: error.code,
-        status: error.status,
+        code: 'HTTP_ERROR',
+        status,
       };
     }
 
@@ -180,9 +184,13 @@ export async function getMenuItemDetails(
     const encodedCategorySlug = encodeURIComponent(categorySlug);
     const encodedItemSlug = encodeURIComponent(itemSlug);
 
-    const url = `${BASE_URL}/api/menu/item-details?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&categorySlug=${encodedCategorySlug}&itemSlug=${encodedItemSlug}`;
+    const url = `${BASE_URL}/api/${API_VERSION}/menu/item-details?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&categorySlug=${encodedCategorySlug}&itemSlug=${encodedItemSlug}`;
 
-    const response = await authorizedFetch(url);
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     rawData = await response.json();
 
     // Validate the data using Zod schema
@@ -192,12 +200,13 @@ export async function getMenuItemDetails(
   } catch (error) {
     console.error("Failed to fetch menu item details:", error);
 
-    if (error instanceof ApiError) {
+    if (error instanceof Error && error.message.includes('HTTP error')) {
+      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
       return {
         success: false,
         error: error.message,
-        code: error.code,
-        status: error.status,
+        code: 'HTTP_ERROR',
+        status,
       };
     }
 

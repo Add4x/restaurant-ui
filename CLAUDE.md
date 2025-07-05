@@ -35,8 +35,7 @@ This is a Next.js restaurant website project with the following architecture:
 
 ### Backend Integration
 
-- **Authentication**: Uses OAuth 2.0 client credentials flow with HTTP-only cookies
-- **API Integration**: Custom middleware that handles authentication with a Java backend
+- **API Integration**: Direct API calls to Java backend using versioned endpoints
 - **Payment Processing**: Stripe integration for checkout flow
 
 ### Key Folders
@@ -51,16 +50,9 @@ This is a Next.js restaurant website project with the following architecture:
 ### Data Flow
 
 1. Server components fetch data using server actions
-2. Server actions use authentication to call backend APIs
+2. Server actions call backend APIs directly using versioned endpoints
 3. Client components use Zustand stores for local state (cart, UI state)
 4. Forms and mutations use server actions to update data
-
-### Authentication Flow
-
-1. Middleware checks protected routes for auth cookies
-2. If missing, redirects to auth endpoint
-3. Auth endpoint uses client credentials to get tokens from backend
-4. Tokens stored as HTTP-only cookies for security
 
 ### Payment Flow
 
@@ -73,6 +65,5 @@ This is a Next.js restaurant website project with the following architecture:
 
 Required environment variables:
 - `NEXT_PUBLIC_API_BASE_URL`: Base URL for API calls
+- `NEXT_PUBLIC_API_VERSION`: API version (e.g., "v1/public")
 - `STRIPE_SECRET_KEY`: Stripe API secret key
-- `API_CLIENT_ID`: OAuth client ID
-- `API_CLIENT_SECRET`: OAuth client secret
