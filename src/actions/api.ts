@@ -1,12 +1,11 @@
 "use server";
 
 import { z } from "zod";
-import { authorizedFetch } from "@/actions/auth";
 import { menuItemSchema, locationSchema } from "@/lib/types";
-import { ApiError } from "@/lib/api-client";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || "v1/public";
 
 // Define a consistent return type for server actions
 export type ActionResult<T> =
@@ -64,9 +63,13 @@ export async function getFavoriteMenuItems(
     const encodedMenuSlug = encodeURIComponent(menuSlug);
     const encodedTagSlug = encodeURIComponent(tagSlug);
 
-    const response = await authorizedFetch(
-      `${BASE_URL}/api/menu/items-by-tag?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&tagSlug=${encodedTagSlug}`
+    const response = await fetch(
+      `${BASE_URL}/api/${API_VERSION}/menu/items-by-tag?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&tagSlug=${encodedTagSlug}`
     );
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const rawData = await response.json();
 
     // Define schema for the API response
@@ -96,12 +99,13 @@ export async function getFavoriteMenuItems(
   } catch (error) {
     console.error("Failed to fetch favorite menu items:", error);
 
-    if (error instanceof ApiError) {
+    if (error instanceof Error && error.message.includes('HTTP error')) {
+      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
       return {
         success: false,
         error: error.message,
-        code: error.code,
-        status: error.status,
+        code: 'HTTP_ERROR',
+        status,
       };
     }
 
@@ -131,9 +135,13 @@ export async function getMenuItemsByCategory(
     // Validate input
     const validCategoryId = z.string().uuid().parse(categoryId);
 
-    const response = await authorizedFetch(
-      `${BASE_URL}/api/categories/${validCategoryId}/menu-items`
+    const response = await fetch(
+      `${BASE_URL}/api/${API_VERSION}/categories/${validCategoryId}/menu-items`
     );
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const rawData = await response.json();
 
     // Validate the data
@@ -146,12 +154,13 @@ export async function getMenuItemsByCategory(
       error
     );
 
-    if (error instanceof ApiError) {
+    if (error instanceof Error && error.message.includes('HTTP error')) {
+      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
       return {
         success: false,
         error: error.message,
-        code: error.code,
-        status: error.status,
+        code: 'HTTP_ERROR',
+        status,
       };
     }
 
@@ -180,9 +189,13 @@ export async function getLocationsByBrandName(
   try {
     const encodedBrandName = encodeURIComponent(brandName);
 
-    const response = await authorizedFetch(
-      `${BASE_URL}/api/restaurants/locations?brandName=${encodedBrandName}`
+    const response = await fetch(
+      `${BASE_URL}/api/${API_VERSION}/restaurants/locations?brandName=${encodedBrandName}`
     );
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const rawData = await response.json();
 
     // Validate the data
@@ -192,12 +205,13 @@ export async function getLocationsByBrandName(
   } catch (error) {
     console.error(`Failed to fetch locations for brand: ${brandName}`, error);
 
-    if (error instanceof ApiError) {
+    if (error instanceof Error && error.message.includes('HTTP error')) {
+      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
       return {
         success: false,
         error: error.message,
-        code: error.code,
-        status: error.status,
+        code: 'HTTP_ERROR',
+        status,
       };
     }
 
@@ -242,9 +256,13 @@ export async function getCategoriesWithLocation(
     const encodedLocationSlug = encodeURIComponent(locationSlug);
     const encodedMenuSlug = encodeURIComponent(menuSlug);
 
-    const response = await authorizedFetch(
-      `${BASE_URL}/api/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
+    const response = await fetch(
+      `${BASE_URL}/api/${API_VERSION}/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
     );
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const rawData = await response.json();
 
     // Parse categories response (different structure than the hardcoded one)
@@ -275,12 +293,13 @@ export async function getCategoriesWithLocation(
   } catch (error) {
     console.error("Failed to fetch categories with location:", error);
 
-    if (error instanceof ApiError) {
+    if (error instanceof Error && error.message.includes('HTTP error')) {
+      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
       return {
         success: false,
         error: error.message,
-        code: error.code,
-        status: error.status,
+        code: 'HTTP_ERROR',
+        status,
       };
     }
 

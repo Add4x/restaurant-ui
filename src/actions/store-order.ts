@@ -2,10 +2,10 @@
 
 import { CartItem } from "@/stores/cart-store";
 import { z } from "zod";
-import { authorizedFetch } from "@/actions/auth";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
+const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || "v1/public";
 
 // Schema for validating the order data
 const StoreOrderSchema = z.object({
@@ -48,7 +48,7 @@ export async function createStoreOrder(
     // 3. Generate order number
 
     // Real implementation using our backend API
-    const response = await authorizedFetch(`${BASE_URL}/api/orders`, {
+    const response = await fetch(`${BASE_URL}/api/${API_VERSION}/orders`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
