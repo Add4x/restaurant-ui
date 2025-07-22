@@ -7,7 +7,6 @@ import { useCartStore } from "@/stores/cart-store";
 import { CheckoutSummary } from "@/components/checkout-summary";
 import { PaymentOptions } from "@/components/payment-options";
 import { CheckIcon } from "lucide-react";
-import { verifyPaymentSession } from "@/lib/stripe";
 
 function CheckoutContent() {
   const { items, clearCart } = useCartStore();
@@ -15,7 +14,6 @@ function CheckoutContent() {
   const searchParams = useSearchParams();
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Check for success or canceled payment status
@@ -29,44 +27,14 @@ function CheckoutContent() {
 
     if (status === "success") {
       setPaymentStatus("success");
-
-      // If this is a successful Stripe payment, verify the session
-      if (sessionId) {
-        setIsLoading(true);
-
-        const verifySession = async () => {
-          try {
-            const verified = await verifyPaymentSession(sessionId);
-
-            if (verified.success && verified.paymentStatus === "paid") {
-              clearCart();
-            } else {
-              setPaymentStatus("error");
-            }
-          } catch (error) {
-            console.error("Error verifying session:", error);
-            setPaymentStatus("error");
-          } finally {
-            setIsLoading(false);
-          }
-        };
-
-        verifySession();
-      } else if (method === "in-store") {
-        // For in-store payments, the cart was already cleared
-      }
+      
+      // Clear the cart for successful payments
+      // The Java backend has already verified the payment via webhook
+      clearCart();
     } else if (status === "canceled") {
       setPaymentStatus("canceled");
     }
   }, [searchParams, clearCart]);
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-8">
-        <p>Verifying your payment...</p>
-      </div>
-    );
-  }
 
   if (paymentStatus === "success") {
     return (

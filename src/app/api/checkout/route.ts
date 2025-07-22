@@ -6,7 +6,14 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { items, total, locationId } = body;
-    
+
+    console.log("Checkout route received:", {
+      items: items?.length,
+      total,
+      locationId,
+      body,
+    });
+
     if (!items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json(
         { error: "Invalid cart items" },
@@ -36,7 +43,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Create order and checkout session via Java backend
-    const result = await createOrderAndCheckout(items, total, locationId);
+    const result = await createOrderAndCheckout(
+      items,
+      total,
+      locationId,
+      undefined
+    );
 
     if (!result.success) {
       throw new Error(result.error);

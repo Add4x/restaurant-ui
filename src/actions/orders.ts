@@ -31,13 +31,23 @@ const orderCreateRequestSchema = z.object({
 // Schema for order response
 const orderResponseSchema = z.object({
   orderId: z.number(),
-  customerId: z.number(),
-  locationId: z.number(),
+  customer: z.object({
+    customerId: z.number(),
+    // Other customer fields are optional for now
+  }).passthrough(),
+  location: z.object({
+    locationId: z.number(),
+    // Other location fields are optional for now
+  }).passthrough(),
   orderDate: z.string(),
   totalAmount: z.number(),
   status: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
+  // Optional fields
+  notes: z.string().optional(),
+  items: z.array(z.any()).optional(),
+  payment: z.any().optional(),
 });
 
 // Schema for checkout session request
@@ -55,7 +65,7 @@ const checkoutSessionResponseSchema = z.object({
  */
 function transformCartItemsToOrderItems(items: CartItem[]) {
   return items.map((item) => ({
-    menuItemId: item.menuItem.id,
+    menuItemId: parseInt(item.menuItem.id.toString()),
     quantity: item.quantity,
     subtotal: item.totalPrice,
   }));
@@ -106,6 +116,7 @@ export async function createOrder(
     }
 
     const responseData = await response.json();
+    console.log("Order creation response from backend:", responseData);
 
     // Validate response
     const validatedResponse = orderResponseSchema.parse(responseData);
