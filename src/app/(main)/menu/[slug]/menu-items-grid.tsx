@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import Image from "next/image";
 import { Flame, Star } from "lucide-react";
 
@@ -163,13 +163,10 @@ function MenuItemCard({ menuItem }: MenuItemCardProps) {
 
       <CardFooter>
         {/* Order Button */}
-        <Button
-          className="w-full bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-200"
-          size="sm"
-          disabled
-        >
-          Order Now (Coming Soon)
-        </Button>
+        <AddToCartButton 
+          item={menuItem}
+          className="w-full"
+        />
       </CardFooter>
     </Card>
   );

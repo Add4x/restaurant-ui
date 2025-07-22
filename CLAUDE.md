@@ -54,12 +54,73 @@ This is a Next.js restaurant website project with the following architecture:
 3. Client components use Zustand stores for local state (cart, UI state)
 4. Forms and mutations use server actions to update data
 
+### API Integration Patterns
+
+This project uses a **hybrid approach** for API integration:
+
+#### TanStack Query (Client-side)
+Used for **data fetching** (GET requests):
+- Menu items, categories, locations
+- Real-time data that benefits from caching
+- Operations needing loading/error states in UI
+
+Example:
+```typescript
+// src/hooks/use-menu-items.ts
+export function useMenuItems(categoryId: string) {
+  return useApiQuery<MenuItem[]>(`/categories/${categoryId}/menu-items`, ['menu-items', categoryId]);
+}
+```
+
+#### Server Actions (Server-side)
+Used for **mutations** (POST/PUT/DELETE) and **sensitive operations**:
+- Order creation and management
+- Payment/checkout flows
+- Any operation with sensitive data
+- Complex multi-step operations
+
+Example:
+```typescript
+// src/actions/orders.ts
+export async function createOrder(items, total, locationId) {
+  // Server-side API call - URL not exposed to client
+  const response = await fetch(`${BASE_URL}/api/v1/orders`, {
+    method: 'POST',
+    // ...
+  });
+}
+```
+
+#### Rationale for Hybrid Approach
+
+1. **Security**: Payment and order APIs stay server-side, reducing attack surface
+2. **Performance**: Server actions reduce client bundle size for mutations
+3. **Type Safety**: Full TypeScript support across server/client boundary
+4. **Best Practices**: Follows Next.js App Router recommendations
+5. **Flexibility**: Use the right tool for each use case
+
+#### When to Use Each Pattern
+
+**Use TanStack Query when:**
+- Fetching data that needs caching
+- Need optimistic updates
+- Want built-in retry logic
+- Displaying loading/error states
+
+**Use Server Actions when:**
+- Handling sensitive data (payments, orders)
+- Performing complex multi-step operations
+- Need server-side validation before proceeding
+- Want to keep API structure hidden from client
+
 ### Payment Flow
 
-1. Cart data is used to create Stripe checkout sessions
-2. User is redirected to Stripe hosted checkout
-3. On completion, webhook or success URL verifies payment
-4. Order is confirmed and cart is cleared
+1. Cart data is sent to server action
+2. Server action creates order in Java backend
+3. Server action requests Stripe checkout session from Java backend
+4. User is redirected to Stripe hosted checkout
+5. Java backend webhook handles payment confirmation
+6. Order status is updated to PAID
 
 ## Environment Variables
 

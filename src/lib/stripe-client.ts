@@ -9,7 +9,7 @@ export interface CheckoutSession {
 }
 
 // Client-side function to handle checkout
-export async function initiateCheckout(items: CartItem[]) {
+export async function initiateCheckout(items: CartItem[], locationId: number) {
   try {
     // Calculate totals
     const subtotal = items.reduce((total, item) => total + item.totalPrice, 0);
@@ -26,6 +26,7 @@ export async function initiateCheckout(items: CartItem[]) {
         items,
         total,
         taxRate,
+        locationId,
       }),
     });
 
