@@ -18,7 +18,6 @@ function CheckoutContent() {
   useEffect(() => {
     // Check for success or canceled payment status
     const status = searchParams.get("status");
-    const sessionId = searchParams.get("session_id");
     const method = searchParams.get("paymentMethod");
 
     if (method) {
@@ -27,7 +26,7 @@ function CheckoutContent() {
 
     if (status === "success") {
       setPaymentStatus("success");
-      
+
       // Clear the cart for successful payments
       // The Java backend has already verified the payment via webhook
       clearCart();
