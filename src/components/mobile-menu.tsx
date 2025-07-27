@@ -65,14 +65,22 @@ const MobileMenu = ({ isOpen, setIsMobileMenuOpen }: MobileMenuProps) => {
           >
             Menu
           </NavItem>
-          <NavItem
-            href="/#contact"
-            onClick={() => {
-              setIsMobileMenuOpen(false);
-            }}
-          >
-            Contact
-          </NavItem>
+          <li>
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                setTimeout(() => {
+                  const contactSection = document.getElementById('footer-contact');
+                  if (contactSection) {
+                    contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }, 100);
+              }}
+              className="block text-base font-semibold w-full text-left"
+            >
+              Contact
+            </button>
+          </li>
         </ul>
       </nav>
     </div>

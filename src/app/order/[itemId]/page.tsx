@@ -84,11 +84,10 @@ export default function OrderItemPage() {
       }
 
       setSpiceLevelError(false);
-      // In a real implementation, we'd include spiceLevel and specialInstructions
-      // with the order details
+      // Pass spice level and special instructions to cart
       // TODO: Fix type mismatch between MenuItemDetailProtein and MenuItemProtein
-      addItem(item, null);
-      router.push("/checkout");
+      addItem(item, null, spiceLevel, specialInstructions);
+      router.push("/cart");
     }
   };
 

@@ -10,13 +10,15 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useCartStore } from "@/stores/cart-store";
+import { useLocationStore } from "@/stores/location-store";
 import { useRouter } from "next/navigation";
-import { initiateCheckout } from "@/lib/stripe-client";
+import { createOrderAndCheckout } from "@/actions/orders";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { CreditCard, Store } from "lucide-react";
 
 export function PaymentOptions() {
   const { items, clearCart } = useCartStore();
+  const { selectedLocation } = useLocationStore();
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState<"online" | "in-store">(
     "online"
@@ -31,6 +33,11 @@ export function PaymentOptions() {
   const total = subtotal + tax;
 
   const handleCheckout = async () => {
+    if (!selectedLocation) {
+      setError("Please select a location first");
+      return;
+    }
+
     if (paymentMethod === "in-store") {
       // Handle in-store payment
       clearCart();
@@ -38,15 +45,19 @@ export function PaymentOptions() {
       return;
     }
 
-    // Handle online payment with Stripe
+    // Handle online payment - call server action directly
     try {
       setIsLoading(true);
       setError(null);
 
-      const result = await initiateCheckout(items);
+      const result = await createOrderAndCheckout(
+        items,
+        total,
+        selectedLocation.locationId
+      );
 
-      if (result.success && result.url) {
-        window.location.href = result.url;
+      if (result.success) {
+        window.location.href = result.data.checkoutUrl;
       } else {
         setError(result.error || "Failed to create checkout session");
       }
