@@ -27,17 +27,22 @@ import { isCartEnabled } from '@/lib/feature-flags'
 const mockMenuItem: MenuItem = {
   id: 1,
   name: 'Test Burger',
+  slug: 'test-burger',
   description: 'A delicious test burger',
   price: 12.99,
-  category: 'Burgers',
+  isVegetarian: false,
+  isGlutenFree: false,
+  tags: [
+    { id: 1, name: 'Popular', slug: 'popular' },
+    { id: 2, name: 'Spicy', slug: 'spicy' }
+  ],
+  proteins: [
+    { id: 1, name: 'Chicken', additionalCost: 2.00 },
+    { id: 2, name: 'Beef', additionalCost: 3.00 }
+  ],
+  modifications: [],
   image_url: '/test-burger.jpg',
-  availability_status: 'available',
-  preparation_time: 15,
-  spice_level: 'mild',
-  allergens: ['gluten', 'dairy'],
-  is_vegetarian: false,
-  is_vegan: false,
-  is_gluten_free: false,
+  image_alt_text: 'Test burger'
 }
 
 describe('AddToCartButton', () => {

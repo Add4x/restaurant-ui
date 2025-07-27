@@ -8,19 +8,21 @@ export interface CartItem {
   quantity: number;
   selectedProtein: MenuItemProtein | null;
   totalPrice: number;
+  spiceLevel: string | null;
+  specialInstructions: string;
 }
 
 interface CartState {
   items: CartItem[];
-  isOpen: boolean;
   addItem: (
     menuItem: MenuItem,
-    selectedProtein: MenuItemProtein | null
+    selectedProtein: MenuItemProtein | null,
+    spiceLevel?: string | null,
+    specialInstructions?: string
   ) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
-  toggleCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;
 }
@@ -29,46 +31,32 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
-      isOpen: false,
-      addItem: (menuItem, selectedProtein) => {
+      addItem: (menuItem, selectedProtein, spiceLevel = null, specialInstructions = "") => {
         const { items } = get();
         const itemId = `${menuItem.id}-${
           selectedProtein?.protein_options.name || "base"
-        }`;
+        }-${Date.now()}`; // Add timestamp to make each order unique
 
-        // Check if item already exists with the same protein option
-        const existingItemIndex = items.findIndex((item) => item.id === itemId);
+        // Calculate item price based on base price and protein option
+        const itemPrice =
+          menuItem.price +
+          (selectedProtein?.protein_options.price_addition || 0);
 
-        if (existingItemIndex !== -1) {
-          // If item exists, increment quantity
-          const updatedItems = [...items];
-          updatedItems[existingItemIndex].quantity += 1;
-          updatedItems[existingItemIndex].totalPrice =
-            updatedItems[existingItemIndex].quantity *
-            (menuItem.price +
-              (selectedProtein?.protein_options.price_addition || 0));
-
-          set({ items: updatedItems });
-        } else {
-          // Calculate item price based on base price and protein option
-          const itemPrice =
-            menuItem.price +
-            (selectedProtein?.protein_options.price_addition || 0);
-
-          // Add new item
-          set({
-            items: [
-              ...items,
-              {
-                id: itemId,
-                menuItem,
-                selectedProtein,
-                quantity: 1,
-                totalPrice: itemPrice,
-              },
-            ],
-          });
-        }
+        // Always add as new item since customizations make each order unique
+        set({
+          items: [
+            ...items,
+            {
+              id: itemId,
+              menuItem,
+              selectedProtein,
+              spiceLevel,
+              specialInstructions,
+              quantity: 1,
+              totalPrice: itemPrice,
+            },
+          ],
+        });
       },
       removeItem: (id) => {
         set((state) => ({
@@ -95,9 +83,6 @@ export const useCartStore = create<CartState>()(
       },
       clearCart: () => {
         set({ items: [] });
-      },
-      toggleCart: () => {
-        set((state) => ({ isOpen: !state.isOpen }));
       },
       getTotalItems: () => {
         return get().items.reduce((total, item) => total + item.quantity, 0);
