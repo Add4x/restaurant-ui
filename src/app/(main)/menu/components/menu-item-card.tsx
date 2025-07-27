@@ -67,7 +67,7 @@ export function MenuItemCard({ item, index = 0 }: MenuItemCardProps) {
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.05 }}
         viewport={{ once: true }}
-        className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group"
+        className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 group flex flex-col h-full"
       >
         <div className="relative">
           {/* Image Section */}
@@ -106,7 +106,7 @@ export function MenuItemCard({ item, index = 0 }: MenuItemCardProps) {
           </div>
         </div>
 
-        <div className="p-5">
+        <div className="p-5 flex flex-col flex-1">
           {/* Title and Price */}
           <div className="flex justify-between items-start mb-3">
             <h3 className="text-xl font-bold text-gray-900 font-playfair flex-1 mr-2">
@@ -159,7 +159,7 @@ export function MenuItemCard({ item, index = 0 }: MenuItemCardProps) {
           )}
 
           {/* Add to Cart Button */}
-          <div className="mt-auto">
+          <div className="mt-auto pt-4">
             <AddToCartButton item={item} />
           </div>
         </div>

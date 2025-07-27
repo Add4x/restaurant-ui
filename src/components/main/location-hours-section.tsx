@@ -50,11 +50,21 @@ export function LocationHoursSection() {
             transition={{ duration: 0.6, delay: 0.1 }}
           >
             <Card className="h-full hover:shadow-lg transition-shadow">
-              <CardContent className="p-6 text-center">
+              <CardContent className="p-6">
                 <Clock className="w-10 h-10 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold text-lg mb-2">Hours</h3>
-                <p className="text-gray-600">
-                  {selectedLocation.openingHours || "Contact for hours"}
+                <h3 className="font-semibold text-lg mb-3 text-center">Today&apos;s Hours</h3>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500">Lunch:</span>
+                    <span className="text-gray-700 font-medium">12:00 PM - 3:00 PM</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-500">Dinner:</span>
+                    <span className="text-gray-700 font-medium">5:00 PM - 10:00 PM</span>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3 text-center">
+                  Closed between lunch & dinner
                 </p>
               </CardContent>
             </Card>
