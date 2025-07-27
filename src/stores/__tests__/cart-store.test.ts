@@ -39,7 +39,7 @@ describe('Cart Store', () => {
   })
 
   it('should add an item to the cart', () => {
-    const { addItem, items } = useCartStore.getState()
+    const { addItem } = useCartStore.getState()
     
     addItem(mockMenuItem, null)
     

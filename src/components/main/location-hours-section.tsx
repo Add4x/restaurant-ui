@@ -10,19 +10,6 @@ export function LocationHoursSection() {
 
   if (!selectedLocation) return null;
 
-  const formatTime = (time: string) => {
-    const [hours, minutes] = time.split(":");
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
-  };
-
-  const formatHours = (openTime: string, closeTime: string) => {
-    return `${formatTime(openTime)} - ${formatTime(closeTime)}`;
-  };
-
-  const todayHours = selectedLocation.hours?.[0];
 
   return (
     <section className="container py-12 md:py-16">
@@ -38,7 +25,7 @@ export function LocationHoursSection() {
           >
             <a
               href={`https://maps.google.com/?q=${encodeURIComponent(
-                `${selectedLocation.address}, ${selectedLocation.city}, ${selectedLocation.state} ${selectedLocation.zip}`
+                selectedLocation.address
               )}`}
               target="_blank"
               rel="noopener noreferrer"
@@ -50,9 +37,6 @@ export function LocationHoursSection() {
                   <h3 className="font-semibold text-lg mb-2">Location</h3>
                   <p className="text-gray-600">
                     {selectedLocation.address}
-                    <br />
-                    {selectedLocation.city}, {selectedLocation.state}{" "}
-                    {selectedLocation.zip}
                   </p>
                   <p className="text-primary text-sm mt-2">Click for map & directions</p>
                 </CardContent>
@@ -68,14 +52,10 @@ export function LocationHoursSection() {
             <Card className="h-full hover:shadow-lg transition-shadow">
               <CardContent className="p-6 text-center">
                 <Clock className="w-10 h-10 text-primary mx-auto mb-4" />
-                <h3 className="font-semibold text-lg mb-2">Hours Today</h3>
-                {todayHours ? (
-                  <p className="text-gray-600">
-                    {formatHours(todayHours.openTime, todayHours.closeTime)}
-                  </p>
-                ) : (
-                  <p className="text-gray-600">Contact for hours</p>
-                )}
+                <h3 className="font-semibold text-lg mb-2">Hours</h3>
+                <p className="text-gray-600">
+                  {selectedLocation.openingHours || "Contact for hours"}
+                </p>
               </CardContent>
             </Card>
           </motion.div>
@@ -89,9 +69,9 @@ export function LocationHoursSection() {
               <CardContent className="p-6 text-center">
                 <Phone className="w-10 h-10 text-primary mx-auto mb-4" />
                 <h3 className="font-semibold text-lg mb-2">Call Us</h3>
-                <p className="text-gray-600">{selectedLocation.phone}</p>
+                <p className="text-gray-600">{selectedLocation.phoneNumber}</p>
                 <a
-                  href={`tel:${selectedLocation.phone}`}
+                  href={`tel:${selectedLocation.phoneNumber}`}
                   className="text-primary hover:underline mt-2 inline-block"
                 >
                   Order by Phone

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { CartItemComponent } from '../cart-item'
-import { CartItem, useCartStore } from '@/stores/cart-store'
+import { CartItem } from '@/stores/cart-store'
 import { MenuItem, MenuItemProtein } from '@/lib/types'
 
 const mockRemoveItem = vi.fn()
@@ -128,7 +128,7 @@ describe('CartItemComponent', () => {
       ...mockCartItem,
       menuItem: {
         ...mockMenuItem,
-        image_url: null as any,
+        image_url: null as unknown as string,
       },
     }
     

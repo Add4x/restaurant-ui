@@ -147,11 +147,29 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     .join(" ");
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-16">
-        <h1 className="text-4xl font-bold mb-12 normal-case font-playfair text-primaryDark text-center">
-          {categoryName}
-        </h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Category Header */}
+      <div className="bg-gradient-to-b from-primary/10 to-transparent">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <Button
+            onClick={handleGoBack}
+            variant="ghost"
+            className="mb-4 hover:bg-white/50"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Menu
+          </Button>
+          <h1 className="text-4xl md:text-5xl font-bold font-playfair text-primaryDark">
+            {categoryName}
+          </h1>
+          <p className="text-gray-600 mt-2">
+            Explore our selection of authentic {categoryName.toLowerCase()} dishes
+          </p>
+        </div>
+      </div>
+
+      {/* Menu Items */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <Suspense fallback={<LoadingGrid />}>
           <MenuItemsGrid menuItems={menuItems} />
         </Suspense>

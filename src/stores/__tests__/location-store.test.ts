@@ -49,7 +49,7 @@ describe('Location Store', () => {
     const { setBrandName, setLocations, setSelectedLocation } = useLocationStore.getState()
     setBrandName('')
     setLocations([])
-    setSelectedLocation(null as any)
+    setSelectedLocation(null)
   })
 
   it('should set brand name', () => {

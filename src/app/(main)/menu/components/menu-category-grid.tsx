@@ -20,7 +20,10 @@ import { useCategories } from "@/hooks/use-categories";
 import { useRouter } from "next/navigation";
 import { useMenuStore } from "@/stores/menu-store";
 import { useLocationStore } from "@/stores/location-store";
-// import Image from "next/image";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+
 export function MenuCategoryGrid() {
   const { data: result, error, isLoading, refetch } = useCategories();
   const router = useRouter();
@@ -75,55 +78,65 @@ export function MenuCategoryGrid() {
     // Navigate to the category page
     router.push(`/menu/${categorySlug}`);
   };
+
   return (
     <div className="container mx-auto">
-      <h1 className="text-4xl font-bold text-center mb-8 text-primaryDark font-playfair">
-        Our Menu
-      </h1>
-      <div className="grid gap-6">
-        {/* first item - full width */}
-        <Card className="w-full rounded-lg overflow-hidden">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div className="relative w-full h-[18.75rem] ">
-              {/* <Image
-                src={categories[0].image_url}
-                alt={categories[0].image_alt_text}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover"
-                loading="eager"
-              /> */}
-              <img
-                src={categories[0].imageUrl}
-                alt={categories[0].imageAltText}
-                className="object-cover w-full h-full"
-              />
-            </div>
+      <div className="grid gap-8">
+        {/* first item - featured full width */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <Card className="w-full rounded-lg overflow-hidden group hover:shadow-2xl transition-all duration-300">
+            <div className="grid md:grid-cols-2 gap-0">
+              <div className="relative w-full h-[20rem] md:h-[24rem] overflow-hidden">
+                <Image
+                  src={categories[0].imageUrl}
+                  alt={categories[0].imageAltText}
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
 
-            <CardContent className="flex flex-col gap-4 justify-center p-4">
-              <CardHeader className="p-0"></CardHeader>
-              <CardTitle className="text-2xl font-bold text-primaryDark normal-case">
-                {categories[0].name}
-              </CardTitle>
-              <Divider />
-              <CardDescription className="flex flex-col gap-4 text-sm text-gray-500">
-                <p className="text-sm normal-case">
-                  {categories[0].description}
-                </p>
-                <Button
-                  onClick={() => handleViewMore(categories[0].slug)}
-                  className="self-start cursor-pointer"
-                >
-                  View More
-                </Button>
-              </CardDescription>
-            </CardContent>
-          </div>
-        </Card>
-        {/* Remaining items */}
-        <div className="grid md:grid-cols-2 gap-6">
-          {categories.slice(1).map((item) => (
-            <MenuCard key={item.id} item={item} />
+              <CardContent className="flex flex-col justify-center p-8 md:p-12">
+                <CardHeader className="p-0 mb-4">
+                  <CardTitle className="text-3xl md:text-4xl font-bold text-primaryDark font-playfair">
+                    {categories[0].name}
+                  </CardTitle>
+                </CardHeader>
+                <Divider className="mb-6" />
+                <CardDescription className="flex flex-col gap-6">
+                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                    {categories[0].description}
+                  </p>
+                  <Button
+                    onClick={() => handleViewMore(categories[0].slug)}
+                    size="lg"
+                    className="self-start group/btn hover:bg-primary/90 transition-all"
+                  >
+                    Explore {categories[0].name}
+                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
+                  </Button>
+                </CardDescription>
+              </CardContent>
+            </div>
+          </Card>
+        </motion.div>
+
+        {/* Remaining items in grid */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {categories.slice(1).map((item, index) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 + index * 0.1 }}
+            >
+              <MenuCard item={item} />
+            </motion.div>
           ))}
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 export function HeroSection() {
   const parallaxRef = useRef<HTMLDivElement>(null);
@@ -45,18 +46,18 @@ export function HeroSection() {
             Treat yourself to a taste of India
           </h3>
           <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-            <a
+            <Link
               href="/menu"
-              className="bg-primary hover:bg-primary/90 text-white font-semibold px-6 sm:px-8 py-3 rounded-lg transition-all transform hover:scale-105 w-full sm:w-auto"
+              className="bg-primary hover:bg-primary/90 text-white font-semibold px-6 sm:px-8 py-3 rounded-lg transition-all transform hover:scale-105 w-full sm:w-auto inline-block text-center"
             >
               View Menu
-            </a>
-            <a
+            </Link>
+            <Link
               href="/order"
-              className="bg-white hover:bg-gray-100 text-primary font-semibold px-6 sm:px-8 py-3 rounded-lg transition-all transform hover:scale-105 w-full sm:w-auto"
+              className="bg-white hover:bg-gray-100 text-primary font-semibold px-6 sm:px-8 py-3 rounded-lg transition-all transform hover:scale-105 w-full sm:w-auto inline-block text-center"
             >
               Order Online
-            </a>
+            </Link>
           </div>
         </div>
       </div>
