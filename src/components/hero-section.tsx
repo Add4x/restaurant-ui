@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 export function HeroSection() {
   const parallaxRef = useRef<HTMLDivElement>(null);
@@ -39,13 +40,28 @@ export function HeroSection() {
 
         {/* Content (moved outside parallax container) */}
         <div className="relative z-20 container mx-auto px-4 text-center h-full flex flex-col justify-center items-center tracking-wide">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 font-playfair">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 font-playfair"
+          >
             Indian Street Side Eatery
-          </h1>
-          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8">
+          </motion.h1>
+          <motion.h3
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-6 md:mb-8"
+          >
             Treat yourself to a taste of India
-          </h3>
-          <div className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
+          </motion.h3>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="flex flex-col sm:flex-row gap-4 w-full max-w-md"
+          >
             <Link
               href="/menu"
               className="bg-primary hover:bg-primary/90 text-white font-semibold px-6 sm:px-8 py-3 rounded-lg transition-all transform hover:scale-105 w-full sm:w-auto inline-block text-center"
@@ -58,7 +74,7 @@ export function HeroSection() {
             >
               Order Online
             </Link>
-          </div>
+          </motion.div>
         </div>
       </div>
     </>
