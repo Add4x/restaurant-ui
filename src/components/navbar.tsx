@@ -61,12 +61,17 @@ const Navbar = () => {
             >
               Menu
             </NavItem>
-            <NavItem
-              href="#contact"
-              className="border-b-2 border-transparent hover:border-b-2 hover:border-primary hover:scale-x-105 transition-all duration-300"
+            <button
+              onClick={() => {
+                const contactSection = document.getElementById('footer-contact');
+                if (contactSection) {
+                  contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }}
+              className="border-b-2 border-transparent hover:border-b-2 hover:border-primary hover:scale-x-105 transition-all duration-300 text-base font-semibold"
             >
               Contact
-            </NavItem>
+            </button>
           </div>
           <div className="flex items-center gap-4">
             <div className="mt-1">

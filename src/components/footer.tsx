@@ -16,7 +16,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="relative bg-gray-900 text-gray-300 overflow-hidden">
+    <footer id="footer-contact" className="relative bg-gray-900 text-gray-300 overflow-hidden">
       {/* Decorative background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-96 h-96 bg-primary rounded-full filter blur-3xl" />
@@ -96,6 +96,7 @@ export function Footer() {
             <motion.div
               {...fadeInUp}
               transition={{ duration: 0.6, delay: 0.2 }}
+              id="contact"
             >
               <h3 className="text-white font-semibold text-lg mb-6">Contact Info</h3>
               <ul className="space-y-4">
