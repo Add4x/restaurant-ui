@@ -22,25 +22,31 @@ export async function createOrder(
   try {
     // Transform cart items to backend format
     const orderItems = items.map((item) => ({
-      menuItemId: item.menuItem.id.toString(),
+      menuItemId: Number(item.menuItem.id),
       quantity: item.quantity,
-      specialInstructions: item.specialInstructions,
+      subtotal: item.menuItem.price * item.quantity,
     }));
 
-    const orderData: CreateOrderRequest = {
-      locationId,
+    // Calculate total from items
+    const calculatedTotal = items.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0);
+
+    const orderData = {
+      customerId: 1, // TODO: Get from user context/auth
+      locationId: Number(locationId),
+      orderDate: new Date().toISOString(),
+      totalAmount: calculatedTotal,
+      notes: notes,
       items: orderItems,
-      specialInstructions: notes,
     };
 
-    const order = await privateApiClient.post<Order>(
+    const order = await privateApiClient.post<{ orderId: number }>(
       API_ENDPOINTS.orders.create,
       orderData
     );
 
     return {
       success: true,
-      data: { orderId: order.id },
+      data: { orderId: order.orderId.toString() },
     };
   } catch (error) {
     console.error("Failed to create order:", error);
@@ -62,8 +68,8 @@ export async function createCheckoutSession(
 ): Promise<ActionResult<{ checkoutUrl: string }>> {
   try {
     const response = await privateApiClient.post<{ checkoutUrl: string }>(
-      API_ENDPOINTS.orders.checkout,
-      { orderId }
+      API_ENDPOINTS.checkout.createSession,
+      { orderId: Number(orderId) }
     );
 
     return {
