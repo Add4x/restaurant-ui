@@ -11,7 +11,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/divider";
 import {
-  ErrorState,
   DataNotFoundError,
   NetworkError,
 } from "@/components/ui/error-state";
@@ -23,12 +22,18 @@ import { useLocationStore } from "@/stores/location-store";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import type { Category as ApiCategory } from "@/lib/api/types";
+import type { Category } from "@/lib/types";
 
 export function MenuCategoryGrid() {
-  const { data: result, error, isLoading, refetch } = useCategories();
+  const { brandName, selectedLocation } = useLocationStore();
+  const { data: result, error, isLoading, refetch } = useCategories(
+    brandName || undefined,
+    selectedLocation?.slug || undefined,
+    'main-menu'
+  );
   const router = useRouter();
   const { setCurrentCategory } = useMenuStore();
-  const { brandName, selectedLocation } = useLocationStore();
 
   // Handle loading state or when location data is not ready
   if (isLoading || !brandName || !selectedLocation?.slug)
@@ -39,24 +44,10 @@ export function MenuCategoryGrid() {
     return <NetworkError onRetry={() => refetch()} />;
   }
 
-  // Handle API error response
-  if (result?.error) {
-    return (
-      <ErrorState
-        title="Failed to Load Menu Categories"
-        message={
-          result.message ||
-          "We couldn't load the menu categories. Please try again."
-        }
-        onRetry={() => refetch()}
-        variant="default"
-      />
-    );
-  }
 
-  // Handle no data - only show this if we have a successful result but no categories
-  const categories = result?.data;
-  if (result && (!categories || categories.length === 0)) {
+  // Handle no data
+  const apiCategories = result as ApiCategory[] | undefined;
+  if (!apiCategories || apiCategories.length === 0) {
     return (
       <DataNotFoundError
         title="No Menu Categories Available"
@@ -66,8 +57,19 @@ export function MenuCategoryGrid() {
     );
   }
 
-  // If we don't have result yet, don't render anything (let loading state handle it)
-  if (!result || !categories) {
+  // Convert API categories to frontend format
+  const categories: Category[] = apiCategories.map(cat => ({
+    id: cat.id,
+    slug: cat.slug,
+    name: cat.name,
+    description: cat.description || "",
+    displayOrder: cat.displayOrder,
+    imageUrl: cat.imageUrl || "/images/menu-placeholder.jpg",
+    imageAltText: cat.name,
+  }));
+
+  // If we don't have categories, don't render anything (let loading state handle it)
+  if (!categories) {
     return <ComponentLoading message="Loading menu categories..." />;
   }
 
@@ -92,8 +94,8 @@ export function MenuCategoryGrid() {
             <div className="grid md:grid-cols-2 gap-0">
               <div className="relative w-full h-[20rem] md:h-[24rem] overflow-hidden">
                 <Image
-                  src={categories[0].imageUrl}
-                  alt={categories[0].imageAltText}
+                  src={categories[0].imageUrl || "/images/menu-placeholder.jpg"}
+                  alt={categories[0].name}
                   fill
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                   sizes="(max-width: 768px) 100vw, 50vw"

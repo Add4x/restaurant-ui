@@ -1,175 +1,97 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import {
-  getMenuItemsByCategory,
-  getMenuItemDetails,
-  getMenuItemsByCategorySlug,
-} from "@/actions/menu";
-import { useLocationStore } from "@/stores/location-store";
+// Client-side hooks use fetch directly to Route Handlers
+import type { MenuItem } from "@/lib/api/types";
 
 /**
- * Hook for fetching all menu items by category (legacy - uses category ID)
+ * Hook for fetching menu items by category ID
  */
-export function useMenuItems(categoryId: string) {
-  return useQuery({
-    queryKey: ["menu-items", categoryId],
+export function useMenuItemsByCategory(categoryId: string) {
+  return useQuery<MenuItem[]>({
+    queryKey: ["menu-items", "category", categoryId],
     queryFn: async () => {
-      if (!categoryId) {
-        return {
-          error: true,
-          message: "Category ID is required",
-          code: "MISSING_PARAMS",
-          status: 400,
-        };
+      const response = await fetch(`/api/categories/${categoryId}/menu-items`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu items');
       }
-
-      const result = await getMenuItemsByCategory(categoryId);
-
-      if (!result.success) {
-        // Instead of throwing, return a structured error that components can handle
-        return {
-          error: true,
-          message: result.error,
-          code: result.code,
-          status: result.status,
-        };
-      }
-
-      return {
-        error: false,
-        data: result.data,
-      };
+      return response.json();
     },
     enabled: !!categoryId,
-    retry: (failureCount, error) => {
-      // Don't retry on 404 errors (category not found)
-      if (error?.message?.includes("404")) {
-        return false;
-      }
-      // Retry up to 2 times for other errors
-      return failureCount < 2;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 
 /**
- * Hook for fetching menu items by category slug using the new API
+ * Hook for fetching a single menu item by slug
  */
-export function useMenuItemsByCategory(menuSlug: string, categorySlug: string) {
-  const { brandName, selectedLocation } = useLocationStore();
-
-  return useQuery({
-    queryKey: [
-      "menu-items-by-category",
-      brandName,
-      selectedLocation?.slug,
-      menuSlug,
-      categorySlug,
-    ],
+export function useMenuItem(slug: string) {
+  return useQuery<MenuItem>({
+    queryKey: ["menu-item", slug],
     queryFn: async () => {
-      if (!brandName || !selectedLocation?.slug) {
-        throw new Error("Brand name and location are required");
+      const response = await fetch(`/api/menu/${slug}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu item');
       }
-
-      const result = await getMenuItemsByCategorySlug(
-        brandName,
-        selectedLocation.slug,
-        menuSlug,
-        categorySlug
-      );
-
-      if (!result.success) {
-        // Instead of throwing, return a structured error that components can handle
-        return {
-          error: true,
-          message: result.error,
-          code: result.code,
-          status: result.status,
-        };
-      }
-
-      return {
-        error: false,
-        data: result.data,
-      };
+      return response.json();
     },
-    enabled:
-      !!brandName && !!selectedLocation?.slug && !!menuSlug && !!categorySlug,
-    retry: (failureCount, error) => {
-      // Don't retry on 404 errors (category not found)
-      if (error?.message?.includes("404")) {
-        return false;
-      }
-      // Retry up to 2 times for other errors
-      return failureCount < 2;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 
 /**
- * Hook for fetching detailed menu item information
+ * Hook for fetching a single menu item by ID
  */
-export function useMenuItemDetails(
-  menuSlug: string,
+export function useMenuItemById(id: string) {
+  return useQuery<MenuItem>({
+    queryKey: ["menu-item", "id", id],
+    queryFn: async () => {
+      const response = await fetch(`/api/menu/items/${id}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu item');
+      }
+      return response.json();
+    },
+    enabled: !!id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+/**
+ * Hook for fetching menu items by category slug
+ */
+export function useMenuItemsByCategorySlug(
+  brandName: string | undefined,
+  locationSlug: string | undefined,
   categorySlug: string,
-  itemSlug: string
+  menuSlug: string = 'main-menu'
 ) {
-  const { brandName, selectedLocation } = useLocationStore();
-
-  return useQuery({
-    queryKey: [
-      "menu-item-details",
-      brandName,
-      selectedLocation?.slug,
-      menuSlug,
-      categorySlug,
-      itemSlug,
-    ],
+  return useQuery<MenuItem[]>({
+    queryKey: ["menu-items", "category-slug", brandName, locationSlug, menuSlug, categorySlug],
     queryFn: async () => {
-      if (!brandName || !selectedLocation?.slug) {
-        throw new Error("Brand name and location are required");
+      if (!brandName || !locationSlug || !categorySlug) {
+        throw new Error('Missing required parameters');
       }
-
-      const result = await getMenuItemDetails(
+      
+      const params = new URLSearchParams({
         brandName,
-        selectedLocation.slug,
+        locationSlug,
         menuSlug,
         categorySlug,
-        itemSlug
-      );
-
-      if (!result.success) {
-        // Instead of throwing, return a structured error that components can handle
-        return {
-          error: true,
-          message: result.error,
-          code: result.code,
-          status: result.status,
-        };
+      });
+      
+      const response = await fetch(`/api/menu/items?${params.toString()}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu items');
       }
-
-      return {
-        error: false,
-        data: result.data,
-      };
+      return response.json();
     },
-    enabled:
-      !!brandName &&
-      !!selectedLocation?.slug &&
-      !!menuSlug &&
-      !!categorySlug &&
-      !!itemSlug,
-    retry: (failureCount, error) => {
-      // Don't retry on 404 errors (item not found)
-      if (error?.message?.includes("404")) {
-        return false;
-      }
-      // Retry up to 2 times for other errors
-      return failureCount < 2;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    enabled: !!brandName && !!locationSlug && !!categorySlug,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }

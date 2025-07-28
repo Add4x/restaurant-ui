@@ -3,11 +3,14 @@
 import React, { Suspense } from "react";
 import { MenuItemsGrid } from "@/app/(main)/menu/[slug]/menu-items-grid";
 import { LoadingGrid } from "@/components/loading-grid";
-import { useMenuItemsByCategory } from "@/hooks/use-menu-items";
+import { useMenuItemsByCategorySlug } from "@/hooks/use-menu-items";
 import { useMenuStore } from "@/stores/menu-store";
+import { useLocationStore } from "@/stores/location-store";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, ArrowLeft, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { MenuItem as ApiMenuItem } from "@/lib/api/types";
+import type { MenuItem } from "@/lib/types";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -53,7 +56,8 @@ function ErrorState({
 }
 
 export default function CategoryPage({ params }: CategoryPageProps) {
-  const { currentMenuSlug, setCurrentCategory } = useMenuStore();
+  const { setCurrentCategory } = useMenuStore();
+  const { brandName, selectedLocation } = useLocationStore();
   const router = useRouter();
 
   // We need to unwrap the params Promise
@@ -67,12 +71,18 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     });
   }, [params, setCurrentCategory]);
 
+  // Get menu items directly by category slug
   const {
-    data: result,
+    data: menuItems,
     isLoading,
     isError,
     refetch,
-  } = useMenuItemsByCategory(currentMenuSlug, categorySlug || "");
+  } = useMenuItemsByCategorySlug(
+    brandName || undefined,
+    selectedLocation?.slug || undefined,
+    categorySlug || "",
+    'main-menu'
+  );
 
   const handleRetry = () => {
     refetch();
@@ -84,10 +94,10 @@ export default function CategoryPage({ params }: CategoryPageProps) {
 
   // Log errors for debugging
   React.useEffect(() => {
-    if (result?.error && !isLoading) {
-      console.error("Menu items error:", result.message);
+    if (isError && !isLoading) {
+      console.error("Menu items error:", isError);
     }
-  }, [result?.error, result?.message, isLoading]);
+  }, [isError, isLoading]);
 
   // Loading state
   if (!categorySlug || isLoading) {
@@ -111,26 +121,10 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     );
   }
 
-  // API returned an error (like 404)
-  if (result?.error) {
-    const isNotFound =
-      result.status === 404 || result.code === "RESOURCE_NOT_FOUND";
-    const message = isNotFound
-      ? "This menu category doesn't exist or has no items available."
-      : result.message || "Unable to load menu items.";
-
-    return (
-      <ErrorState
-        message={message}
-        onRetry={handleRetry}
-        onGoBack={handleGoBack}
-      />
-    );
-  }
 
   // Success state
-  const menuItems = result?.data;
-  if (!menuItems || menuItems.length === 0) {
+  const apiItems = menuItems as ApiMenuItem[] | undefined;
+  if (!apiItems || apiItems.length === 0) {
     return (
       <ErrorState
         message="No menu items found in this category."
@@ -140,11 +134,29 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     );
   }
 
-  // Get category name from the slug (capitalize first letter)
+  // Get category name from slug
   const categoryName = categorySlug
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+    ? categorySlug
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ")
+    : "Menu Items";
+
+  // Convert API items to the expected MenuItem format
+  const items: MenuItem[] = apiItems.map(item => ({
+    id: parseInt(item.id),
+    slug: item.slug,
+    name: item.name,
+    description: item.description || "",
+    price: item.price,
+    isVegetarian: item.isVegetarian,
+    isGlutenFree: item.isGlutenFree,
+    tags: [],
+    proteins: [],
+    modifications: [],
+    image_url: item.imageUrl || "/images/menu-placeholder.jpg",
+    image_alt_text: item.name,
+  }));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -171,7 +183,7 @@ export default function CategoryPage({ params }: CategoryPageProps) {
       {/* Menu Items */}
       <div className="max-w-7xl mx-auto px-4 py-8">
         <Suspense fallback={<LoadingGrid />}>
-          <MenuItemsGrid menuItems={menuItems} />
+          <MenuItemsGrid menuItems={items} />
         </Suspense>
       </div>
     </div>

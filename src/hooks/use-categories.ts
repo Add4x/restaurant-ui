@@ -1,99 +1,60 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getCategories, getMenuItemsByCategory } from "@/actions/api";
-import { useLocationStore } from "@/stores/location-store";
-import { z } from "zod";
+// Client-side hooks use fetch directly to Route Handlers
+import type { Category, MenuItem } from "@/lib/api/types";
 
-export const categorySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  // other fields...
-});
-
-export type Category = z.infer<typeof categorySchema>;
-
-export function useCategories() {
-  const { brandName, selectedLocation } = useLocationStore();
-
-  return useQuery({
-    queryKey: ["categories", brandName, selectedLocation?.slug],
+export function useCategories(brandName?: string, locationSlug?: string, menuSlug?: string) {
+  return useQuery<Category[]>({
+    queryKey: ["categories", brandName, locationSlug, menuSlug],
     queryFn: async () => {
-      if (!brandName || !selectedLocation?.slug) {
-        return {
-          error: true,
-          message: "Brand name and location are required",
-          code: "MISSING_PARAMS",
-          status: 400,
-        };
+      const params = new URLSearchParams();
+      if (brandName) params.append('brandName', brandName);
+      if (locationSlug) params.append('locationSlug', locationSlug);
+      if (menuSlug) params.append('menuSlug', menuSlug);
+      
+      const queryString = params.toString();
+      const endpoint = queryString ? `/api/categories?${queryString}` : '/api/categories';
+      
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
       }
-
-      const result = await getCategories(brandName, selectedLocation.slug);
-
-      if (!result.success) {
-        return {
-          error: true,
-          message: result.error,
-          code: result.code,
-          status: result.status,
-        };
-      }
-
-      return {
-        error: false,
-        data: result.data,
-      };
+      return response.json();
     },
-    enabled: !!brandName && !!selectedLocation?.slug,
-    retry: (failureCount, error) => {
-      if (error?.message?.includes("404")) {
-        return false;
-      }
-      return failureCount < 2;
-    },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 
-export function useCategory(id: string) {
-  return useQuery({
-    queryKey: ["categories", id],
+export function useCategoryBySlug(slug: string) {
+  return useQuery<Category>({
+    queryKey: ["category", "slug", slug],
     queryFn: async () => {
-      if (!id) {
-        return {
-          error: true,
-          message: "Category ID is required",
-          code: "MISSING_PARAMS",
-          status: 400,
-        };
+      const response = await fetch(`/api/categories/slug/${slug}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch category');
       }
-
-      const result = await getMenuItemsByCategory(id);
-
-      if (!result.success) {
-        // Instead of throwing, return a structured error that components can handle
-        return {
-          error: true,
-          message: result.error,
-          code: result.code,
-          status: result.status,
-        };
-      }
-
-      return {
-        error: false,
-        data: result.data,
-      };
+      return response.json();
     },
-    enabled: !!id,
-    retry: (failureCount, error) => {
-      // Don't retry on 404 errors (category not found)
-      if (error?.message?.includes("404")) {
-        return false;
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+export function useMenuItemsByCategory(categoryId: string) {
+  return useQuery<MenuItem[]>({
+    queryKey: ["menu-items", "category", categoryId],
+    queryFn: async () => {
+      const response = await fetch(`/api/categories/${categoryId}/menu-items`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch menu items');
       }
-      // Retry up to 2 times for other errors
-      return failureCount < 2;
+      return response.json();
     },
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    enabled: !!categoryId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 }
