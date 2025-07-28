@@ -2,10 +2,8 @@
 
 import { z } from "zod";
 import { menuItemSchema, locationSchema } from "@/lib/types";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
-const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || "v1/public";
+import { publicApiClient } from "@/lib/api-client.server";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
 // Define a consistent return type for server actions
 export type ActionResult<T> =
@@ -58,19 +56,16 @@ export async function getFavoriteMenuItems(
   tagSlug: string = "popular"
 ): Promise<ActionResult<FavoriteMenuItem[]>> {
   try {
-    const encodedBrandName = encodeURIComponent(brandName);
-    const encodedLocationSlug = encodeURIComponent(locationSlug);
-    const encodedMenuSlug = encodeURIComponent(menuSlug);
-    const encodedTagSlug = encodeURIComponent(tagSlug);
+    const queryParams = new URLSearchParams({
+      brandName,
+      locationSlug,
+      menuSlug,
+      tagSlug,
+    });
 
-    const response = await fetch(
-      `${BASE_URL}/api/${API_VERSION}/menu/items-by-tag?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&tagSlug=${encodedTagSlug}`
+    const rawData = await publicApiClient.get(
+      `/menu/items-by-tag?${queryParams.toString()}`
     );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const rawData = await response.json();
 
     // Define schema for the API response
     const apiMenuItemSchema = z.object({
@@ -99,15 +94,14 @@ export async function getFavoriteMenuItems(
   } catch (error) {
     console.error("Failed to fetch favorite menu items:", error);
 
-    if (error instanceof Error && error.message.includes("HTTP error")) {
-      const status = parseInt(
-        error.message.match(/status: (\d+)/)?.[1] || "500"
-      );
+    // Handle API errors from server client
+    if (error && typeof error === 'object' && 'status' in error) {
+      const apiError = error as { message: string; status: number };
       return {
         success: false,
-        error: error.message,
+        error: apiError.message,
         code: "HTTP_ERROR",
-        status,
+        status: apiError.status,
       };
     }
 
@@ -137,14 +131,9 @@ export async function getMenuItemsByCategory(
     // Validate input
     const validCategoryId = z.string().uuid().parse(categoryId);
 
-    const response = await fetch(
-      `${BASE_URL}/api/${API_VERSION}/categories/${validCategoryId}/menu-items`
+    const rawData = await publicApiClient.get(
+      `/categories/${validCategoryId}/menu-items`
     );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const rawData = await response.json();
 
     // Validate the data
     const menuItems = z.array(menuItemSchema).parse(rawData);
@@ -156,15 +145,14 @@ export async function getMenuItemsByCategory(
       error
     );
 
-    if (error instanceof Error && error.message.includes("HTTP error")) {
-      const status = parseInt(
-        error.message.match(/status: (\d+)/)?.[1] || "500"
-      );
+    // Handle API errors from server client
+    if (error && typeof error === 'object' && 'status' in error) {
+      const apiError = error as { message: string; status: number };
       return {
         success: false,
-        error: error.message,
+        error: apiError.message,
         code: "HTTP_ERROR",
-        status,
+        status: apiError.status,
       };
     }
 
@@ -191,16 +179,13 @@ export async function getLocationsByBrandName(
   brandName: string
 ): Promise<ActionResult<LocationData[]>> {
   try {
-    const encodedBrandName = encodeURIComponent(brandName);
+    const queryParams = new URLSearchParams({
+      brandName,
+    });
 
-    const response = await fetch(
-      `${BASE_URL}/api/${API_VERSION}/restaurants/locations?brandName=${encodedBrandName}`
+    const rawData = await publicApiClient.get(
+      `/restaurants/locations?${queryParams.toString()}`
     );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const rawData = await response.json();
 
     // Validate the data
     const locations = z.array(locationSchema).parse(rawData);
@@ -209,15 +194,14 @@ export async function getLocationsByBrandName(
   } catch (error) {
     console.error(`Failed to fetch locations for brand: ${brandName}`, error);
 
-    if (error instanceof Error && error.message.includes("HTTP error")) {
-      const status = parseInt(
-        error.message.match(/status: (\d+)/)?.[1] || "500"
-      );
+    // Handle API errors from server client
+    if (error && typeof error === 'object' && 'status' in error) {
+      const apiError = error as { message: string; status: number };
       return {
         success: false,
-        error: error.message,
+        error: apiError.message,
         code: "HTTP_ERROR",
-        status,
+        status: apiError.status,
       };
     }
 
@@ -258,18 +242,15 @@ export async function getCategoriesWithLocation(
   >
 > {
   try {
-    const encodedBrandName = encodeURIComponent(brandName);
-    const encodedLocationSlug = encodeURIComponent(locationSlug);
-    const encodedMenuSlug = encodeURIComponent(menuSlug);
+    const queryParams = new URLSearchParams({
+      brandName,
+      locationSlug,
+      menuSlug,
+    });
 
-    const response = await fetch(
-      `${BASE_URL}/api/${API_VERSION}/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
+    const rawData = await publicApiClient.get(
+      `${API_ENDPOINTS.menu.categories}?${queryParams.toString()}`
     );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const rawData = await response.json();
 
     // Parse categories response (different structure than the hardcoded one)
     const categoryResponseSchema = z.object({
@@ -299,15 +280,23 @@ export async function getCategoriesWithLocation(
   } catch (error) {
     console.error("Failed to fetch categories with location:", error);
 
-    if (error instanceof Error && error.message.includes("HTTP error")) {
-      const status = parseInt(
-        error.message.match(/status: (\d+)/)?.[1] || "500"
-      );
+    // Handle API errors from server client
+    if (error && typeof error === 'object' && 'status' in error) {
+      const apiError = error as { message: string; status: number };
       return {
         success: false,
-        error: error.message,
+        error: apiError.message,
         code: "HTTP_ERROR",
-        status,
+        status: apiError.status,
+      };
+    }
+
+    // Handle Zod validation errors specially
+    if (error instanceof z.ZodError) {
+      return {
+        success: false,
+        error: `Invalid data format: ${error.message}`,
+        code: "VALIDATION_ERROR",
       };
     }
 
