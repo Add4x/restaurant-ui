@@ -53,7 +53,7 @@ export function PaymentOptions() {
       const result = await createOrderAndCheckout(
         items,
         total,
-        selectedLocation.locationId
+        selectedLocation.locationId.toString()
       );
 
       if (result.success) {

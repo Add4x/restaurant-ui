@@ -56,62 +56,136 @@ This is a Next.js restaurant website project with the following architecture:
 
 ### API Integration Patterns
 
-This project uses a **hybrid approach** for API integration:
+This project follows **enterprise-standard security patterns** with complete separation of server and client concerns:
 
-#### TanStack Query (Client-side)
-Used for **data fetching** (GET requests):
-- Menu items, categories, locations
-- Real-time data that benefits from caching
-- Operations needing loading/error states in UI
+#### Architecture Overview
 
-Example:
-```typescript
-// src/hooks/use-menu-items.ts
-export function useMenuItems(categoryId: string) {
-  return useApiQuery<MenuItem[]>(`/categories/${categoryId}/menu-items`, ['menu-items', categoryId]);
-}
+1. **Server-Only API Clients** 
+   - `/src/lib/api-client.server.ts` - Server-side only, contains backend URL
+   - `/src/lib/api-config.server.ts` - Server-only configuration
+   - Backend URLs are NEVER exposed to client-side code
+   - Handles authentication with Basic Auth for server-to-server calls
+
+2. **Route Handlers** (`/app/api/*`)
+   - Proxy public API endpoints to hide backend structure
+   - Handle server-side authentication
+   - Provide consistent API interface for client
+
+3. **TanStack Query** (Client-side data fetching)
+   - Used for all GET requests via Route Handlers
+   - Provides caching, loading states, and error handling
+   - Configured with global error handler
+
+4. **Server Actions** (Sensitive operations only)
+   - Order creation and checkout
+   - Payment processing
+   - Any operation with sensitive data
+
+#### File Structure
+
+```
+src/
+├── lib/
+│   ├── api-client.server.ts   # Server-only API client
+│   ├── api-config.server.ts   # Server-only config (backend URLs)
+│   └── api/
+│       ├── endpoints.ts       # Type-safe endpoint definitions
+│       ├── types.ts           # API types matching backend
+│       └── error-handler.ts   # Global error handling
+├── app/
+│   └── api/                   # Route Handlers (server-side proxy)
+│       ├── locations/
+│       ├── categories/
+│       └── menu/
+├── hooks/                     # Client-side hooks (use fetch to Route Handlers)
+│   ├── use-locations.ts
+│   ├── use-categories.ts
+│   ├── use-menu-items.ts
+│   └── use-offers.ts
+└── actions/                   # Server Actions (sensitive operations)
+    └── orders.ts              # Order/payment operations
 ```
 
-#### Server Actions (Server-side)
-Used for **mutations** (POST/PUT/DELETE) and **sensitive operations**:
-- Order creation and management
-- Payment/checkout flows
-- Any operation with sensitive data
-- Complex multi-step operations
+#### API Flow Examples
 
-Example:
+**Public Data Fetching:**
+```
+Client Component → TanStack Query → fetch() → Route Handler → Server API Client → Backend
+                                       ↑                              ↑
+                                 (relative URLs)              (server-only, has backend URL)
+```
+
+**Sensitive Operations:**
+```
+Client Component → Server Action → API Client → Backend
+```
+
+#### Implementation Examples
+
+**Client-Side Data Fetching (TanStack Query):**
 ```typescript
-// src/actions/orders.ts
-export async function createOrder(items, total, locationId) {
-  // Server-side API call - URL not exposed to client
-  const response = await fetch(`${BASE_URL}/api/v1/orders`, {
-    method: 'POST',
-    // ...
+// src/hooks/use-categories.ts
+export function useCategories() {
+  return useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      // Client uses relative URLs - no backend exposure
+      const response = await fetch('/api/categories');
+      if (!response.ok) throw new Error('Failed to fetch');
+      return response.json();
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 ```
 
-#### Rationale for Hybrid Approach
+**Server-Side Route Handler:**
+```typescript
+// src/app/api/categories/route.ts
+import { publicApiClient } from '@/lib/api-client.server'; // Server-only import
 
-1. **Security**: Payment and order APIs stay server-side, reducing attack surface
-2. **Performance**: Server actions reduce client bundle size for mutations
-3. **Type Safety**: Full TypeScript support across server/client boundary
-4. **Best Practices**: Follows Next.js App Router recommendations
-5. **Flexibility**: Use the right tool for each use case
+export async function GET() {
+  // Server-side has access to backend URL
+  const categories = await publicApiClient.get('/categories');
+  return NextResponse.json(categories);
+}
+```
+
+**Sensitive Operations (Server Actions):**
+```typescript
+// src/actions/orders.ts
+"use server";
+export async function createOrder(items, total, locationId) {
+  // Uses privateApiClient with auth headers
+  const order = await privateApiClient.post<Order>(
+    API_ENDPOINTS.orders.create,
+    orderData
+  );
+  return { success: true, data: { orderId: order.id } };
+}
+```
+
+#### Security Considerations
+
+1. **Complete URL Isolation**: Backend URLs only exist in server-side environment variables
+2. **Server-Only Imports**: API clients that know backend URLs throw errors if imported client-side
+3. **API Keys**: Stored in server-only environment variables (no NEXT_PUBLIC_ prefix)
+4. **Authentication**: Basic Auth headers added only on server-side
+5. **Error Handling**: Sensitive error details sanitized before client display
+6. **Route Handlers**: Act as secure proxy between client and backend
 
 #### When to Use Each Pattern
 
-**Use TanStack Query when:**
-- Fetching data that needs caching
-- Need optimistic updates
-- Want built-in retry logic
-- Displaying loading/error states
+**Use Route Handlers + TanStack Query for:**
+- All public data fetching (GET requests)
+- Data that benefits from caching
+- Operations needing loading/error states
 
-**Use Server Actions when:**
-- Handling sensitive data (payments, orders)
-- Performing complex multi-step operations
-- Need server-side validation before proceeding
-- Want to keep API structure hidden from client
+**Use Server Actions for:**
+- Payment processing
+- Order creation
+- Any operation with sensitive data
+- Operations requiring server-side validation
 
 ### Payment Flow
 
@@ -124,7 +198,19 @@ export async function createOrder(items, total, locationId) {
 
 ## Environment Variables
 
-Required environment variables:
-- `NEXT_PUBLIC_API_BASE_URL`: Base URL for API calls
-- `NEXT_PUBLIC_API_VERSION`: API version (e.g., "v1/public")
+### Server-Side Only (Secure)
+These variables are only accessible server-side and contain sensitive information:
+- `API_BASE_URL`: Backend API base URL (e.g., "http://localhost:8080")
+- `API_VERSION`: API version (e.g., "v1")
+- `API_CLIENT_ID`: API client ID for server-to-server authentication
+- `API_CLIENT_SECRET`: API client secret for server-to-server authentication
 - `STRIPE_SECRET_KEY`: Stripe API secret key
+- `BRAND_NAME`: Restaurant brand name for API calls
+- `RESTAURANT_BRAND`: Restaurant display name
+- `MAIN_LOCATION_SLUG`: Main location slug
+
+### Client-Side (Public)
+These are publicly visible environment variables:
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key
+- `NEXT_PUBLIC_ENABLE_CART`: Feature flag for cart functionality
