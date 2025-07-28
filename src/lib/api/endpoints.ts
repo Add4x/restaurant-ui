@@ -24,7 +24,13 @@ export const API_ENDPOINTS = {
     list: '/orders',
     byId: (id: string) => `/orders/${id}`,
     cancel: (id: string) => `/orders/${id}/cancel`,
-    checkout: '/orders/checkout',
+  },
+  
+  // Checkout endpoints
+  checkout: {
+    createSession: '/checkout/create-checkout-session',
+    success: '/checkout/success',
+    cancel: '/checkout/cancel',
   },
   
   // Payment endpoints (server-side only)
