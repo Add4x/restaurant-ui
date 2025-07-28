@@ -66,7 +66,7 @@ export async function getFavoriteMenuItems(
     const response = await fetch(
       `${BASE_URL}/api/${API_VERSION}/menu/items-by-tag?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&tagSlug=${encodedTagSlug}`
     );
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -99,12 +99,14 @@ export async function getFavoriteMenuItems(
   } catch (error) {
     console.error("Failed to fetch favorite menu items:", error);
 
-    if (error instanceof Error && error.message.includes('HTTP error')) {
-      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
+    if (error instanceof Error && error.message.includes("HTTP error")) {
+      const status = parseInt(
+        error.message.match(/status: (\d+)/)?.[1] || "500"
+      );
       return {
         success: false,
         error: error.message,
-        code: 'HTTP_ERROR',
+        code: "HTTP_ERROR",
         status,
       };
     }
@@ -138,7 +140,7 @@ export async function getMenuItemsByCategory(
     const response = await fetch(
       `${BASE_URL}/api/${API_VERSION}/categories/${validCategoryId}/menu-items`
     );
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -154,12 +156,14 @@ export async function getMenuItemsByCategory(
       error
     );
 
-    if (error instanceof Error && error.message.includes('HTTP error')) {
-      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
+    if (error instanceof Error && error.message.includes("HTTP error")) {
+      const status = parseInt(
+        error.message.match(/status: (\d+)/)?.[1] || "500"
+      );
       return {
         success: false,
         error: error.message,
-        code: 'HTTP_ERROR',
+        code: "HTTP_ERROR",
         status,
       };
     }
@@ -192,7 +196,7 @@ export async function getLocationsByBrandName(
     const response = await fetch(
       `${BASE_URL}/api/${API_VERSION}/restaurants/locations?brandName=${encodedBrandName}`
     );
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -205,12 +209,14 @@ export async function getLocationsByBrandName(
   } catch (error) {
     console.error(`Failed to fetch locations for brand: ${brandName}`, error);
 
-    if (error instanceof Error && error.message.includes('HTTP error')) {
-      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
+    if (error instanceof Error && error.message.includes("HTTP error")) {
+      const status = parseInt(
+        error.message.match(/status: (\d+)/)?.[1] || "500"
+      );
       return {
         success: false,
         error: error.message,
-        code: 'HTTP_ERROR',
+        code: "HTTP_ERROR",
         status,
       };
     }
@@ -259,7 +265,7 @@ export async function getCategoriesWithLocation(
     const response = await fetch(
       `${BASE_URL}/api/${API_VERSION}/menu/categories?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}`
     );
-    
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -293,12 +299,14 @@ export async function getCategoriesWithLocation(
   } catch (error) {
     console.error("Failed to fetch categories with location:", error);
 
-    if (error instanceof Error && error.message.includes('HTTP error')) {
-      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
+    if (error instanceof Error && error.message.includes("HTTP error")) {
+      const status = parseInt(
+        error.message.match(/status: (\d+)/)?.[1] || "500"
+      );
       return {
         success: false,
         error: error.message,
-        code: 'HTTP_ERROR',
+        code: "HTTP_ERROR",
         status,
       };
     }
