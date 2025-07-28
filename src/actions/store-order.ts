@@ -2,10 +2,8 @@
 
 import { CartItem } from "@/stores/cart-store";
 import { z } from "zod";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
-const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || "v1/public";
+import { privateApiClient } from "@/lib/api-client.server";
+import { API_ENDPOINTS } from "@/lib/api/endpoints";
 
 // Schema for validating the order data
 const StoreOrderSchema = z.object({
@@ -47,25 +45,26 @@ export async function createStoreOrder(
     // 2. Send notification to store staff
     // 3. Generate order number
 
-    // Real implementation using our backend API
-    const response = await fetch(`${BASE_URL}/api/${API_VERSION}/orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        items,
-        customerName,
-        customerPhone,
-        pickupTime,
-      }),
-    });
+    // Transform cart items to backend format
+    const orderItems = items.map((item) => ({
+      menuItemId: item.menuItem.id.toString(),
+      quantity: item.quantity,
+      specialInstructions: item.specialInstructions,
+    }));
 
-    if (!response.ok) {
-      throw new Error("Failed to create order");
-    }
+    // Create order using secure API client
+    const orderData = {
+      items: orderItems,
+      customerName,
+      customerPhone,
+      pickupTime,
+      // Add any other required fields for your backend
+    };
 
-    const data = await response.json();
+    const data = await privateApiClient.post<{ id: string; orderNumber?: number }>(
+      API_ENDPOINTS.orders.create,
+      orderData
+    );
 
     return {
       success: true,

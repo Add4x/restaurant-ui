@@ -11,10 +11,7 @@ import {
 import { Category, MenuItemDetail, MenuItem } from "@/lib/types";
 import { menuItemDetailSchema, menuItemSchema } from "@/lib/types";
 import { z } from "zod";
-
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
-const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || "v1/public";
+import { publicApiClient } from "@/lib/api-client.server";
 
 /**
  * Get categories for a specific brand and location
@@ -76,19 +73,16 @@ export async function getMenuItemsByCategorySlug(
       };
     }
 
-    const encodedBrandName = encodeURIComponent(brandName);
-    const encodedLocationSlug = encodeURIComponent(locationSlug);
-    const encodedMenuSlug = encodeURIComponent(menuSlug);
-    const encodedCategorySlug = encodeURIComponent(categorySlug);
+    const queryParams = new URLSearchParams({
+      brandName,
+      locationSlug,
+      menuSlug,
+      categorySlug,
+    });
 
-    const url = `${BASE_URL}/api/${API_VERSION}/menu/items?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&categorySlug=${encodedCategorySlug}`;
-
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    rawData = await response.json();
+    rawData = await publicApiClient.get(
+      `/menu/items?${queryParams.toString()}`
+    );
 
     // Validate the data using Zod schema
     const menuItems = z.array(menuItemSchema).parse(rawData);
@@ -97,13 +91,14 @@ export async function getMenuItemsByCategorySlug(
   } catch (error) {
     console.error("Failed to fetch menu items by category slug:", error);
 
-    if (error instanceof Error && error.message.includes('HTTP error')) {
-      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
+    // Handle API errors from server client
+    if (error && typeof error === 'object' && 'status' in error) {
+      const apiError = error as { message: string; status: number };
       return {
         success: false,
-        error: error.message,
+        error: apiError.message,
         code: 'HTTP_ERROR',
-        status,
+        status: apiError.status,
       };
     }
 
@@ -178,20 +173,17 @@ export async function getMenuItemDetails(
       };
     }
 
-    const encodedBrandName = encodeURIComponent(brandName);
-    const encodedLocationSlug = encodeURIComponent(locationSlug);
-    const encodedMenuSlug = encodeURIComponent(menuSlug);
-    const encodedCategorySlug = encodeURIComponent(categorySlug);
-    const encodedItemSlug = encodeURIComponent(itemSlug);
+    const queryParams = new URLSearchParams({
+      brandName,
+      locationSlug,
+      menuSlug,
+      categorySlug,
+      itemSlug,
+    });
 
-    const url = `${BASE_URL}/api/${API_VERSION}/menu/item-details?brandName=${encodedBrandName}&locationSlug=${encodedLocationSlug}&menuSlug=${encodedMenuSlug}&categorySlug=${encodedCategorySlug}&itemSlug=${encodedItemSlug}`;
-
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    rawData = await response.json();
+    rawData = await publicApiClient.get(
+      `/menu/item-details?${queryParams.toString()}`
+    );
 
     // Validate the data using Zod schema
     const menuItemDetail = menuItemDetailSchema.parse(rawData);
@@ -200,13 +192,14 @@ export async function getMenuItemDetails(
   } catch (error) {
     console.error("Failed to fetch menu item details:", error);
 
-    if (error instanceof Error && error.message.includes('HTTP error')) {
-      const status = parseInt(error.message.match(/status: (\d+)/)?.[1] || '500');
+    // Handle API errors from server client
+    if (error && typeof error === 'object' && 'status' in error) {
+      const apiError = error as { message: string; status: number };
       return {
         success: false,
-        error: error.message,
+        error: apiError.message,
         code: 'HTTP_ERROR',
-        status,
+        status: apiError.status,
       };
     }
 
