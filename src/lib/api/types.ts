@@ -71,6 +71,28 @@ export interface MenuItem {
   calories?: number;
   isActive: boolean;
   isAvailable: boolean;
+  proteins?: MenuItemProtein[];
+  modifications?: MenuItemModification[];
+  tags?: MenuItemTag[];
+}
+
+export interface MenuItemProtein {
+  id: number;
+  name: string;
+  additionalCost: number;
+}
+
+export interface MenuItemModification {
+  id: number;
+  name: string;
+  description: string;
+  additionalCost: number;
+}
+
+export interface MenuItemTag {
+  id: number;
+  name: string;
+  slug: string;
 }
 
 export interface CartItem {

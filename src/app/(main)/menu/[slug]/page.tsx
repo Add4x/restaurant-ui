@@ -151,9 +151,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
     price: item.price,
     isVegetarian: item.isVegetarian,
     isGlutenFree: item.isGlutenFree,
-    tags: [],
-    proteins: [],
-    modifications: [],
+    tags: item.tags || [],
+    proteins: item.proteins || [],
+    modifications: item.modifications || [],
     image_url: item.imageUrl || "/images/menu-placeholder.jpg",
     image_alt_text: item.name,
   }));

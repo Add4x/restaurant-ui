@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { publicApiClient } from '@/lib/api-client.server';
-import type { MenuItem } from '@/lib/api/types';
 
 export async function GET(request: Request) {
   try {
@@ -24,9 +23,60 @@ export async function GET(request: Request) {
       categorySlug,
     });
     
-    const menuItems = await publicApiClient.get<MenuItem[]>(
+    interface BackendMenuItem {
+      id: number;
+      name: string;
+      slug: string;
+      description?: string;
+      price: number;
+      categoryId?: string;
+      imageUrl?: string;
+      image_url?: string;
+      isVegetarian?: boolean;
+      isVegan?: boolean;
+      isGlutenFree?: boolean;
+      spiceLevel?: 'MILD' | 'MEDIUM' | 'HOT' | 'EXTRA_HOT';
+      calories?: number;
+      isActive?: boolean;
+      isAvailable?: boolean;
+      proteins?: Array<{
+        id: number;
+        name: string;
+        additionalCost: number;
+      }>;
+      modifications?: Array<{
+        id: number;
+        name: string;
+        description: string;
+        additionalCost: number;
+      }>;
+      tags?: Array<{
+        id: number;
+        name: string;
+        slug: string;
+      }>;
+    }
+    
+    const rawMenuItems = await publicApiClient.get<BackendMenuItem[]>(
       `/menu/items?${queryParams.toString()}`
     );
+    
+    // Transform the response to match frontend expectations
+    const menuItems = rawMenuItems.map(item => ({
+      ...item,
+      id: String(item.id),
+      categoryId: item.categoryId || '',
+      imageUrl: item.imageUrl || item.image_url,
+      isVegetarian: item.isVegetarian || false,
+      isVegan: item.isVegan || false,
+      isGlutenFree: item.isGlutenFree || false,
+      isActive: item.isActive ?? true,
+      isAvailable: item.isAvailable ?? true,
+      // Include proteins, modifications, and tags if they exist
+      proteins: item.proteins || [],
+      modifications: item.modifications || [],
+      tags: item.tags || [],
+    }));
     
     return NextResponse.json(menuItems);
   } catch (error) {
