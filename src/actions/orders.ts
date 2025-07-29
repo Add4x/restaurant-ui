@@ -3,7 +3,6 @@
 import { CartItem } from "@/stores/cart-store";
 import { privateApiClient } from "@/lib/api-client.server";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import type { CreateOrderRequest, Order } from "@/lib/api/types";
 
 // Define a consistent return type for server actions
 export type ActionResult<T> =
