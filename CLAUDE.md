@@ -8,209 +8,142 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Start the development server with Turbopack
-npm run dev
+pnpm dev
 
 # Build for production
-npm run build
+pnpm build
 
 # Start the production server
-npm run start
+pnpm start
 
 # Run linting
-npm run lint
+pnpm lint
+
+# Run tests
+pnpm test                # Run all tests
+pnpm test:watch      # Run tests in watch mode
+pnpm test:coverage   # Generate coverage report
+pnpm test:ui         # Open Vitest UI
+
+# Type checking (no built-in script, use TypeScript compiler directly)
+pnpm exec tsc --noEmit
 ```
 
 ## Architecture Overview
 
-This is a Next.js restaurant website project with the following architecture:
+This is a Next.js 15 restaurant website project with the following architecture:
 
 ### Frontend Structure
 
 - **App Router**: Uses Next.js App Router (not Pages Router)
-- **UI Framework**: TailwindCSS with Radix UI components
-- **State Management**: Zustand for client-side state (cart, offers)
+- **UI Framework**: TailwindCSS v4 with Radix UI components
+- **State Management**: Zustand for client-side state (cart, offers, location, menu)
 - **Data Fetching**: 
-  - Server components with server actions for API calls
-  - TanStack React Query for client-side data fetching/caching
+  - Server components with server actions for sensitive operations
+  - TanStack React Query for client-side data fetching/caching via Route Handlers
+- **Testing**: Vitest with React Testing Library
 
 ### Backend Integration
 
-- **API Integration**: Direct API calls to Java backend using versioned endpoints
+- **API Integration**: Java Spring Boot backend with versioned REST APIs
 - **Payment Processing**: Stripe integration for checkout flow
+- **Authentication**: Basic Auth for server-to-server communication
 
 ### Key Folders
 
 - `/src/app/`: Next.js app router routes and page components
 - `/src/components/`: Reusable UI components (both shared and feature-specific)
-- `/src/actions/`: Server actions for API calls and data fetching
+- `/src/actions/`: Server actions for sensitive operations (orders, checkout)
 - `/src/stores/`: Zustand store definitions for client-side state
-- `/src/lib/`: Utility functions, type definitions, and service integrations
-- `/public/`: Static assets (images, etc.)
+- `/src/lib/`: Utility functions, type definitions, and server-only API clients
+- `/src/hooks/`: Custom React hooks for data fetching with TanStack Query
+- `/src/app/api/`: Route Handlers that proxy backend APIs
 
-### Data Flow
-
-1. Server components fetch data using server actions
-2. Server actions call backend APIs directly using versioned endpoints
-3. Client components use Zustand stores for local state (cart, UI state)
-4. Forms and mutations use server actions to update data
-
-### API Integration Patterns
+### Data Flow & Security Architecture
 
 This project follows **enterprise-standard security patterns** with complete separation of server and client concerns:
 
-#### Architecture Overview
+#### Architecture Principles
 
-1. **Server-Only API Clients** 
-   - `/src/lib/api-client.server.ts` - Server-side only, contains backend URL
-   - `/src/lib/api-config.server.ts` - Server-only configuration
-   - Backend URLs are NEVER exposed to client-side code
-   - Handles authentication with Basic Auth for server-to-server calls
+1. **Backend URLs are NEVER exposed to client code** - Only exist in server-side environment variables
+2. **Server-Only API Clients** - Located in `/src/lib/api-client.server.ts`, throw errors if imported client-side
+3. **Route Handlers as API Proxy** - All client requests go through Next.js Route Handlers that forward to backend
+4. **Sensitive Operations use Server Actions** - Order creation, payment processing bypass Route Handlers
 
-2. **Route Handlers** (`/app/api/*`)
-   - Proxy public API endpoints to hide backend structure
-   - Handle server-side authentication
-   - Provide consistent API interface for client
+#### API Flow Patterns
 
-3. **TanStack Query** (Client-side data fetching)
-   - Used for all GET requests via Route Handlers
-   - Provides caching, loading states, and error handling
-   - Configured with global error handler
-
-4. **Server Actions** (Sensitive operations only)
-   - Order creation and checkout
-   - Payment processing
-   - Any operation with sensitive data
-
-#### File Structure
-
+**Public Data Fetching (GET requests):**
 ```
-src/
-├── lib/
-│   ├── api-client.server.ts   # Server-only API client
-│   ├── api-config.server.ts   # Server-only config (backend URLs)
-│   └── api/
-│       ├── endpoints.ts       # Type-safe endpoint definitions
-│       ├── types.ts           # API types matching backend
-│       └── error-handler.ts   # Global error handling
-├── app/
-│   └── api/                   # Route Handlers (server-side proxy)
-│       ├── locations/
-│       ├── categories/
-│       └── menu/
-├── hooks/                     # Client-side hooks (use fetch to Route Handlers)
-│   ├── use-locations.ts
-│   ├── use-categories.ts
-│   ├── use-menu-items.ts
-│   └── use-offers.ts
-└── actions/                   # Server Actions (sensitive operations)
-    └── orders.ts              # Order/payment operations
+Client Hook → TanStack Query → fetch('/api/...') → Route Handler → Server API Client → Backend
 ```
 
-#### API Flow Examples
-
-**Public Data Fetching:**
+**Sensitive Operations (POST/PUT/DELETE):**
 ```
-Client Component → TanStack Query → fetch() → Route Handler → Server API Client → Backend
-                                       ↑                              ↑
-                                 (relative URLs)              (server-only, has backend URL)
+Client Component → Server Action → Server API Client → Backend
 ```
 
-**Sensitive Operations:**
-```
-Client Component → Server Action → API Client → Backend
-```
+#### Implementation Standards
 
-#### Implementation Examples
-
-**Client-Side Data Fetching (TanStack Query):**
+**Client-Side Hook Example:**
 ```typescript
-// src/hooks/use-categories.ts
-export function useCategories() {
-  return useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: async () => {
-      // Client uses relative URLs - no backend exposure
-      const response = await fetch('/api/categories');
-      if (!response.ok) throw new Error('Failed to fetch');
-      return response.json();
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-}
+// Always use relative URLs in client code
+const response = await fetch('/api/categories');
 ```
 
-**Server-Side Route Handler:**
+**Route Handler Example:**
 ```typescript
-// src/app/api/categories/route.ts
-import { publicApiClient } from '@/lib/api-client.server'; // Server-only import
-
-export async function GET() {
-  // Server-side has access to backend URL
-  const categories = await publicApiClient.get('/categories');
-  return NextResponse.json(categories);
-}
+// Only Route Handlers import server-only API clients
+import { publicApiClient } from '@/lib/api-client.server';
 ```
 
-**Sensitive Operations (Server Actions):**
+**Server Action Example:**
 ```typescript
-// src/actions/orders.ts
 "use server";
-export async function createOrder(items, total, locationId) {
-  // Uses privateApiClient with auth headers
-  const order = await privateApiClient.post<Order>(
-    API_ENDPOINTS.orders.create,
-    orderData
-  );
-  return { success: true, data: { orderId: order.id } };
-}
+import { privateApiClient } from '@/lib/api-client.server';
 ```
 
-#### Security Considerations
+### API Integration Patterns
 
-1. **Complete URL Isolation**: Backend URLs only exist in server-side environment variables
-2. **Server-Only Imports**: API clients that know backend URLs throw errors if imported client-side
-3. **API Keys**: Stored in server-only environment variables (no NEXT_PUBLIC_ prefix)
-4. **Authentication**: Basic Auth headers added only on server-side
-5. **Error Handling**: Sensitive error details sanitized before client display
-6. **Route Handlers**: Act as secure proxy between client and backend
+- **Public API Client** (`publicApiClient`): For public endpoints, no auth required
+- **Private API Client** (`privateApiClient`): For authenticated endpoints, includes Basic Auth
+- **Error Handling**: Global error handler transforms backend errors for client display
+- **Type Safety**: Shared types in `/src/lib/api/types.ts` match Java backend DTOs
 
-#### When to Use Each Pattern
+### Environment Variables
 
-**Use Route Handlers + TanStack Query for:**
-- All public data fetching (GET requests)
-- Data that benefits from caching
-- Operations needing loading/error states
-
-**Use Server Actions for:**
-- Payment processing
-- Order creation
-- Any operation with sensitive data
-- Operations requiring server-side validation
-
-### Payment Flow
-
-1. Cart data is sent to server action
-2. Server action creates order in Java backend
-3. Server action requests Stripe checkout session from Java backend
-4. User is redirected to Stripe hosted checkout
-5. Java backend webhook handles payment confirmation
-6. Order status is updated to PAID
-
-## Environment Variables
-
-### Server-Side Only (Secure)
-These variables are only accessible server-side and contain sensitive information:
-- `API_BASE_URL`: Backend API base URL (e.g., "http://localhost:8080")
+#### Server-Side Only (Secure)
+- `API_BASE_URL`: Backend API base URL
 - `API_VERSION`: API version (e.g., "v1")
-- `API_CLIENT_ID`: API client ID for server-to-server authentication
-- `API_CLIENT_SECRET`: API client secret for server-to-server authentication
+- `API_CLIENT_ID`: Basic Auth username
+- `API_CLIENT_SECRET`: Basic Auth password
 - `STRIPE_SECRET_KEY`: Stripe API secret key
-- `BRAND_NAME`: Restaurant brand name for API calls
-- `RESTAURANT_BRAND`: Restaurant display name
-- `MAIN_LOCATION_SLUG`: Main location slug
+- `RESTAURANT_BRAND`: Restaurant brand name
+- `MAIN_LOCATION_SLUG`: Default location slug
 
-### Client-Side (Public)
-These are publicly visible environment variables:
+#### Client-Side (Public)
 - `NEXT_PUBLIC_SUPABASE_URL`: Supabase project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase anonymous key
 - `NEXT_PUBLIC_ENABLE_CART`: Feature flag for cart functionality
+
+### Testing Strategy
+
+- **Unit Tests**: Components, hooks, and utilities tested with Vitest
+- **Test Utils**: Custom render function with providers in `/src/test/utils/test-utils.tsx`
+- **MSW**: Mock Service Worker for API mocking in tests
+- **Coverage**: Run `npm run test:coverage` to generate coverage reports
+
+### Payment Flow
+
+1. Cart items collected in Zustand store
+2. Server action `createOrderAndCheckout` called with cart data
+3. Order created in backend via private API client
+4. Stripe checkout session created by backend
+5. User redirected to Stripe hosted checkout
+6. Backend webhook handles payment confirmation
+
+### Key Conventions
+
+- **Error Handling**: All API errors go through centralized error handler
+- **Loading States**: TanStack Query provides loading/error states automatically
+- **Type Safety**: Backend response types mapped to frontend types in Route Handlers
+- **Security**: No backend URLs, API keys, or sensitive data in client code
