@@ -14,6 +14,7 @@ interface BackendOrderRequest {
     menuItemId: number;
     proteinId: number | null;
     quantity: number;
+    unitPrice: number;
     subtotal: number;
     modificationIds: number[] | null;
   }>;
@@ -39,13 +40,19 @@ export async function createOrder(
   
   try {
     // Transform cart items to backend format
-    const orderItems = items.map((item) => ({
-      menuItemId: Number(item.menuItem.id),
-      proteinId: null, // TODO: Fix protein ID mapping - current structure doesn't have ID
-      quantity: item.quantity,
-      subtotal: item.totalPrice, // Use the totalPrice that includes protein and modification costs
-      modificationIds: null // TODO: Fix modification IDs mapping
-    }));
+    const orderItems = items.map((item) => {
+      // Calculate unit price (base price + protein addition)
+      const unitPrice = item.menuItem.price + (item.selectedProtein?.protein_options.price_addition || 0);
+      
+      return {
+        menuItemId: Number(item.menuItem.id),
+        proteinId: null, // TODO: Fix protein ID mapping - current structure doesn't have ID
+        quantity: item.quantity,
+        unitPrice: unitPrice,
+        subtotal: item.totalPrice, // Use the totalPrice that includes protein and modification costs
+        modificationIds: null // TODO: Fix modification IDs mapping
+      };
+    });
 
     // Calculate total from items (using totalPrice which includes all additions)
     const calculatedTotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
