@@ -3,7 +3,22 @@
 import { CartItem } from "@/stores/cart-store";
 import { privateApiClient } from "@/lib/api-client.server";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
-import type { CreateOrderRequest, Order } from "@/lib/api/types";
+// Backend order request structure that matches OrderCreateDTO
+interface BackendOrderRequest {
+  customerId: number;
+  locationId: number;
+  orderDate: string;
+  totalAmount: number;
+  notes?: string;
+  items: Array<{
+    menuItemId: number;
+    proteinId: number | null;
+    quantity: number;
+    subtotal: number;
+    modificationIds: number[] | null;
+  }>;
+  paymentRequest: null;
+}
 
 // Define a consistent return type for server actions
 export type ActionResult<T> =
@@ -19,26 +34,34 @@ export async function createOrder(
   locationId: string,
   notes?: string
 ): Promise<ActionResult<{ orderId: string }>> {
+  // Define orderData outside try block so it's accessible in catch
+  let orderData: BackendOrderRequest | undefined;
+  
   try {
     // Transform cart items to backend format
     const orderItems = items.map((item) => ({
       menuItemId: Number(item.menuItem.id),
+      proteinId: null, // TODO: Fix protein ID mapping - current structure doesn't have ID
       quantity: item.quantity,
-      subtotal: item.menuItem.price * item.quantity,
+      subtotal: item.totalPrice, // Use the totalPrice that includes protein and modification costs
+      modificationIds: null // TODO: Fix modification IDs mapping
     }));
 
-    // Calculate total from items
-    const calculatedTotal = items.reduce((sum, item) => sum + (item.menuItem.price * item.quantity), 0);
+    // Calculate total from items (using totalPrice which includes all additions)
+    const calculatedTotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
-    const orderData = {
+    orderData = {
       customerId: 1, // TODO: Get from user context/auth
-      locationId: Number(locationId),
+      locationId: Number(locationId), // Convert string to number for backend
       orderDate: new Date().toISOString(),
       totalAmount: calculatedTotal,
       notes: notes,
       items: orderItems,
+      paymentRequest: null // Payment is handled separately via checkout
     };
 
+    console.log("Sending order data:", JSON.stringify(orderData, null, 2));
+    
     const order = await privateApiClient.post<{ orderId: number }>(
       API_ENDPOINTS.orders.create,
       orderData
@@ -50,12 +73,31 @@ export async function createOrder(
     };
   } catch (error) {
     console.error("Failed to create order:", error);
+    if (orderData) {
+      console.error("Order data that failed:", JSON.stringify(orderData, null, 2));
+    }
+
+    // Extract more detailed error information
+    let errorMessage = "Failed to create order";
+    let errorCode = "ORDER_CREATE_ERROR";
+    let status = 500;
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      // Check if it's an API error with more details
+      if ('status' in error && typeof error.status === 'number') {
+        status = error.status;
+      }
+      if ('code' in error && typeof error.code === 'string') {
+        errorCode = error.code;
+      }
+    }
 
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Failed to create order",
-      code: "ORDER_CREATE_ERROR",
-      status: 500,
+      error: errorMessage,
+      code: errorCode,
+      status,
     };
   }
 }

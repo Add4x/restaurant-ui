@@ -32,7 +32,9 @@ class ApiClient {
     const clientId = process.env.API_CLIENT_ID;
     const clientSecret = process.env.API_CLIENT_SECRET;
     
-    if (clientId && clientSecret) {
+    // Only add auth header if both credentials are provided
+    // The backend allows public endpoints without authentication
+    if (clientId && clientSecret && clientId.trim() !== '' && clientSecret.trim() !== '') {
       // Basic auth for server-to-server communication
       const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
       headers['Authorization'] = `Basic ${auth}`;
